@@ -18,6 +18,9 @@ coverage/
 .turbo/
 .output/
 
+# Hermes Internal Plans & Sessions
+.hermes/
+
 # OS & Editors
 .DS_Store
 Thumbs.db
