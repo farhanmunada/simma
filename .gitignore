@@ -1,0 +1,25 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build & Runtime Cache
+dist/
+build/
+.cache/
+coverage/
+*.log
+.turbo/
+.output/
+
+# OS & Editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
