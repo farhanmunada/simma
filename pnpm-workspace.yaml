@@ -1,0 +1,4 @@
+packages:
+  - "simma-be"
+  - "simma-fe"
+  - "packages/*"

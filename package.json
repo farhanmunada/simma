@@ -1,0 +1,15 @@
+{
+  "name": "simma",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "dev:be": "pnpm --filter simma-be run dev",
+    "dev:fe": "pnpm --filter simma-fe run dev"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
