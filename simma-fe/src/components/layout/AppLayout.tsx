@@ -62,6 +62,7 @@ const navItems: NavItem[] = [
     subItems: [
       { title: "Presensi Siswa", href: "/attendance/students" },
       { title: "Presensi Guru", href: "/attendance/teachers" },
+      { title: "Rekapitulasi", href: "/attendance/recap" },
     ],
   },
   {

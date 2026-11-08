@@ -6,6 +6,7 @@ import { useAuthStore } from "./stores/auth.store";
 import { SettingsRoutes } from "./features/settings";
 import { StudentsRoutes } from "./features/students";
 import { TahfidzRoutes } from "./features/tahfidz";
+import { AttendanceRoutes } from "./features/attendance";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,7 +64,7 @@ export function App() {
             <Route path="settings/*" element={<SettingsRoutes />} />
             <Route path="students/*" element={<StudentsRoutes />} />
             <Route path="tahfidz/*" element={<TahfidzRoutes />} />
-            <Route path="attendance/*" element={<div>Presensi Harian</div>} />
+            <Route path="attendance/*" element={<AttendanceRoutes />} />
             <Route path="grades/*" element={<div>Penilaian Akademik</div>} />
             <Route path="reports/*" element={<div>Rapor & Legger</div>} />
           </Route>
