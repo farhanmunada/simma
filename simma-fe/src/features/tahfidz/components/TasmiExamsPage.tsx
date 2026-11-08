@@ -4,7 +4,6 @@ import {
   Filter,
   Trash2,
   Edit2,
-  Award,
   AlertTriangle,
   Calculator,
 } from "lucide-react";

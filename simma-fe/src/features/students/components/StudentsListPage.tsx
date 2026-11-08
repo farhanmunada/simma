@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
-import { Plus, Search, Trash2, Eye, Filter, Users } from "lucide-react";
+import { Plus, Search, Trash2, Eye, Users } from "lucide-react";
 import {
   useStudents,
   useCreateStudent,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
-import { Plus, Trash2, Edit3, FileEdit, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Edit3, FileEdit } from "lucide-react";
 import {
   useAssessments,
   useCreateAssessment,

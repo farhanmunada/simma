@@ -4,10 +4,7 @@ import {
   Filter,
   Trash2,
   Edit2,
-  CheckCircle,
   AlertTriangle,
-  Calendar,
-  BookOpen,
 } from "lucide-react";
 import {
   useTahfidzRecords,

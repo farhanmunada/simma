@@ -21,7 +21,6 @@ import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
 import { Modal } from "../../../components/ui/Modal";
-import { Input } from "../../../components/ui/Input";
 import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
 
 export const AcademicYearsPage: React.FC = () => {

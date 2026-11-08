@@ -1,4 +1,4 @@
-import { eq, and, desc, isNull, inArray } from "drizzle-orm";
+import { eq, and, desc, isNull } from "drizzle-orm";
 import { getDb } from "../../core/database/client.js";
 import {
   students,

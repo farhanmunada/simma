@@ -222,7 +222,7 @@ export class GradesService {
     id: string,
     input: UpdateSemesterGradeInput,
   ): Promise<SemesterGrade> {
-    const existing = await this.getSemesterGradeById(id);
+    await this.getSemesterGradeById(id);
 
     let letterGrade = input.letterGrade;
     if (input.finalScore !== undefined && !letterGrade) {

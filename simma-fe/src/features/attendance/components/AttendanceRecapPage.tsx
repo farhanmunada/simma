@@ -1,12 +1,8 @@
 import React, { useState, useMemo } from "react";
 import {
-  Calendar,
   Filter,
-  BarChart3,
-  User,
   GraduationCap,
   Briefcase,
-  Search,
 } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";

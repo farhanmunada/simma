@@ -9,7 +9,6 @@ import {
   Plus,
   ShieldCheck,
   Edit2,
-  Calendar,
 } from "lucide-react";
 import {
   useStudent,
@@ -19,7 +18,6 @@ import {
 } from "../api/students.api";
 import type {
   StudentStatus,
-  Gender,
   ParentRelationType,
   UpdateStudentDto,
   CreateAndLinkParentDto,
