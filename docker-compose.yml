@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: simma_postgres_dev
+    environment:
+      POSTGRES_USER: simma
+      POSTGRES_PASSWORD: simma_dev_password
+      POSTGRES_DB: simma_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - simma_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U simma"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  simma_db_data:
+    driver: local
