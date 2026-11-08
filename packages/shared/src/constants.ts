@@ -5,6 +5,7 @@ export const ROLES = [
   "waka_kurikulum",
   "waka_kesiswaan",
   "waka_sarpras",
+  "guru",
   "guru_mapel",
   "wali_kelas",
   "guru_tahfidz",
@@ -18,6 +19,23 @@ export type Role = (typeof ROLES)[number];
 // Attendance status
 export const ATTENDANCE_STATUS = ["H", "S", "I", "A", "T"] as const;
 export type AttendanceStatus = (typeof ATTENDANCE_STATUS)[number];
+
+export const STUDENT_ATTENDANCE_STATUS = [
+  "hadir",
+  "izin",
+  "sakit",
+  "alpa",
+] as const;
+export type StudentAttendanceStatus = (typeof STUDENT_ATTENDANCE_STATUS)[number];
+
+export const TEACHER_ATTENDANCE_STATUS = [
+  "hadir",
+  "izin",
+  "sakit",
+  "alpa",
+  "dinas_luar",
+] as const;
+export type TeacherAttendanceStatus = (typeof TEACHER_ATTENDANCE_STATUS)[number];
 
 // Semester type
 export const SEMESTER_TYPE = [1, 2] as const;
