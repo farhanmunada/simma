@@ -9,6 +9,7 @@ import { studentRoutes } from "./modules/students/students.routes.js";
 import { tahfidzRoutes } from "./modules/tahfidz/tahfidz.routes.js";
 import { attendanceRoutes } from "./modules/attendance/attendance.routes.js";
 import { gradesRoutes } from "./modules/grades/grades.routes.js";
+import { reportsRoutes } from "./modules/reports/reports.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -42,6 +43,7 @@ export async function buildApp() {
   await app.register(tahfidzRoutes, { prefix: "/api/v1/tahfidz" });
   await app.register(attendanceRoutes, { prefix: "/api/v1/attendance" });
   await app.register(gradesRoutes, { prefix: "/api/v1/grades" });
+  await app.register(reportsRoutes, { prefix: "/api/v1/reports" });
 
   return app;
 }
