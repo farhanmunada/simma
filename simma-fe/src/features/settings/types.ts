@@ -15,6 +15,8 @@ export interface CreateAcademicYearDto {
   isActive?: boolean;
 }
 
+export type UpdateAcademicYearDto = Partial<CreateAcademicYearDto>;
+
 export interface Semester {
   id: string;
   academicYearId: string;
@@ -34,6 +36,8 @@ export interface CreateSemesterDto {
   isActive?: boolean;
 }
 
+export type UpdateSemesterDto = Partial<CreateSemesterDto>;
+
 export interface Classroom {
   id: string;
   semesterId: string;
@@ -52,6 +56,8 @@ export interface CreateClassroomDto {
   homeroomTeacherId?: string | null;
   capacity?: number;
 }
+
+export type UpdateClassroomDto = Partial<CreateClassroomDto>;
 
 export interface Subject {
   id: string;
@@ -74,6 +80,8 @@ export interface CreateSubjectDto {
   phase: "E" | "F";
 }
 
+export type UpdateSubjectDto = Partial<CreateSubjectDto>;
+
 export interface Teacher {
   id: string;
   userId?: string | null;
@@ -94,6 +102,8 @@ export interface CreateTeacherDto {
   employmentType: "PNS" | "PPPK" | "GTY" | "GTT";
   certification?: string | null;
 }
+
+export type UpdateTeacherDto = Partial<CreateTeacherDto>;
 
 export interface QueryFilterParams {
   page?: number;

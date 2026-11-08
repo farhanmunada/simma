@@ -3,29 +3,36 @@ import { apiClient } from "../../../lib/api-client";
 import type {
   AcademicYear,
   CreateAcademicYearDto,
+  UpdateAcademicYearDto,
   Semester,
   CreateSemesterDto,
+  UpdateSemesterDto,
   Classroom,
   CreateClassroomDto,
+  UpdateClassroomDto,
   Subject,
   CreateSubjectDto,
+  UpdateSubjectDto,
   Teacher,
   CreateTeacherDto,
+  UpdateTeacherDto,
   QueryFilterParams,
 } from "../types";
 
-// Helper request wrapper to handle /settings and /setup endpoints seamlessly
+// Helper request wrapper to handle /setup endpoints seamlessly
 async function settingsRequest<T>(
   endpoint: string,
   options: Parameters<typeof apiClient>[1] = {}
 ): Promise<T> {
+  const target = endpoint.startsWith("/setup/")
+    ? endpoint
+    : endpoint.replace("/settings/", "/setup/");
   try {
-    return await apiClient<T>(endpoint, options);
+    return await apiClient<T>(target, options);
   } catch (error: unknown) {
     const err = error as { statusCode?: number };
-    if (err?.statusCode === 404 && endpoint.includes("/settings/")) {
-      const fallbackEndpoint = endpoint.replace("/settings/", "/setup/");
-      return await apiClient<T>(fallbackEndpoint, options);
+    if (err?.statusCode === 404 && target !== endpoint) {
+      return await apiClient<T>(endpoint, options);
     }
     throw error;
   }
@@ -100,6 +107,23 @@ export async function patchAcademicYearStatus(id: string, isActive: boolean = tr
   }
 }
 
+export async function updateAcademicYear(
+  id: string,
+  data: UpdateAcademicYearDto
+): Promise<AcademicYear> {
+  const res = await settingsRequest<unknown>(`/settings/academic-years/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractSingle<AcademicYear>(res);
+}
+
+export async function deleteAcademicYear(id: string): Promise<{ success: boolean }> {
+  return await settingsRequest<{ success: boolean }>(`/settings/academic-years/${id}`, {
+    method: "DELETE",
+  });
+}
+
 // ----------------------------------------------------
 // 2. SEMESTERS
 // ----------------------------------------------------
@@ -150,6 +174,23 @@ export async function patchSemesterStatus(id: string, isActive: boolean = true):
   }
 }
 
+export async function updateSemester(
+  id: string,
+  data: UpdateSemesterDto
+): Promise<Semester> {
+  const res = await settingsRequest<unknown>(`/settings/semesters/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractSingle<Semester>(res);
+}
+
+export async function deleteSemester(id: string): Promise<{ success: boolean }> {
+  return await settingsRequest<{ success: boolean }>(`/settings/semesters/${id}`, {
+    method: "DELETE",
+  });
+}
+
 // ----------------------------------------------------
 // 3. CLASSROOMS
 // ----------------------------------------------------
@@ -171,6 +212,23 @@ export async function createClassroom(data: CreateClassroomDto): Promise<Classro
     body: JSON.stringify(data),
   });
   return extractSingle<Classroom>(res);
+}
+
+export async function updateClassroom(
+  id: string,
+  data: UpdateClassroomDto
+): Promise<Classroom> {
+  const res = await settingsRequest<unknown>(`/settings/classrooms/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractSingle<Classroom>(res);
+}
+
+export async function deleteClassroom(id: string): Promise<{ success: boolean }> {
+  return await settingsRequest<{ success: boolean }>(`/settings/classrooms/${id}`, {
+    method: "DELETE",
+  });
 }
 
 // ----------------------------------------------------
@@ -196,6 +254,23 @@ export async function createSubject(data: CreateSubjectDto): Promise<Subject> {
   return extractSingle<Subject>(res);
 }
 
+export async function updateSubject(
+  id: string,
+  data: UpdateSubjectDto
+): Promise<Subject> {
+  const res = await settingsRequest<unknown>(`/settings/subjects/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractSingle<Subject>(res);
+}
+
+export async function deleteSubject(id: string): Promise<{ success: boolean }> {
+  return await settingsRequest<{ success: boolean }>(`/settings/subjects/${id}`, {
+    method: "DELETE",
+  });
+}
+
 // ----------------------------------------------------
 // 5. TEACHERS
 // ----------------------------------------------------
@@ -217,6 +292,23 @@ export async function createTeacher(data: CreateTeacherDto): Promise<Teacher> {
     body: JSON.stringify(data),
   });
   return extractSingle<Teacher>(res);
+}
+
+export async function updateTeacher(
+  id: string,
+  data: UpdateTeacherDto
+): Promise<Teacher> {
+  const res = await settingsRequest<unknown>(`/settings/teachers/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractSingle<Teacher>(res);
+}
+
+export async function deleteTeacher(id: string): Promise<{ success: boolean }> {
+  return await settingsRequest<{ success: boolean }>(`/settings/teachers/${id}`, {
+    method: "DELETE",
+  });
 }
 
 // ----------------------------------------------------
@@ -242,6 +334,27 @@ export function useCreateAcademicYear() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateAcademicYearDto) => createAcademicYear(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["academic-years"] });
+    },
+  });
+}
+
+export function useUpdateAcademicYear() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateAcademicYearDto }) =>
+      updateAcademicYear(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["academic-years"] });
+    },
+  });
+}
+
+export function useDeleteAcademicYear() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteAcademicYear(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["academic-years"] });
     },
@@ -284,6 +397,27 @@ export function useCreateSemester() {
   });
 }
 
+export function useUpdateSemester() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateSemesterDto }) =>
+      updateSemester(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["semesters"] });
+    },
+  });
+}
+
+export function useDeleteSemester() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteSemester(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["semesters"] });
+    },
+  });
+}
+
 export function usePatchSemesterStatus() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -320,6 +454,27 @@ export function useCreateClassroom() {
   });
 }
 
+export function useUpdateClassroom() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateClassroomDto }) =>
+      updateClassroom(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classrooms"] });
+    },
+  });
+}
+
+export function useDeleteClassroom() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteClassroom(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classrooms"] });
+    },
+  });
+}
+
 export function useSubjects(params?: QueryFilterParams) {
   return useQuery({
     queryKey: ["subjects", params],
@@ -345,6 +500,27 @@ export function useCreateSubject() {
   });
 }
 
+export function useUpdateSubject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateSubjectDto }) =>
+      updateSubject(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    },
+  });
+}
+
+export function useDeleteSubject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteSubject(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    },
+  });
+}
+
 export function useTeachers(params?: QueryFilterParams) {
   return useQuery({
     queryKey: ["teachers", params],
@@ -364,6 +540,27 @@ export function useCreateTeacher() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateTeacherDto) => createTeacher(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+}
+
+export function useUpdateTeacher() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateTeacherDto }) =>
+      updateTeacher(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+}
+
+export function useDeleteTeacher() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteTeacher(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
