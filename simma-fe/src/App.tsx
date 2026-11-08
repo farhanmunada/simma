@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppLayout } from "./components/layout/AppLayout";
 import { useAuthStore } from "./stores/auth.store";
+import { SettingsRoutes } from "./features/settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,7 +57,7 @@ export function App() {
             }
           >
             <Route index element={<DashboardPlaceholder />} />
-            <Route path="settings/*" element={<div>Pengaturan Master Data</div>} />
+            <Route path="settings/*" element={<SettingsRoutes />} />
             <Route path="students/*" element={<div>Data Siswa</div>} />
             <Route path="tahfidz/*" element={<div>Tahfidz & Tasmi</div>} />
             <Route path="attendance/*" element={<div>Presensi Harian</div>} />
