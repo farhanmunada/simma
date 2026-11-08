@@ -21,15 +21,6 @@ function cleanEndpoint(ep: string): string {
   return ep;
 }
 
-function extractList<T>(res: unknown): T[] {
-  if (Array.isArray(res)) return res as T[];
-  if (res && typeof res === "object") {
-    const payload = res as { data?: unknown };
-    if (Array.isArray(payload.data)) return payload.data as T[];
-  }
-  return [];
-}
-
 function extractSingle<T>(res: unknown): T {
   if (res && typeof res === "object") {
     const payload = res as { data?: unknown };

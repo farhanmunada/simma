@@ -17,7 +17,6 @@ import type {
 } from "./students.schema.js";
 import type {
   Student,
-  Parent,
   StudentParent,
   StudentParentDetail,
 } from "./students.types.js";

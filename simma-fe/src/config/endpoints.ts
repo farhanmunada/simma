@@ -1,0 +1,80 @@
+/**
+ * SIMMA Centralized API Endpoints Registry
+ * Single Source of Truth untuk semua rute API Backend di sisi Frontend.
+ *
+ * Pola ini memisahkan definisi URL dari implementasi fetch/query.
+ * Jika rute BE berganti nama atau prefix berubah, cukup sesuaikan nilai di file ini.
+ */
+
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: "/auth/login",
+    REFRESH: "/auth/refresh",
+    LOGOUT: "/auth/logout",
+    ME: "/auth/me",
+  },
+  SETUP: {
+    INSTITUTION: "/setup/institution",
+    ACADEMIC_YEARS: "/setup/academic-years",
+    ACADEMIC_YEAR_DETAIL: (id: string) => `/setup/academic-years/${id}`,
+    ACADEMIC_YEAR_ACTIVE: (id: string) => `/setup/academic-years/${id}/active`,
+    SEMESTERS: "/setup/semesters",
+    SEMESTER_DETAIL: (id: string) => `/setup/semesters/${id}`,
+    SEMESTER_ACTIVE: (id: string) => `/setup/semesters/${id}/active`,
+    CLASSROOMS: "/setup/classrooms",
+    CLASSROOM_DETAIL: (id: string) => `/setup/classrooms/${id}`,
+    SUBJECTS: "/setup/subjects",
+    SUBJECT_DETAIL: (id: string) => `/setup/subjects/${id}`,
+    TEACHERS: "/setup/teachers",
+    TEACHER_DETAIL: (id: string) => `/setup/teachers/${id}`,
+  },
+  STUDENTS: {
+    LIST: "/students",
+    CREATE: "/students",
+    DETAIL: (id: string) => `/students/${id}`,
+    UPDATE: (id: string) => `/students/${id}`,
+    DELETE: (id: string) => `/students/${id}`,
+    PARENTS: (id: string) => `/students/${id}/parents`,
+    ASSIGN_CLASSROOM: (id: string) => `/students/${id}/classroom`,
+  },
+  TAHFIDZ: {
+    LIST: "/tahfidz",
+    CREATE: "/tahfidz",
+    DETAIL: (id: string) => `/tahfidz/${id}`,
+    UPDATE: (id: string) => `/tahfidz/${id}`,
+    DELETE: (id: string) => `/tahfidz/${id}`,
+    PROGRESS: (studentId: string) => `/tahfidz/progress/${studentId}`,
+    TASMI_LIST: "/tahfidz/tasmi",
+    TASMI_CREATE: "/tahfidz/tasmi",
+    TASMI_DETAIL: (id: string) => `/tahfidz/tasmi/${id}`,
+    TASMI_UPDATE: (id: string) => `/tahfidz/tasmi/${id}`,
+    TASMI_DELETE: (id: string) => `/tahfidz/tasmi/${id}`,
+  },
+  ATTENDANCE: {
+    STUDENTS: "/attendance/students",
+    STUDENT_DETAIL: (id: string) => `/attendance/students/${id}`,
+    BULK_STUDENTS: "/attendance/bulk",
+    CLASSROOM_DAILY: (classId: string, date: string) => `/attendance/classroom/${classId}/date/${date}`,
+    STUDENT_SUMMARY: (studentId: string) => `/attendance/student/${studentId}/summary`,
+    TEACHERS: "/attendance/teachers",
+    TEACHER_DETAIL: (id: string) => `/attendance/teachers/${id}`,
+    BULK_TEACHERS: "/attendance/teachers/bulk",
+    TEACHER_SUMMARY: (teacherId: string) => `/attendance/teacher/${teacherId}/summary`,
+    RECAP: "/attendance/recap",
+  },
+  GRADES: {
+    ASSESSMENTS: "/grades/assessments",
+    ASSESSMENT_DETAIL: (id: string) => `/grades/assessments/${id}`,
+    ASSESSMENT_GRADES: (id: string) => `/grades/assessments/${id}/grades`,
+    BATCH_UPSERT: "/grades/batch",
+    SEMESTERS: "/grades/semesters",
+    SEMESTER_DETAIL: (id: string) => `/grades/semesters/${id}`,
+    SEMESTER_CALCULATE: "/grades/semester/calculate",
+  },
+  REPORTS: {
+    STUDENT_CARD: (studentId: string, semesterId: string) => `/reports/student/${studentId}/semester/${semesterId}`,
+    STUDENT_PDF: (studentId: string, semesterId: string) => `/reports/student/${studentId}/semester/${semesterId}/pdf`,
+    STUDENT_NOTES: (studentId: string) => `/reports/student/${studentId}/notes`,
+    CLASSROOM_LEGGER: (classroomId: string, semesterId: string) => `/reports/classroom/${classroomId}/semester/${semesterId}/legger`,
+  },
+} as const;

@@ -57,7 +57,7 @@ export class TahfidzService {
     id: string,
     input: UpdateTahfidzRecordInput,
   ): Promise<TahfidzRecord> {
-    const existing = await this.getRecordById(id);
+    await this.getRecordById(id);
 
     const updated = await this.repo.updateRecord(id, {
       ...(input.studentId !== undefined && { studentId: input.studentId }),

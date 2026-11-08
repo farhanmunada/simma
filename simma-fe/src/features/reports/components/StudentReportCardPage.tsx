@@ -5,13 +5,9 @@ import {
   Printer,
   Edit3,
   Award,
-  BookOpen,
-  CalendarCheck,
-  CheckCircle2,
   AlertCircle,
   Plus,
   Trash2,
-  Sparkles,
   User,
 } from "lucide-react";
 import { Card } from "../../../components/ui/Card";
