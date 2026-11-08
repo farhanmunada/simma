@@ -8,6 +8,7 @@ import { StudentsRoutes } from "./features/students";
 import { TahfidzRoutes } from "./features/tahfidz";
 import { AttendanceRoutes } from "./features/attendance";
 import { GradesRoutes } from "./features/grades";
+import { ReportsRoutes } from "./features/reports";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -67,7 +68,7 @@ export function App() {
             <Route path="tahfidz/*" element={<TahfidzRoutes />} />
             <Route path="attendance/*" element={<AttendanceRoutes />} />
             <Route path="grades/*" element={<GradesRoutes />} />
-            <Route path="reports/*" element={<div>Rapor & Legger</div>} />
+            <Route path="reports/*" element={<ReportsRoutes />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
