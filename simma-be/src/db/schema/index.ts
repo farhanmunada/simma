@@ -14,6 +14,7 @@ export {
   classStudents,
 } from "./students";
 export { tahfidzRecords, tasmiExams } from "./tahfidz";
+export { assessments, studentGrades, grades, semesterGrades } from "./grades";
 export type {
   Institution,
   NewInstitution,
@@ -44,3 +45,11 @@ export type {
   TasmiExam,
   NewTasmiExam,
 } from "./tahfidz";
+export type {
+  Assessment,
+  NewAssessment,
+  StudentGrade,
+  NewStudentGrade,
+  SemesterGrade,
+  NewSemesterGrade,
+} from "./grades";
