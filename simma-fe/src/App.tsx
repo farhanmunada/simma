@@ -9,6 +9,7 @@ import { TahfidzRoutes } from "./features/tahfidz";
 import { AttendanceRoutes } from "./features/attendance";
 import { GradesRoutes } from "./features/grades";
 import { ReportsRoutes } from "./features/reports";
+import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,7 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/ppdb" element={<PpdbPublicPortalPage />} />
           <Route
             path="/"
             element={
@@ -63,6 +65,7 @@ export function App() {
             }
           >
             <Route index element={<DashboardPlaceholder />} />
+            <Route path="ppdb-admin/*" element={<PpdbRoutes />} />
             <Route path="settings/*" element={<SettingsRoutes />} />
             <Route path="students/*" element={<StudentsRoutes />} />
             <Route path="tahfidz/*" element={<TahfidzRoutes />} />

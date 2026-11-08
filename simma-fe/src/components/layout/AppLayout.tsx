@@ -44,7 +44,11 @@ const navItems: NavItem[] = [
     title: "Kesiswaan",
     icon: Users,
     roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas"],
-    subItems: [{ title: "Data Siswa", href: "/students" }],
+    subItems: [
+      { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
+      { title: "Buku Induk Siswa", href: "/students" },
+      { title: "Penempatan Rombel", href: "/students/classes" },
+    ],
   },
   {
     title: "Tahfidz & Tasmi'",

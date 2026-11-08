@@ -16,6 +16,7 @@ export {
 export { tahfidzRecords, tasmiExams } from "./tahfidz";
 export { attendanceStudents, attendanceTeachers } from "./attendance";
 export { assessments, studentGrades, grades, semesterGrades } from "./grades";
+export { ppdbApplicants } from "./ppdb";
 export type {
   Institution,
   NewInstitution,
@@ -60,3 +61,4 @@ export type {
   SemesterGrade,
   NewSemesterGrade,
 } from "./grades";
+export type { PpdbApplicant, NewPpdbApplicant } from "./ppdb";

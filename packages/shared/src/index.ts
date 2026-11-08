@@ -6,4 +6,5 @@ export * from "./schemas/tahfidz.schema.js";
 export * from "./schemas/attendance.schema.js";
 export * from "./schemas/grades.schema.js";
 export * from "./schemas/reports.schema.js";
+export * from "./schemas/ppdb.schema.js";
 export * from "./types/common.types.js";
