@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppLayout } from "./components/layout/AppLayout";
+import { LoginPage } from "./features/auth";
 import { useAuthStore } from "./stores/auth.store";
 
 const queryClient = new QueryClient({
@@ -46,7 +47,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<div className="p-8 text-center text-sm text-slate-600">Halaman Login (Auth Feature)</div>} />
+          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/"
             element={
