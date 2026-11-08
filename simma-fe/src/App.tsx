@@ -4,6 +4,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import { LoginPage } from "./features/auth";
 import { useAuthStore } from "./stores/auth.store";
 import { SettingsRoutes } from "./features/settings";
+import { StudentsRoutes } from "./features/students";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,7 +60,7 @@ export function App() {
           >
             <Route index element={<DashboardPlaceholder />} />
             <Route path="settings/*" element={<SettingsRoutes />} />
-            <Route path="students/*" element={<div>Data Siswa</div>} />
+            <Route path="students/*" element={<StudentsRoutes />} />
             <Route path="tahfidz/*" element={<div>Tahfidz & Tasmi</div>} />
             <Route path="attendance/*" element={<div>Presensi Harian</div>} />
             <Route path="grades/*" element={<div>Penilaian Akademik</div>} />
