@@ -1,10 +1,12 @@
 import { eq, and, or, ilike, count, desc } from "drizzle-orm";
 import { getDb } from "../../core/database/client.js";
-import { ppdbApplicants } from "../../db/schema/ppdb.js";
+import { ppdbApplicants, ppdbDocuments } from "../../db/schema/ppdb.js";
 import { academicYears } from "../../db/schema/setup.js";
 import type {
   PpdbApplicant,
   NewPpdbApplicant,
+  PpdbDocument,
+  NewPpdbDocument,
 } from "./ppdb.types.js";
 
 export class PpdbRepository {
@@ -24,6 +26,7 @@ export class PpdbRepository {
     search?: string;
     status?: string;
     major?: string;
+    track?: string;
   }): Promise<{ data: PpdbApplicant[]; total: number }> {
     const db = getDb();
     const conditions = [];
@@ -47,6 +50,10 @@ export class PpdbRepository {
 
     if (params.major) {
       conditions.push(eq(ppdbApplicants.chosenMajor, params.major));
+    }
+
+    if (params.track) {
+      conditions.push(eq(ppdbApplicants.track, params.track));
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -80,6 +87,23 @@ export class PpdbRepository {
     return row || null;
   }
 
+  async findByIdentifier(identifier: string): Promise<PpdbApplicant | null> {
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(ppdbApplicants)
+      .where(
+        or(
+          eq(ppdbApplicants.nik, identifier),
+          eq(ppdbApplicants.nisn, identifier),
+          eq(ppdbApplicants.email, identifier),
+          eq(ppdbApplicants.registrationNumber, identifier)
+        )
+      )
+      .limit(1);
+    return row || null;
+  }
+
   async findByRegistrationNumber(regNumber: string): Promise<PpdbApplicant | null> {
     const db = getDb();
     const [row] = await db
@@ -100,6 +124,16 @@ export class PpdbRepository {
     return row || null;
   }
 
+  async findByEmail(email: string): Promise<PpdbApplicant | null> {
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(ppdbApplicants)
+      .where(eq(ppdbApplicants.email, email))
+      .limit(1);
+    return row || null;
+  }
+
   async getLatestRegistrationNumber(prefix: string): Promise<string | null> {
     const db = getDb();
     const term = `${prefix}%`;
@@ -116,6 +150,72 @@ export class PpdbRepository {
     const db = getDb();
     const [row] = await db.insert(ppdbApplicants).values(data).returning();
     return row;
+  }
+
+  async update(id: string, data: Partial<NewPpdbApplicant>): Promise<PpdbApplicant | null> {
+    const db = getDb();
+    const [row] = await db
+      .update(ppdbApplicants)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(ppdbApplicants.id, id))
+      .returning();
+    return row || null;
+  }
+
+  // Documents
+  async createDocument(data: NewPpdbDocument): Promise<PpdbDocument> {
+    const db = getDb();
+    const [row] = await db.insert(ppdbDocuments).values(data).returning();
+    return row;
+  }
+
+  async findDocumentsByApplicantId(applicantId: string): Promise<PpdbDocument[]> {
+    const db = getDb();
+    return db
+      .select()
+      .from(ppdbDocuments)
+      .where(eq(ppdbDocuments.applicantId, applicantId))
+      .orderBy(desc(ppdbDocuments.createdAt));
+  }
+
+  async findDocumentById(id: string): Promise<PpdbDocument | null> {
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(ppdbDocuments)
+      .where(eq(ppdbDocuments.id, id))
+      .limit(1);
+    return row || null;
+  }
+
+  async updateDocumentVerification(
+    id: string,
+    status: string,
+    notes?: string | null,
+    verifiedBy?: string | null
+  ): Promise<PpdbDocument | null> {
+    const db = getDb();
+    const [row] = await db
+      .update(ppdbDocuments)
+      .set({
+        verificationStatus: status,
+        verificationNotes: notes || null,
+        verifiedBy: verifiedBy || null,
+        verifiedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(ppdbDocuments.id, id))
+      .returning();
+    return row || null;
+  }
+
+  async deleteDocument(id: string): Promise<boolean> {
+    const db = getDb();
+    const res = await db.delete(ppdbDocuments).where(eq(ppdbDocuments.id, id));
+    return (res.rowCount ?? 0) > 0;
   }
 
   async updateStatus(

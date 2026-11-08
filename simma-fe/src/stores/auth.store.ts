@@ -10,7 +10,8 @@ export type UserRole =
   | "guru_mapel"
   | "guru"
   | "siswa"
-  | "orang_tua";
+  | "orang_tua"
+  | "calon_siswa";
 
 export interface AuthUser {
   id: string;

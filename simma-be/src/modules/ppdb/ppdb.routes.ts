@@ -25,16 +25,33 @@ export const ppdbRoutes: FastifyPluginAsync = async (app) => {
     ],
   };
 
-  // 1. Public Routes (Calon Siswa / Wali / Publik)
+  // 1. Candidate Portal Routes (Autentikasi & Pengisian Mandiri Calon Siswa)
+  const candidateGuard = {
+    preHandler: [authenticate, requireRoles("calon_siswa")],
+  };
+
+  app.post("/portal/register", controller.registerAccount);
+  app.post("/portal/login", controller.loginCalonSiswa);
+  app.get("/portal/me", candidateGuard, controller.getMyApplication);
+  app.put("/portal/me", candidateGuard, controller.updateMyApplication);
+  app.post("/portal/me/finalize", candidateGuard, controller.finalizeMyApplication);
+  app.post("/portal/me/documents", candidateGuard, controller.uploadDocument);
+  app.delete("/portal/me/documents/:id", candidateGuard, controller.deleteDocument);
+
+  // 2. Protected Document File Streaming (Calon Siswa & Staf Panitia)
+  app.get("/documents/:id/file", { preHandler: [authenticate] }, controller.streamDocument);
+
+  // 3. Public Routes (Calon Siswa / Wali / Publik)
   app.post("/register", controller.register);
   app.post("/", controller.register);
   app.get("/check-status", controller.checkStatus);
   app.get("/public-info", controller.getPublicInfo);
 
-  // 2. Internal Staff Routes (Panitia PPDB & TU)
+  // 4. Internal Staff Routes (Panitia PPDB & TU)
   app.get("/stats", readAuthGuard, controller.getStats);
   app.get("/applicants", readAuthGuard, controller.getApplicants);
   app.get("/applicants/:id", readAuthGuard, controller.getApplicantById);
+  app.patch("/documents/:id/verify", writeAuthGuard, controller.verifyDocument);
   app.patch("/applicants/:id/status", writeAuthGuard, controller.updateStatus);
   app.post("/applicants/:id/enroll", writeAuthGuard, controller.enroll);
   app.delete("/applicants/:id", writeAuthGuard, controller.delete);

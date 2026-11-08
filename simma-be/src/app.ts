@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
+import multipart from "@fastify/multipart";
 import { getEnv } from "./core/config/env.js";
 import { errorHandler } from "./core/errors/index.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
@@ -31,6 +32,12 @@ export async function buildApp() {
   await app.register(rateLimit, {
     max: 100,
     timeWindow: "1 minute",
+  });
+  await app.register(multipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB max
+      files: 5,
+    },
   });
 
   // Error handler

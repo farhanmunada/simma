@@ -56,17 +56,18 @@ D:\Coding\simma\              <- Root monorepo (Leader: main branch)
 | Worker (coding) | `worker-gemini` | — |
 | Worker (review & security) | `worker-gemini` | — |
 
-### 4.2 Wave-Based Development
+### 4.2 Wave-Based Development (Prioritas Administratif Sekolah)
 
-Worker TIDAK serentak 7 modul dari nol. Urutan wave:
+Pengembangan mengutamakan penyelesaian **Fondasi Administratif Sekolah** (Tata Usaha, Persuratan, PPDB, Buku Induk Siswa) sebelum modul akademik harian. Urutan wave:
 
-| Wave | Worker | Modul | Dependency |
+| Wave | Worker | Modul | Boundary & Ketergantungan |
 |---|---|---|---|
 | 0 | Leader saja | Monorepo init, DB, shared types, auth core, migration setup | — |
-| 1 | Worker A + B | (A) Auth & RBAC, (B) Setup (TA, Semester, Kelas, Mapel, GTK) | Wave 0 |
-| 2 | Worker C + D | (C) Data Siswa, (D) Tahfidz & Tasmi' | Wave 1 |
-| 3 | Worker E + F | (E) Presensi, (F) Input Nilai | Wave 2 |
-| 4 | Worker G | Rapor (generate PDF) | Wave 3 |
+| 1 | Worker A + B | (A) `01-auth-rbac`, (B) `02-master-setup` (TA, Semester, Kelas, Mapel, GTK) | Wave 0 |
+| 2 | Worker C + D | (C) `03-tata-usaha-persuratan` (Surat Masuk/Keluar, Disposisi, Naskah Dinas), (D) `04-ppdb-madrasah` (Portal Calon Siswa & Seleksi) | Wave 1 |
+| 3 | Worker E | `05-kesiswaan-buku-induk` (Buku Induk EMIS 4.0, Rombel, Mutasi dari PPDB) | Wave 2 |
+| 4 | Worker F + G | (F) `06-presensi-siswa`, (G) `07-tahfidz-tasmi` | Wave 3 |
+| 5 | Worker H + I | (H) `08-penilaian-akademik`, (I) `09-rapor-rdm` (PDF RDM Kemenag) | Wave 4 |
 
 Setiap selesai wave → Worker Review & Security → Leader merge → wave berikutnya.
 
@@ -108,17 +109,19 @@ Berjalan sebagai gatekeeper setelah setiap wave selesai. Tugas:
 
 ---
 
-## 5. File Boundary per Modul (BE)
+## 5. File Boundary per Modul
 
 | Modul | Folder BE | Folder FE | DB Schema |
 |---|---|---|---|
-| Auth & RBAC | `src/modules/auth/` | `src/features/auth/` | `src/db/schema/users.ts` |
-| Setup | `src/modules/settings/` | `src/features/settings/` | `src/db/schema/{academic-years,semesters,classrooms,subjects,teachers}.ts` |
-| Data Siswa | `src/modules/students/` | `src/features/students/` | `src/db/schema/{students,parents,class-students}.ts` |
-| Tahfidz | `src/modules/tahfidz/` | `src/features/tahfidz/` | `src/db/schema/tahfidz.ts` |
-| Presensi | `src/modules/attendance/` | `src/features/attendance/` | `src/db/schema/attendance.ts` |
-| Input Nilai | `src/modules/grades/` | `src/features/grades/` | `src/db/schema/{assessments,grades,semester-grades}.ts` |
-| Rapor | `src/modules/reports/` | `src/features/reports/` | Konsumsi data grades & students |
+| 01. Auth & RBAC | `src/modules/auth/` | `src/features/auth/` | `src/db/schema/users.ts` |
+| 02. Setup | `src/modules/setup/` | `src/features/settings/` | `src/db/schema/setup.ts` |
+| 03. Tata Usaha & Surat | `src/modules/letters/` | `src/features/letters/` | `src/db/schema/letters.ts` |
+| 04. PPDB Madrasah | `src/modules/ppdb/` | `src/features/ppdb/` | `src/db/schema/ppdb.ts` |
+| 05. Kesiswaan (Buku Induk) | `src/modules/students/` | `src/features/students/` | `src/db/schema/students.ts` |
+| 06. Presensi | `src/modules/attendance/` | `src/features/attendance/` | `src/db/schema/attendance.ts` |
+| 07. Tahfidz | `src/modules/tahfidz/` | `src/features/tahfidz/` | `src/db/schema/tahfidz.ts` |
+| 08. Input Nilai | `src/modules/grades/` | `src/features/grades/` | `src/db/schema/grades.ts` |
+| 09. Rapor RDM | `src/modules/reports/` | `src/features/reports/` | Konsumsi data grades & students |
 
 ---
 
@@ -164,14 +167,16 @@ src/features/<feature>/
 | Testing | `agentVault/04-Quality-and-Repeated-Testing/01-multi-stage-testing.md` |
 | Security | `agentVault/04-Security/risk-tiers-and-sandboxing.md` |
 
-**Spesifikasi project (sudah ada di `docs/`):**
+**Spesifikasi project (tersedia di `docs/`):**
 
 | Doc | Isi |
 |---|---|
-| `docs/PRD.md` | Modul fungsional, RBAC, acceptance criteria |
-| `docs/ARCHITECTURE.md` | Tech stack, ERD, API endpoints, file structure |
-| `docs/UX-DESIGN.md` | UI/UX patterns, component specs |
-| `docs/RESEARCH.md` | Riset EMIS, RDM, regulasi Kemenag |
+| `docs/modules/<nomor>-<modul>/PRD.md` | PRD granular per modul, aturan validasi, kriteria penerimaan |
+| `docs/modules/README.md` | Peta ketergantungan dan alur integrasi antar-modul |
+| `docs/PRD.md` | Overview sistem, domain model makro, modul fungsional |
+| `docs/ARCHITECTURE.md` | Tech stack, mitigasi konkurensi, file structure monorepo |
+| `docs/UX-DESIGN.md` | UI/UX patterns, component specs, Tailwind CSS v4 |
+| `docs/RESEARCH.md` & `RESEARCH_PPDB.md` | Regulasi Kemenag (KMA 347/450, PMA 12/2024, EMIS, RDM, SNPDB) |
 
 ---
 

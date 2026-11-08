@@ -5,21 +5,120 @@ import type {
   PpdbApplicantsResponse,
   PpdbStats,
   PpdbPublicInfo,
+  PpdbDocument,
   RegisterApplicantInput,
   UpdateApplicantStatusInput,
   CheckStatusQueryParams,
+  PpdbRegisterAccountInput,
+  PpdbLoginInput,
+  UpdateApplicantFormInput,
+  VerifyDocumentInput,
 } from "../types";
 
 export interface PpdbQueryParams {
   search?: string;
   status?: string;
+  track?: string;
   major?: string;
   academicYearId?: string;
   page?: number;
   limit?: number;
 }
 
-// 1. Public API Hooks
+// 1. Calon Siswa Authentication & Portal Hooks
+export const useRegisterAccount = () => {
+  return useMutation({
+    mutationFn: (data: PpdbRegisterAccountInput) =>
+      apiClient<{
+        applicant: PpdbApplicant;
+        token: string;
+      }>("/ppdb/portal/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+  });
+};
+
+export const useLoginCalonSiswa = () => {
+  return useMutation({
+    mutationFn: (data: PpdbLoginInput) =>
+      apiClient<{
+        applicant: PpdbApplicant;
+        token: string;
+      }>("/ppdb/portal/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+  });
+};
+
+export const useMyApplication = () => {
+  return useQuery<PpdbApplicant>({
+    queryKey: ["ppdb", "portal", "me"],
+    queryFn: () => apiClient<PpdbApplicant>("/ppdb/portal/me"),
+  });
+};
+
+export const useUpdateMyApplication = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateApplicantFormInput) =>
+      apiClient<PpdbApplicant>("/ppdb/portal/me", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ppdb", "portal", "me"] });
+    },
+  });
+};
+
+export const useFinalizeMyApplication = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      apiClient<PpdbApplicant>("/ppdb/portal/me/finalize", {
+        method: "POST",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ppdb", "portal", "me"] });
+    },
+  });
+};
+
+export const useUploadDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ file, documentType }: { file: File; documentType: string }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("documentType", documentType);
+
+      return apiClient<PpdbDocument>("/ppdb/portal/me/documents", {
+        method: "POST",
+        body: formData,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ppdb", "portal", "me"] });
+    },
+  });
+};
+
+export const useDeleteDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (documentId: string) =>
+      apiClient<{ message: string }>(`/ppdb/portal/me/documents/${documentId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ppdb", "portal", "me"] });
+    },
+  });
+};
+
+// 2. Public API Hooks
 export const usePpdbPublicInfo = () => {
   return useQuery<PpdbPublicInfo>({
     queryKey: ["ppdb", "public-info"],
@@ -71,6 +170,7 @@ export const usePpdbApplicants = (params: PpdbQueryParams = {}) => {
         params: {
           search: params.search,
           status: params.status,
+          track: params.track,
           major: params.major,
           academicYearId: params.academicYearId,
           page: params.page,
@@ -88,6 +188,26 @@ export const usePpdbApplicant = (id: string | undefined) => {
       return apiClient<PpdbApplicant>(`/ppdb/applicants/${id}`);
     },
     enabled: Boolean(id),
+  });
+};
+
+export const useVerifyDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      documentId,
+      data,
+    }: {
+      documentId: string;
+      data: VerifyDocumentInput;
+    }) =>
+      apiClient<PpdbDocument>(`/ppdb/documents/${documentId}/verify`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ppdb", "applicants"] });
+    },
   });
 };
 

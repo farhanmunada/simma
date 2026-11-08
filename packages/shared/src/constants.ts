@@ -12,6 +12,7 @@ export const ROLES = [
   "pembina_ekskul",
   "admin_tu",
   "bendahara",
+  "calon_siswa",
 ] as const;
 
 export type Role = (typeof ROLES)[number];

@@ -31,40 +31,33 @@ D:\Coding\simma\
 
 ---
 
-## Status Proyek
-- [x] Phase 1: Inisiasi Repositori, Guardrails & .gitignore.
-- [x] Phase 2: Riset Regulasi Kemenag & Domain Madrasah (`docs/RESEARCH.md`).
-- [x] Phase 3: Product Requirement Document (`docs/PRD.md`).
-- [x] Phase 4: Arsitektur Sistem, Mitigasi Konkurensi & Skema Basis Data (`docs/ARCHITECTURE.md`).
-- [x] Phase 5: Wave 0 Foundation — monorepo scaffold, core errors, DB config, shared types, AGENTS.md.
-- [ ] Phase 6: Gerbang Persetujuan + Wave 1 (Worker A: Auth & RBAC, Worker B: Setup).
+## Status Pengembangan & Dokumentasi Modular
+
+Dokumentasi spesifikasi (PRD), arsitektur, diagram aktivitas, dan ERD dikelola secara modular di `docs/modules/` sesuai urutan pembuatan:
+
+- [x] **01. Auth & RBAC (`docs/modules/01-auth-rbac/`):** Autentikasi JWT, multi-role 11 peran madrasah, brute-force lockout, audit trail.
+- [x] **02. Master Setup (`docs/modules/02-master-setup/`):** Profil lembaga, aktivasi atomik TA & Semester, rombel, 44 Mapel KMA 347/450, penugasan GTK.
+- [x] **03. Tata Usaha & Persuratan (`docs/modules/03-tata-usaha-persuratan/`):** Agenda surat masuk, lembar disposisi Kamad, penomoran otomatis PMA 12/2024, generator surat dinas (SKAS, ST, SKKB) + QR Code.
+- [x] **04. PPDB Madrasah (`docs/modules/04-ppdb-madrasah/`):** Portal akun mandiri calon siswa, seleksi 4 jalur Kemenag, upload berkas terisolasi, panel verifikasi TU, mutasi atomik calon siswa diterima ke Buku Induk.
+- [x] **05. Kesiswaan & Buku Induk (`docs/modules/05-kesiswaan-buku-induk/`):** Buku Induk Abadi format EMIS 4.0, Buku Klapper A-Z, penempatan rombel semester, audit kelayakan data EMIS.
+- [ ] **06. Presensi Siswa (`docs/modules/06-presensi-siswa/`):** Presensi harian/mapel, pola default hadir, alert akumulasi alpha, rekap kehadiran ke rapor.
+- [ ] **07. Tahfidz & Tasmi' (`docs/modules/07-tahfidz-tasmi/`):** Setoran hafalan ziyadah/muraja'ah, penilaian 3 dimensi, ujian tasmi' per juz, heatmap capaian.
+- [ ] **08. Penilaian Akademik (`docs/modules/08-penilaian-akademik/`):** Asesmen TP/LM & SAS, bobot fleksibel, grid spreadsheet, nilai akhir & deskripsi capaian KMA 347/450.
+- [ ] **09. Rapor & Legger RDM (`docs/modules/09-rapor-rdm/`):** Verifikasi kelengkapan nilai wali kelas, legger kelas, cetak rapor format resmi RDM Kemenag (PDF).
 
 ---
 
-## Wave-Based Development
+## Urutan Pengembangan (Development Waves)
 
-**Wave 0 (Leader):** ✅ DONE
-- pnpm-workspace.yaml, root package.json
-- BE: Fastify scaffold, AppError + error-handler, env config, DB client
-- FE: React + Vite + Tailwind minimal
-- Shared: Zod auth schemas, role/status/gender constants
-- Docker: PostgreSQL 16 dev container
-- Docs: AGENTS.md, decision.md (vault log)
+Pengembangan mengutamakan **Fondasi Administratif Sekolah** (Tata Usaha, Persuratan, PPDB, Buku Induk) sebelum modul akademik harian:
 
-**Wave 1 (Worker A + B):** 🔄 NEXT
-- Worker A: `feat/auth` — Login, JWT, password hash, token refresh
-- Worker B: `feat/setup` — TA, semester, kelas, mapel, guru mapping
-
-**Wave 2 (Worker C + D):** ⏳ Blocked on Wave 1
-- Worker C: `feat/students` — Siswa CRUD, parent, class assignments
-- Worker D: `feat/tahfidz` — Memorization tracking, review session
-
-**Wave 3 (Worker E + F):** ⏳ Blocked on Wave 2
-- Worker E: `feat/attendance` — Daily attendance toggle, reports
-- Worker F: `feat/grades` — Assessment input, auto-calculate, submission
-
-**Wave 4 (Worker G):** ⏳ Blocked on Wave 3
-- Worker G: `feat/reports` — Rapor PDF generation (RDM format)
+1. **Wave 1 — Auth & Master Setup:** Autentikasi terpusat & konfigurasi lembaga (TA, Semester, Rombel, GTK, Mapel).
+2. **Wave 2 — Tata Usaha & Persuratan:** Agenda surat masuk/keluar, disposisi Kamad, penomoran resmi Kemenag, generator surat dinas.
+3. **Wave 3 — Pintu Masuk Kesiswaan (PPDB):** Pendaftaran mandiri calon siswa, berkas persyaratan, verifikasi TU, mutasi atomik ke Buku Induk.
+4. **Wave 4 — Kesiswaan & Buku Induk Siswa:** Master data siswa EMIS 4.0, Buku Klapper, penempatan rombel, riwayat mutasi.
+5. **Wave 5 — Pembiasaan & Aktivitas Harian (Presensi & Tahfidz):** Presensi harian/mapel, setoran hafalan Al-Qur'an santri & ujian tasmi'.
+6. **Wave 6 — Asesmen & Penilaian Kurikulum Merdeka:** Input nilai TP/LM/SAS, formula capaian kompetensi KMA 347/450.
+7. **Wave 7 — Pelaporan Akhir Semester (Rapor RDM):** Legger nilai kelas, verifikasi kelulusan semester, cetak rapor resmi Kemenag (PDF).
 
 ---
 
