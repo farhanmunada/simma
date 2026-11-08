@@ -21,3 +21,10 @@ export type {
   Subject,
   NewSubject,
 } from "./setup";
+export { tahfidzRecords, tasmiExams } from "./tahfidz";
+export type {
+  TahfidzRecord,
+  NewTahfidzRecord,
+  TasmiExam,
+  NewTasmiExam,
+} from "./tahfidz";

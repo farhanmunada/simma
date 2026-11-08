@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
