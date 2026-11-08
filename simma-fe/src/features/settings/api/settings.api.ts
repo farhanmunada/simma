@@ -19,7 +19,7 @@ import type {
   QueryFilterParams,
 } from "../types";
 
-// Helper request wrapper to handle /setup endpoints seamlessly
+// Helper request wrapper to target /setup endpoints
 async function settingsRequest<T>(
   endpoint: string,
   options: Parameters<typeof apiClient>[1] = {}
@@ -27,15 +27,7 @@ async function settingsRequest<T>(
   const target = endpoint.startsWith("/setup/")
     ? endpoint
     : endpoint.replace("/settings/", "/setup/");
-  try {
-    return await apiClient<T>(target, options);
-  } catch (error: unknown) {
-    const err = error as { statusCode?: number };
-    if (err?.statusCode === 404 && target !== endpoint) {
-      return await apiClient<T>(endpoint, options);
-    }
-    throw error;
-  }
+  return await apiClient<T>(target, options);
 }
 
 function extractList<T>(res: unknown): T[] {
@@ -81,30 +73,14 @@ export async function createAcademicYear(data: CreateAcademicYearDto): Promise<A
 }
 
 export async function patchAcademicYearStatus(id: string, isActive: boolean = true): Promise<AcademicYear> {
-  try {
-    const res = await settingsRequest<unknown>(`/settings/academic-years/${id}/status`, {
-      method: "PATCH",
-      body: JSON.stringify({ isActive }),
-    });
-    return extractSingle<AcademicYear>(res);
-  } catch (error: unknown) {
-    const err = error as { statusCode?: number };
-    if (err?.statusCode === 404) {
-      try {
-        const res = await settingsRequest<unknown>(`/settings/academic-years/${id}/set-active`, {
-          method: "PATCH",
-        });
-        return extractSingle<AcademicYear>(res);
-      } catch {
-        const res = await settingsRequest<unknown>(`/settings/academic-years/${id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ isActive }),
-        });
-        return extractSingle<AcademicYear>(res);
-      }
-    }
-    throw error;
-  }
+  const endpoint = isActive
+    ? `/setup/academic-years/${id}/set-active`
+    : `/setup/academic-years/${id}`;
+  const options = isActive
+    ? { method: "PATCH" }
+    : { method: "PATCH", body: JSON.stringify({ isActive: false }) };
+  const res = await settingsRequest<unknown>(endpoint, options);
+  return extractSingle<AcademicYear>(res);
 }
 
 export async function updateAcademicYear(
@@ -148,30 +124,14 @@ export async function createSemester(data: CreateSemesterDto): Promise<Semester>
 }
 
 export async function patchSemesterStatus(id: string, isActive: boolean = true): Promise<Semester> {
-  try {
-    const res = await settingsRequest<unknown>(`/settings/semesters/${id}/status`, {
-      method: "PATCH",
-      body: JSON.stringify({ isActive }),
-    });
-    return extractSingle<Semester>(res);
-  } catch (error: unknown) {
-    const err = error as { statusCode?: number };
-    if (err?.statusCode === 404) {
-      try {
-        const res = await settingsRequest<unknown>(`/settings/semesters/${id}/set-active`, {
-          method: "PATCH",
-        });
-        return extractSingle<Semester>(res);
-      } catch {
-        const res = await settingsRequest<unknown>(`/settings/semesters/${id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ isActive }),
-        });
-        return extractSingle<Semester>(res);
-      }
-    }
-    throw error;
-  }
+  const endpoint = isActive
+    ? `/setup/semesters/${id}/set-active`
+    : `/setup/semesters/${id}`;
+  const options = isActive
+    ? { method: "PATCH" }
+    : { method: "PATCH", body: JSON.stringify({ isActive: false }) };
+  const res = await settingsRequest<unknown>(endpoint, options);
+  return extractSingle<Semester>(res);
 }
 
 export async function updateSemester(

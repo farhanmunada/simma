@@ -24,6 +24,11 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
     authGuard,
     setupController.setActiveAcademicYear,
   );
+  app.patch(
+    "/academic-years/:id/status",
+    authGuard,
+    setupController.setActiveAcademicYear,
+  );
 
   // Semesters
   app.get("/semesters", authGuard, setupController.getSemesters);
@@ -32,6 +37,7 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
   app.patch("/semesters/:id", authGuard, setupController.updateSemester);
   app.delete("/semesters/:id", authGuard, setupController.deleteSemester);
   app.patch("/semesters/:id/set-active", authGuard, setupController.setActiveSemester);
+  app.patch("/semesters/:id/status", authGuard, setupController.setActiveSemester);
 
   // Classrooms
   app.get("/classrooms", authGuard, setupController.getClassrooms);
