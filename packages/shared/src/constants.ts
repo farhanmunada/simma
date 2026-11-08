@@ -11,6 +11,7 @@ export const ROLES = [
   "pembina_ekskul",
   "admin_tu",
   "bendahara",
+  "guru",
 ] as const;
 
 export type Role = (typeof ROLES)[number];
@@ -26,6 +27,21 @@ export type SemesterType = (typeof SEMESTER_TYPE)[number];
 // Assessment type (Kurikulum Merdeka)
 export const ASSESSMENT_TYPE = ["SLM", "SAS"] as const;
 export type AssessmentType = (typeof ASSESSMENT_TYPE)[number];
+
+// Academic assessment types (Harian, Tugas, UTS, UAS)
+export const GRADE_ASSESSMENT_TYPES = ["harian", "tugas", "uts", "uas"] as const;
+export type GradeAssessmentType = (typeof GRADE_ASSESSMENT_TYPES)[number];
+
+// Letter grades
+export const LETTER_GRADES = ["A", "B", "C", "D"] as const;
+export type LetterGrade = (typeof LETTER_GRADES)[number];
+
+export function calculateLetterGrade(score: number): LetterGrade {
+  if (score >= 85) return "A";
+  if (score >= 75) return "B";
+  if (score >= 60) return "C";
+  return "D";
+}
 
 // Tahfidz type: Ziyadah (new memorization) / Muraja'ah (review)
 export const TAHFIDZ_TYPE = ["Z", "M"] as const;
