@@ -1,2 +1,23 @@
 export { users } from "./users";
-// Other schema exports will be added by workers per module
+export {
+  institutions,
+  academicYears,
+  semesters,
+  teachers,
+  classrooms,
+  subjects,
+} from "./setup";
+export type {
+  Institution,
+  NewInstitution,
+  AcademicYear,
+  NewAcademicYear,
+  Semester,
+  NewSemester,
+  Teacher,
+  NewTeacher,
+  Classroom,
+  NewClassroom,
+  Subject,
+  NewSubject,
+} from "./setup";

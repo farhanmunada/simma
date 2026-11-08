@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { getEnv } from "./core/config/env.js";
 import { errorHandler } from "./core/errors/index.js";
+import { setupRoutes } from "./modules/setup/setup.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -29,10 +30,8 @@ export async function buildApp() {
     timestamp: new Date().toISOString(),
   }));
 
-  // Module routes will be registered here by workers
-  // await app.register(authRoutes, { prefix: "/api/v1/auth" });
-  // await app.register(studentsRoutes, { prefix: "/api/v1/students" });
-  // etc.
+  // Module routes
+  await app.register(setupRoutes, { prefix: "/api/v1/setup" });
 
   return app;
 }
