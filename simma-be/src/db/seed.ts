@@ -231,15 +231,72 @@ async function seed() {
     }
   }
 
-  // 6. SEED SUBJECTS
-  console.log("6. Seeding Mata Pelajaran (Mapel Kemenag)...");
+  // 6. SEED SUBJECTS (Sesuai KMA 347/2022, KMA 450/2024 & RESEARCH.md)
+  console.log("6. Seeding Mata Pelajaran (Mapel Kemenag Kurikulum Merdeka)...");
   const subjectList = [
-    { code: "QURDIS-10", name: "Al-Qur'an Hadis", group: "A", jpPerWeek: 2, phase: "E" },
-    { code: "AKIDAH-10", name: "Akidah Akhlak", group: "A", jpPerWeek: 2, phase: "E" },
-    { code: "FIKIH-10", name: "Fikih", group: "A", jpPerWeek: 2, phase: "E" },
-    { code: "SKI-10", name: "Sejarah Kebudayaan Islam", group: "A", jpPerWeek: 2, phase: "E" },
-    { code: "BARAB-10", name: "Bahasa Arab", group: "A", jpPerWeek: 3, phase: "E" },
-    { code: "MTK-10", name: "Matematika", group: "B", jpPerWeek: 4, phase: "E" },
+    // Kelompok A (PAI & Bahasa Arab - Fase E)
+    { code: "QURDIS-10", name: "Al-Qur'an Hadis", group: "A", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "AKIDAH-10", name: "Akidah Akhlak", group: "A", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "FIKIH-10", name: "Fikih", group: "A", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "SKI-10", name: "Sejarah Kebudayaan Islam", group: "A", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "BARAB-10", name: "Bahasa Arab", group: "A", jpPerWeek: 4, phase: "E", isRequired: true },
+
+    // Kelompok A (PAI & Bahasa Arab - Fase F)
+    { code: "QURDIS-F", name: "Al-Qur'an Hadis", group: "A", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "AKIDAH-F", name: "Akidah Akhlak", group: "A", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "FIKIH-F", name: "Fikih", group: "A", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "SKI-F", name: "Sejarah Kebudayaan Islam", group: "A", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "BARAB-F", name: "Bahasa Arab", group: "A", jpPerWeek: 2, phase: "F", isRequired: true },
+
+    // Kelompok B (Umum - Fase E)
+    { code: "PPKN-10", name: "Pendidikan Pancasila", group: "B", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "BIND-10", name: "Bahasa Indonesia", group: "B", jpPerWeek: 4, phase: "E", isRequired: true },
+    { code: "MTK-10", name: "Matematika", group: "B", jpPerWeek: 4, phase: "E", isRequired: true },
+    { code: "BING-10", name: "Bahasa Inggris", group: "B", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "PJOK-10", name: "Pendidikan Jasmani, Olahraga, dan Kesehatan", group: "B", jpPerWeek: 3, phase: "E", isRequired: true },
+    { code: "SEJ-10", name: "Sejarah", group: "B", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "SENI-10", name: "Seni dan Budaya", group: "B", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "INF-10", name: "Informatika", group: "B", jpPerWeek: 2, phase: "E", isRequired: true },
+
+    // Kelompok B (Umum - Fase F)
+    { code: "PPKN-F", name: "Pendidikan Pancasila", group: "B", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "BIND-F", name: "Bahasa Indonesia", group: "B", jpPerWeek: 3, phase: "F", isRequired: true },
+    { code: "MTK-F", name: "Matematika", group: "B", jpPerWeek: 3, phase: "F", isRequired: true },
+    { code: "BING-F", name: "Bahasa Inggris", group: "B", jpPerWeek: 3, phase: "F", isRequired: true },
+    { code: "PJOK-F", name: "Pendidikan Jasmani, Olahraga, dan Kesehatan", group: "B", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "SEJ-F", name: "Sejarah", group: "B", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "SENI-F", name: "Seni dan Budaya", group: "B", jpPerWeek: 2, phase: "F", isRequired: true },
+
+    // Kelompok Pilihan / Peminatan Fase F (MIPA)
+    { code: "BIO-F", name: "Biologi", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "KIM-F", name: "Kimia", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "FIS-F", name: "Fisika", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "MTKL-F", name: "Matematika Tingkat Lanjut", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "INFL-F", name: "Informatika Tingkat Lanjut", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+
+    // Kelompok Pilihan / Peminatan Fase F (IPS)
+    { code: "SOS-F", name: "Sosiologi", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "EKO-F", name: "Ekonomi", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "GEO-F", name: "Geografi", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "ANTRO-F", name: "Antropologi", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+
+    // Kelompok Pilihan / Peminatan Fase F (Bahasa & Budaya)
+    { code: "BARABL-F", name: "Bahasa Arab Tingkat Lanjut", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "BINGL-F", name: "Bahasa Inggris Tingkat Lanjut", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+
+    // Kelompok Pilihan / Peminatan Fase F (Keagamaan khas MA/MAPK)
+    { code: "TAFSIR-F", name: "Ilmu Tafsir", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "HADIS-F", name: "Ilmu Hadis", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "USHUL-F", name: "Ushul Fikih", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+    { code: "BARABP-F", name: "Bahasa Arab Peminatan", group: "Pilihan", jpPerWeek: 5, phase: "F", isRequired: false },
+
+    // Vokasi & Prakarya
+    { code: "PKWU-F", name: "Prakarya dan Kewirausahaan", group: "Pilihan", jpPerWeek: 2, phase: "F", isRequired: false },
+
+    // Muatan Lokal Khas Madrasah
+    { code: "TFZ-MULOK", name: "Tahfidz Al-Qur'an (Mulok)", group: "Mulok", jpPerWeek: 2, phase: "E", isRequired: true },
+    { code: "TFZ-MULOK-F", name: "Tahfidz Al-Qur'an (Mulok)", group: "Mulok", jpPerWeek: 2, phase: "F", isRequired: true },
+    { code: "KIR-MULOK", name: "Karya Ilmiah Remaja / Riset", group: "Mulok", jpPerWeek: 2, phase: "E", isRequired: false },
   ];
 
   const subjectIds: string[] = [];

@@ -22,10 +22,10 @@ import { Modal } from "../../../components/ui/Modal";
 import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
 
 const SUBJECT_GROUPS = [
-  { value: "Pendidikan Agama Islam", label: "Pendidikan Agama Islam (PAI Kemenag)" },
-  { value: "Kelompok A Umum", label: "Kelompok A (Umum)" },
-  { value: "Kelompok B Umum", label: "Kelompok B (Umum)" },
-  { value: "Kelompok C Peminatan", label: "Kelompok C (Peminatan)" },
+  { value: "A", label: "Kelompok A (PAI & Bahasa Arab)" },
+  { value: "B", label: "Kelompok B (Umum)" },
+  { value: "Pilihan", label: "Kelompok Pilihan (Peminatan)" },
+  { value: "Mulok", label: "Muatan Lokal" },
 ];
 
 export const SubjectsPage: React.FC = () => {
@@ -60,17 +60,27 @@ export const SubjectsPage: React.FC = () => {
   const updateMutation = useUpdateSubject();
   const deleteMutation = useDeleteSubject();
 
-  // Filter by group and search
+  // Filter by group, phase, and search
   const filteredSubjects = useMemo(() => {
     return subjectsRaw.filter((s) => {
-      const matchGroup = !selectedGroup || s.group.toLowerCase().includes(selectedGroup.toLowerCase());
+      const g = s.group.toLowerCase();
+      const selG = selectedGroup.toLowerCase();
+      const matchGroup =
+        !selectedGroup ||
+        g === selG ||
+        (selG === "a" && (g === "a" || g.includes("agama") || g.includes("pai"))) ||
+        (selG === "b" && (g === "b" || g.includes("umum"))) ||
+        (selG === "pilihan" && (g === "pilihan" || g.includes("peminatan"))) ||
+        (selG === "mulok" && (g === "mulok" || g.includes("lokal")));
+
+      const matchPhase = !selectedPhase || s.phase === selectedPhase;
       const matchSearch =
         !searchTerm.trim() ||
         s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.code.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchGroup && matchSearch;
+      return matchGroup && matchPhase && matchSearch;
     });
-  }, [subjectsRaw, selectedGroup, searchTerm]);
+  }, [subjectsRaw, selectedGroup, selectedPhase, searchTerm]);
 
   const showNotification = (type: "success" | "error", text: string) => {
     setFeedback({ type, text });
@@ -81,7 +91,7 @@ export const SubjectsPage: React.FC = () => {
     setEditingItem(null);
     setCode("");
     setName("");
-    setGroup("Pendidikan Agama Islam");
+    setGroup("A");
     setPhase("E");
     setJpPerWeek(2);
     setIsRequired("true");
@@ -161,23 +171,31 @@ export const SubjectsPage: React.FC = () => {
   };
 
   const getGroupBadge = (grp: string) => {
-    if (grp.toLowerCase().includes("agama") || grp.toLowerCase().includes("pai")) {
+    const g = grp.toLowerCase();
+    if (g === "a" || g.includes("agama") || g.includes("pai")) {
       return (
         <Badge variant="success" size="sm" className="font-medium">
-          PAI Kemenag
+          Kelompok A (PAI)
         </Badge>
       );
     }
-    if (grp.toLowerCase().includes("peminatan") || grp.includes("C")) {
+    if (g === "pilihan" || g.includes("peminatan") || g.includes("c")) {
       return (
         <Badge variant="warning" size="sm" className="font-medium">
-          Peminatan
+          Kelompok Pilihan
+        </Badge>
+      );
+    }
+    if (g === "mulok" || g.includes("lokal")) {
+      return (
+        <Badge variant="neutral" size="sm" className="font-medium">
+          Muatan Lokal
         </Badge>
       );
     }
     return (
       <Badge variant="info" size="sm" className="font-medium">
-        Umum
+        Kelompok B (Umum)
       </Badge>
     );
   };
