@@ -1,50 +1,56 @@
 import type { FastifyPluginAsync } from "fastify";
+import { authenticate, requireRoles } from "../../core/auth/index.js";
 import { setupController } from "./setup.controller.js";
 
 export const setupRoutes: FastifyPluginAsync = async (app) => {
+  const authGuard = {
+    preHandler: [authenticate, requireRoles("super_admin", "admin_tu")],
+  };
+
   // Institutions
-  app.get("/institutions", setupController.getInstitution);
-  app.get("/institutions/:id", setupController.getInstitutionById);
-  app.post("/institutions", setupController.createInstitution);
-  app.patch("/institutions/:id", setupController.updateInstitution);
+  app.get("/institutions", authGuard, setupController.getInstitution);
+  app.get("/institutions/:id", authGuard, setupController.getInstitutionById);
+  app.post("/institutions", authGuard, setupController.createInstitution);
+  app.patch("/institutions/:id", authGuard, setupController.updateInstitution);
 
   // Academic Years
-  app.get("/academic-years", setupController.getAcademicYears);
-  app.get("/academic-years/:id", setupController.getAcademicYearById);
-  app.post("/academic-years", setupController.createAcademicYear);
-  app.patch("/academic-years/:id", setupController.updateAcademicYear);
-  app.delete("/academic-years/:id", setupController.deleteAcademicYear);
+  app.get("/academic-years", authGuard, setupController.getAcademicYears);
+  app.get("/academic-years/:id", authGuard, setupController.getAcademicYearById);
+  app.post("/academic-years", authGuard, setupController.createAcademicYear);
+  app.patch("/academic-years/:id", authGuard, setupController.updateAcademicYear);
+  app.delete("/academic-years/:id", authGuard, setupController.deleteAcademicYear);
   app.patch(
     "/academic-years/:id/set-active",
+    authGuard,
     setupController.setActiveAcademicYear,
   );
 
   // Semesters
-  app.get("/semesters", setupController.getSemesters);
-  app.get("/semesters/:id", setupController.getSemesterById);
-  app.post("/semesters", setupController.createSemester);
-  app.patch("/semesters/:id", setupController.updateSemester);
-  app.delete("/semesters/:id", setupController.deleteSemester);
-  app.patch("/semesters/:id/set-active", setupController.setActiveSemester);
+  app.get("/semesters", authGuard, setupController.getSemesters);
+  app.get("/semesters/:id", authGuard, setupController.getSemesterById);
+  app.post("/semesters", authGuard, setupController.createSemester);
+  app.patch("/semesters/:id", authGuard, setupController.updateSemester);
+  app.delete("/semesters/:id", authGuard, setupController.deleteSemester);
+  app.patch("/semesters/:id/set-active", authGuard, setupController.setActiveSemester);
 
   // Classrooms
-  app.get("/classrooms", setupController.getClassrooms);
-  app.get("/classrooms/:id", setupController.getClassroomById);
-  app.post("/classrooms", setupController.createClassroom);
-  app.patch("/classrooms/:id", setupController.updateClassroom);
-  app.delete("/classrooms/:id", setupController.deleteClassroom);
+  app.get("/classrooms", authGuard, setupController.getClassrooms);
+  app.get("/classrooms/:id", authGuard, setupController.getClassroomById);
+  app.post("/classrooms", authGuard, setupController.createClassroom);
+  app.patch("/classrooms/:id", authGuard, setupController.updateClassroom);
+  app.delete("/classrooms/:id", authGuard, setupController.deleteClassroom);
 
   // Subjects
-  app.get("/subjects", setupController.getSubjects);
-  app.get("/subjects/:id", setupController.getSubjectById);
-  app.post("/subjects", setupController.createSubject);
-  app.patch("/subjects/:id", setupController.updateSubject);
-  app.delete("/subjects/:id", setupController.deleteSubject);
+  app.get("/subjects", authGuard, setupController.getSubjects);
+  app.get("/subjects/:id", authGuard, setupController.getSubjectById);
+  app.post("/subjects", authGuard, setupController.createSubject);
+  app.patch("/subjects/:id", authGuard, setupController.updateSubject);
+  app.delete("/subjects/:id", authGuard, setupController.deleteSubject);
 
   // Teachers
-  app.get("/teachers", setupController.getTeachers);
-  app.get("/teachers/:id", setupController.getTeacherById);
-  app.post("/teachers", setupController.createTeacher);
-  app.patch("/teachers/:id", setupController.updateTeacher);
-  app.delete("/teachers/:id", setupController.deleteTeacher);
+  app.get("/teachers", authGuard, setupController.getTeachers);
+  app.get("/teachers/:id", authGuard, setupController.getTeacherById);
+  app.post("/teachers", authGuard, setupController.createTeacher);
+  app.patch("/teachers/:id", authGuard, setupController.updateTeacher);
+  app.delete("/teachers/:id", authGuard, setupController.deleteTeacher);
 };

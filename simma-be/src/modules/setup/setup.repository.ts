@@ -137,15 +137,17 @@ export class SetupRepository {
 
   async setActiveAcademicYear(id: string): Promise<AcademicYear | null> {
     const db = getDb();
-    await db
-      .update(academicYears)
-      .set({ isActive: false, updatedAt: new Date() });
-    const [row] = await db
-      .update(academicYears)
-      .set({ isActive: true, updatedAt: new Date() })
-      .where(eq(academicYears.id, id))
-      .returning();
-    return row ?? null;
+    return await db.transaction(async (tx) => {
+      await tx
+        .update(academicYears)
+        .set({ isActive: false, updatedAt: new Date() });
+      const [row] = await tx
+        .update(academicYears)
+        .set({ isActive: true, updatedAt: new Date() })
+        .where(eq(academicYears.id, id))
+        .returning();
+      return row ?? null;
+    });
   }
 
   // --- Semesters ---
@@ -225,13 +227,17 @@ export class SetupRepository {
 
   async setActiveSemester(id: string): Promise<Semester | null> {
     const db = getDb();
-    await db.update(semesters).set({ isActive: false, updatedAt: new Date() });
-    const [row] = await db
-      .update(semesters)
-      .set({ isActive: true, updatedAt: new Date() })
-      .where(eq(semesters.id, id))
-      .returning();
-    return row ?? null;
+    return await db.transaction(async (tx) => {
+      await tx
+        .update(semesters)
+        .set({ isActive: false, updatedAt: new Date() });
+      const [row] = await tx
+        .update(semesters)
+        .set({ isActive: true, updatedAt: new Date() })
+        .where(eq(semesters.id, id))
+        .returning();
+      return row ?? null;
+    });
   }
 
   // --- Classrooms ---
