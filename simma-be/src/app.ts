@@ -21,7 +21,12 @@ export async function buildApp() {
   });
 
   // Plugins
-  await app.register(cors, { origin: env.CORS_ORIGIN });
+  await app.register(cors, {
+    origin: env.CORS_ORIGIN === "*" ? true : env.CORS_ORIGIN,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
+    credentials: true,
+  });
   await app.register(rateLimit, {
     max: 100,
     timeWindow: "1 minute",
