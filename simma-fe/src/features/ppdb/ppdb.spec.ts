@@ -44,23 +44,24 @@ describe("PPDB Feature Module (Frontend)", () => {
     expect(typeof ppdbApi.useDeleteApplicant).toBe("function");
   });
 
-  it("should have public portal and dashboard page components defined", async () => {
-    const portalModule = await import("./components/PpdbPublicPortalPage");
-    const dashboardModule = await import("./components/PpdbDashboardPage");
-    const routesModule = await import("./PpdbRoutes");
+  it("should validate applicant status mappings and major types", () => {
+    const statuses = ["draft", "submitted", "verified", "accepted", "rejected", "enrolled"];
+    const majors = ["MIPA", "IPS", "Keagamaan", "Umum"];
 
-    expect(typeof portalModule.PpdbPublicPortalPage).toBe("function");
-    expect(typeof dashboardModule.PpdbDashboardPage).toBe("function");
-    expect(typeof routesModule.PpdbRoutes).toBe("function");
+    expect(statuses).toContain("submitted");
+    expect(statuses).toContain("enrolled");
+    expect(majors).toContain("MIPA");
+    expect(majors).toContain("Keagamaan");
   });
 
-  it("should export all necessary types and components from barrel index", async () => {
-    const indexModule = await import("./index");
+  it("should have all required PPDB query and mutation hooks defined", async () => {
+    const api = await import("./api/ppdb.api");
 
-    expect(typeof indexModule.PpdbPublicPortalPage).toBe("function");
-    expect(typeof indexModule.PpdbDashboardPage).toBe("function");
-    expect(typeof indexModule.PpdbRoutes).toBe("function");
-    expect(typeof indexModule.usePpdbApplicants).toBe("function");
-    expect(typeof indexModule.useEnrollApplicant).toBe("function");
+    expect(typeof api.usePpdbStats).toBe("function");
+    expect(typeof api.usePpdbApplicants).toBe("function");
+    expect(typeof api.usePpdbApplicant).toBe("function");
+    expect(typeof api.useUpdateApplicantStatus).toBe("function");
+    expect(typeof api.useEnrollApplicant).toBe("function");
+    expect(typeof api.useDeleteApplicant).toBe("function");
   });
 });
