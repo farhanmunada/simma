@@ -6,7 +6,7 @@ import {
   integer,
   date,
 } from "drizzle-orm/pg-core";
-import { teachers } from "./setup.js";
+import { teachers } from "./setup";
 import type { TahfidzType, TahfidzStatus, TasmiStatus } from "@simma/shared";
 
 export const tahfidzRecords = pgTable("tahfidz_records", {

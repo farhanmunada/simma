@@ -15,6 +15,13 @@
       "when": 1794106879623,
       "tag": "0001_zippy_madame_web",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794130779048,
+      "tag": "0002_lovely_franklin_storm",
+      "breakpoints": true
     }
   ]
 }

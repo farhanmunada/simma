@@ -12,8 +12,8 @@ import {
   teachers,
   academicYears,
   semesters,
-} from "./setup.js";
-import { students } from "./students.js";
+} from "./setup";
+import { students } from "./students";
 import type { GradeAssessmentType, LetterGrade } from "@simma/shared";
 
 export const assessments = pgTable("assessments", {

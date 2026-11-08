@@ -6,8 +6,8 @@ import {
   date,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { students } from "./students.js";
-import { classrooms, teachers } from "./setup.js";
+import { students } from "./students";
+import { classrooms, teachers } from "./setup";
 import type {
   StudentAttendanceStatus,
   TeacherAttendanceStatus,
