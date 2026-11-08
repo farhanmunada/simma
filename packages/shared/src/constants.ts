@@ -31,6 +31,14 @@ export type AssessmentType = (typeof ASSESSMENT_TYPE)[number];
 export const TAHFIDZ_TYPE = ["Z", "M"] as const;
 export type TahfidzType = (typeof TAHFIDZ_TYPE)[number];
 
+// Tahfidz status: Lulus / Perlu Perbaikan
+export const TAHFIDZ_STATUS = ["lulus", "perlu_perbaikan"] as const;
+export type TahfidzStatus = (typeof TAHFIDZ_STATUS)[number];
+
+// Tasmi' exam status: Lulus / Tidak Lulus / Perlu Perbaikan
+export const TASMI_STATUS = ["lulus", "tidak_lulus", "perlu_perbaikan"] as const;
+export type TasmiStatus = (typeof TASMI_STATUS)[number];
+
 // Gender
 export const GENDER = ["L", "P"] as const;
 export type Gender = (typeof GENDER)[number];

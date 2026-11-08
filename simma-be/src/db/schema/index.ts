@@ -13,6 +13,7 @@ export {
   studentParents,
   classStudents,
 } from "./students";
+export { tahfidzRecords, tasmiExams } from "./tahfidz";
 export type {
   Institution,
   NewInstitution,
@@ -37,4 +38,9 @@ export type {
   ClassStudent,
   NewClassStudent,
 } from "./students";
-
+export type {
+  TahfidzRecord,
+  NewTahfidzRecord,
+  TasmiExam,
+  NewTasmiExam,
+} from "./tahfidz";
