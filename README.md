@@ -31,19 +31,34 @@ D:\Coding\simma\
 
 ---
 
-## Status Pengembangan & Dokumentasi Modular
+## Status Pengembangan & Dokumentasi Modular (19 Modul)
 
-Dokumentasi spesifikasi (PRD), arsitektur, diagram aktivitas, dan ERD dikelola secara modular di `docs/modules/` sesuai urutan pembuatan:
+Dokumentasi spesifikasi (PRD), arsitektur, diagram aktivitas, dan ERD dikelola secara modular di `docs/modules/` sesuai siklus kebutuhan SIMMA:
 
+### Phase 1: MVP (Pondasi Administratif & Siklus Akademik)
 - [x] **01. Auth & RBAC (`docs/modules/01-auth-rbac/`):** Autentikasi JWT, multi-role 11 peran madrasah, brute-force lockout, audit trail.
 - [x] **02. Master Setup (`docs/modules/02-master-setup/`):** Profil lembaga, aktivasi atomik TA & Semester, rombel, 44 Mapel KMA 347/450, penugasan GTK.
 - [x] **03. Tata Usaha & Persuratan (`docs/modules/03-tata-usaha-persuratan/`):** Agenda surat masuk, lembar disposisi Kamad, penomoran otomatis PMA 12/2024, generator surat dinas (SKAS, ST, SKKB) + QR Code.
 - [x] **04. PPDB Madrasah (`docs/modules/04-ppdb-madrasah/`):** Portal akun mandiri calon siswa, seleksi 4 jalur Kemenag, upload berkas terisolasi, panel verifikasi TU, mutasi atomik calon siswa diterima ke Buku Induk.
 - [x] **05. Kesiswaan & Buku Induk (`docs/modules/05-kesiswaan-buku-induk/`):** Buku Induk Abadi format EMIS 4.0, Buku Klapper A-Z, penempatan rombel semester, audit kelayakan data EMIS.
-- [ ] **06. Presensi Siswa (`docs/modules/06-presensi-siswa/`):** Presensi harian/mapel, pola default hadir, alert akumulasi alpha, rekap kehadiran ke rapor.
-- [ ] **07. Tahfidz & Tasmi' (`docs/modules/07-tahfidz-tasmi/`):** Setoran hafalan ziyadah/muraja'ah, penilaian 3 dimensi, ujian tasmi' per juz, heatmap capaian.
-- [ ] **08. Penilaian Akademik (`docs/modules/08-penilaian-akademik/`):** Asesmen TP/LM & SAS, bobot fleksibel, grid spreadsheet, nilai akhir & deskripsi capaian KMA 347/450.
-- [ ] **09. Rapor & Legger RDM (`docs/modules/09-rapor-rdm/`):** Verifikasi kelengkapan nilai wali kelas, legger kelas, cetak rapor format resmi RDM Kemenag (PDF).
+- [x] **06. Presensi Siswa (`docs/modules/06-presensi-siswa/`):** Presensi harian/mapel, pola default hadir, alert akumulasi alpha, rekap kehadiran ke rapor.
+- [x] **07. Tahfidz & Tasmi' (`docs/modules/07-tahfidz-tasmi/`):** Setoran hafalan ziyadah/muraja'ah, penilaian 3 dimensi, ujian tasmi' per juz, heatmap capaian, syahadah.
+- [x] **08. Penilaian Akademik (`docs/modules/08-penilaian-akademik/`):** Asesmen TP/LM & SAS, bobot fleksibel, grid spreadsheet, nilai akhir & deskripsi capaian KMA 347/450.
+- [x] **09. Rapor & Legger RDM (`docs/modules/09-rapor-rdm/`):** Verifikasi kelengkapan nilai wali kelas, legger kelas, cetak rapor format resmi RDM Kemenag (PDF).
+
+### Phase 2: Extended (Kokurikuler, Kepondokan & Finansial)
+- [x] **10. P5RA (`docs/modules/10-p5ra/`):** Kokurikuler Profil Pelajar Pancasila & Rahmatan Lil 'Alamin (10 nilai Kemenag), matriks penilaian 4 predikat, rapor P5RA.
+- [x] **11. Mutaba'ah Yaumiyah (`docs/modules/11-mutabaah-yaumiyah/`):** Monitoring amalan ibadah harian santri (shalat berjamaah, tahajud, dhuha, tilawah, dzikir, puasa sunnah).
+- [x] **12. Keuangan SPP & Billing (`docs/modules/12-keuangan-spp/`):** Billing massal bulanan, kasir cepat auto-suggest, kwitansi bernomor seri, dasbor tunggakan, dispensasi ujian.
+- [x] **13. Kepegawaian GTK (`docs/modules/13-kepegawaian-gtk/`):** Profil pendidik & tenaga kependidikan EMIS/Simpatika, sertifikasi, verifikasi 24 JTM, arsip digital GTK.
+- [x] **14. Jadwal Pelajaran (`docs/modules/14-jadwal-pelajaran/`):** Penjadwalan madrasah formal + diniyah pondok, deteksi bentrok seketika, multi-view jadwal.
+
+### Phase 3: Complete (Manajemen Lanjut & Ekosistem Nasional)
+- [x] **15. Mutasi & Kelulusan (`docs/modules/15-mutasi-siswa/`):** Mutasi masuk, clearance bebas tanggungan 3 dimensi (SPP/perpus/tatib), surat pindah Kemenag, kelulusan XII.
+- [x] **16. Tatib & Poin Kedisiplinan (`docs/modules/16-tatib-kedisiplinan/`):** Sistem kredit poin pelanggaran & reward prestasi, eskalasi SP-1 s/d SP-3, surat panggilan ortu, catatan BK.
+- [x] **17. Ekstrakurikuler (`docs/modules/17-ekstrakurikuler/`):** Direktori ekskul, pendaftaran mandiri, presensi latihan mingguan, penilaian capaian rapor RDM.
+- [x] **18. Integrasi & Ekspor EMIS 4.0 (`docs/modules/18-emis-export/`):** Pra-validasi kepatuhan data NIK/NISN, dasbor kesiapan data, ekspor format resmi portal EMIS Kemenag.
+- [x] **19. Sarana Prasarana (`docs/modules/19-sarana-prasarana/`):** Inventarisasi gedung/ruang/alat, stiker QR Code fisik, alur peminjaman fasilitas, helpdesk kerusakan.
 
 ---
 

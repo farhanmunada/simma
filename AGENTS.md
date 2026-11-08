@@ -68,6 +68,11 @@ Pengembangan mengutamakan penyelesaian **Fondasi Administratif Sekolah** (Tata U
 | 3 | Worker E | `05-kesiswaan-buku-induk` (Buku Induk EMIS 4.0, Rombel, Mutasi dari PPDB) | Wave 2 |
 | 4 | Worker F + G | (F) `06-presensi-siswa`, (G) `07-tahfidz-tasmi` | Wave 3 |
 | 5 | Worker H + I | (H) `08-penilaian-akademik`, (I) `09-rapor-rdm` (PDF RDM Kemenag) | Wave 4 |
+| 6 | Worker J + K | (J) `10-p5ra` (Kokurikuler & Rapor P5RA), (K) `11-mutabaah-yaumiyah` (Amalan Harian Santri) | Wave 5 |
+| 7 | Worker L + M | (L) `12-keuangan-spp` (Billing Kasir & SPP), (M) `13-kepegawaian-gtk` (Simpatika/24 JTM) | Wave 1 & 5 |
+| 8 | Worker N | `14-jadwal-pelajaran` (Jadwal Dual-Kurikulum & Anti-Bentrok) | Wave 1 & 7 |
+| 9 | Worker O + P | (O) `15-mutasi-siswa` (Mutasi & Kelulusan), (P) `16-tatib-kedisiplinan` (Poin & BK) | Wave 3 & 7 |
+| 10 | Worker Q + R | (Q) `17-ekstrakurikuler` (Ekskul & Nilai Rapor), (R) `18-emis-export` (Sinkronisasi EMIS 4.0), (S) `19-sarana-prasarana` (Aset QR & Tiket) | Wave 3, 5 & 9 |
 
 Setiap selesai wave → Worker Review & Security → Leader merge → wave berikutnya.
 
@@ -122,6 +127,16 @@ Berjalan sebagai gatekeeper setelah setiap wave selesai. Tugas:
 | 07. Tahfidz | `src/modules/tahfidz/` | `src/features/tahfidz/` | `src/db/schema/tahfidz.ts` |
 | 08. Input Nilai | `src/modules/grades/` | `src/features/grades/` | `src/db/schema/grades.ts` |
 | 09. Rapor RDM | `src/modules/reports/` | `src/features/reports/` | Konsumsi data grades & students |
+| 10. P5RA | `src/modules/p5ra/` | `src/features/p5ra/` | `src/db/schema/p5ra.ts` |
+| 11. Mutaba'ah Yaumiyah | `src/modules/mutabaah/` | `src/features/mutabaah/` | `src/db/schema/mutabaah.ts` |
+| 12. Keuangan & SPP | `src/modules/finance/` | `src/features/finance/` | `src/db/schema/finance.ts` |
+| 13. Kepegawaian GTK | `src/modules/teachers/` | `src/features/teachers/` | `src/db/schema/teachers.ts` |
+| 14. Jadwal Pelajaran | `src/modules/schedules/` | `src/features/schedules/` | `src/db/schema/schedules.ts` |
+| 15. Mutasi Siswa | `src/modules/transfers/` | `src/features/transfers/` | `src/db/schema/transfers.ts` |
+| 16. Tatib & Disiplin | `src/modules/discipline/` | `src/features/discipline/` | `src/db/schema/discipline.ts` |
+| 17. Ekstrakurikuler | `src/modules/extracurricular/` | `src/features/extracurricular/` | `src/db/schema/extracurricular.ts` |
+| 18. Ekspor EMIS 4.0 | `src/modules/emis/` | `src/features/emis/` | Konsumsi data agregat students/gtk |
+| 19. Sarana Prasarana | `src/modules/facilities/` | `src/features/facilities/` | `src/db/schema/facilities.ts` |
 
 ---
 
