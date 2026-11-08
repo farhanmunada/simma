@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "SIMMA — Arsitektur Sistem Informasi Madrasah",
+    "subtitle": "Topologi Cloud VPS, Ingress Caddy, Fastify API, React SPA, & PostgreSQL",
+    "output": ".archify/architecture-simma-system-20261108-071944/simma-system.html",
+    "quality_profile": "showcase",
+    "visual_preset": "signal-flow",
+    "animation": "trace"
+  },
+  "components": [
+    {
+      "id": "clients_guru",
+      "type": "external",
+      "label": "Guru & Staff",
+      "sublabel": "Nilai, Rapot, & Presensi",
+      "pos": [40, 110],
+      "size": [130, 60],
+      "icon": "person"
+    },
+    {
+      "id": "clients_admin",
+      "type": "external",
+      "label": "Admin & Kamad",
+      "sublabel": "Manajemen & Approval",
+      "pos": [40, 270],
+      "size": [130, 60],
+      "icon": "person"
+    },
+    {
+      "id": "host_firewall",
+      "type": "security",
+      "label": "UFW & Fail2ban",
+      "sublabel": "Port 22/443 Perimeter",
+      "pos": [220, 190],
+      "size": [130, 64],
+      "icon": "security",
+      "tag": "Brute-force Shield"
+    },
+    {
+      "id": "caddy_edge",
+      "type": "security",
+      "label": "Caddy Gateway",
+      "sublabel": "Reverse Proxy (:443)",
+      "pos": [410, 190],
+      "size": [130, 64],
+      "icon": "security",
+      "tag": "Auto-TLS Let's Encrypt"
+    },
+    {
+      "id": "simma_fe",
+      "type": "frontend",
+      "label": "SIMMA Frontend",
+      "sublabel": "React 19 + Vite 6 SPA",
+      "pos": [610, 90],
+      "size": [140, 64],
+      "icon": "frontend",
+      "tag": "Caddy Static Serve"
+    },
+    {
+      "id": "simma_be",
+      "type": "backend",
+      "label": "SIMMA Backend",
+      "sublabel": "Fastify 5 + Node 22 LTS",
+      "pos": [610, 290],
+      "size": [140, 64],
+      "icon": "backend",
+      "tag": "REST API + PDF Engine"
+    },
+    {
+      "id": "postgres_db",
+      "type": "database",
+      "label": "PostgreSQL 16",
+      "sublabel": "ACID Engine + JSONB",
+      "pos": [890, 190],
+      "size": [140, 64],
+      "icon": "database",
+      "tag": "SSD Volume (:5432)"
+    },
+    {
+      "id": "pg_backup",
+      "type": "database",
+      "label": "Backup Service",
+      "sublabel": "pg_dump Daily Cron",
+      "pos": [890, 330],
+      "size": [140, 60],
+      "icon": "clock",
+      "tag": "Automated Dump"
+    },
+    {
+      "id": "emis_kemenag",
+      "type": "external",
+      "label": "EMIS 4.0 Kemenag",
+      "sublabel": "Sinkronisasi / CSV",
+      "pos": [1170, 190],
+      "size": [140, 64],
+      "icon": "cloud",
+      "tag": "Portal Kemenag"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "VPS Cloud Ubuntu 24.04 LTS (4 vCPU / 8GB RAM)",
+      "wraps": [
+        "host_firewall",
+        "caddy_edge",
+        "simma_fe",
+        "simma_be",
+        "postgres_db",
+        "pg_backup"
+      ],
+      "pad": 24
+    },
+    {
+      "kind": "security-group",
+      "label": "Docker Compose Isolated Bridge Network",
+      "wraps": [
+        "caddy_edge",
+        "simma_fe",
+        "simma_be",
+        "postgres_db",
+        "pg_backup"
+      ],
+      "pad": 16
+    }
+  ],
+  "connections": [
+    {
+      "id": "guru-to-fw",
+      "from": "clients_guru",
+      "to": "host_firewall",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "admin-to-fw",
+      "from": "clients_admin",
+      "to": "host_firewall",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fw-to-caddy",
+      "from": "host_firewall",
+      "to": "caddy_edge",
+      "label": "Port 443",
+      "variant": "security"
+    },
+    {
+      "id": "caddy-to-fe",
+      "from": "caddy_edge",
+      "to": "simma_fe",
+      "label": "Static Assets",
+      "variant": "default"
+    },
+    {
+      "id": "caddy-to-be",
+      "from": "caddy_edge",
+      "to": "simma_be",
+      "label": "proxy_pass",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fe-to-be",
+      "from": "simma_fe",
+      "to": "simma_be",
+      "label": "API Queries",
+      "variant": "default"
+    },
+    {
+      "id": "be-to-db",
+      "from": "simma_be",
+      "to": "postgres_db",
+      "label": "Drizzle ORM (SQL)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "db-to-backup",
+      "from": "postgres_db",
+      "to": "pg_backup",
+      "label": "Daily Snapshot",
+      "variant": "dashed"
+    },
+    {
+      "id": "be-to-emis",
+      "from": "simma_be",
+      "to": "emis_kemenag",
+      "label": "CSV Export",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Edge & Keamanan",
+      "items": [
+        "Caddy menangani reverse proxy dan auto-TLS Let's Encrypt secara otomatis",
+        "Perimeter diamankan UFW firewall port 22/443 dan fail2ban brute-force protection",
+        "Stateless auth dengan JWT jose (access token 15 min + refresh token 7 hari)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Aplikasi & Runtime",
+      "items": [
+        "Fastify 5 + Node 22 LTS melayani REST API dengan skema validasi Zod",
+        "React 19 SPA di-bundle Vite 6 dan di-serve static melalui container Caddy",
+        "Worker thread terisolasi untuk rendering PDF Rapot (@react-pdf/renderer)"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Persistensi & Tata Kelola",
+      "items": [
+        "PostgreSQL 16 mengelola data relasional ACID dengan row-level locking untuk konkurensi",
+        "Kolom JSONB menangani skema dinamis kompatibilitas EMIS 4.0 Kemenag",
+        "Container pg-backup menjalankan scheduled daily dump volume database secara otomatis"
+      ]
+    }
+  ]
+}

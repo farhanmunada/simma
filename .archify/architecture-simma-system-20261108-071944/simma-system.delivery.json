@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "5df861c2-7de1-4204-8480-6b5be1af0053",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\candidate.json",
+  "output": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\simma-system.html",
+  "specification": {
+    "sha256": "e9e37a0d1ed20d7f4df0a8265e4d90653bb6e201f3aa48a1c0f328f4a7b3e55b",
+    "bytes": 5622
+  },
+  "artifact": {
+    "sha256": "07c46a7c9467a544dbdacafc8fd7c6c1c62e469683cb07d98c5631c9aa35be8b",
+    "bytes": 850373
+  }
+}

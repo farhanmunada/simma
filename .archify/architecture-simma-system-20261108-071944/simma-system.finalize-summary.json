@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\candidate.json",
+    "sha256": "e9e37a0d1ed20d7f4df0a8265e4d90653bb6e201f3aa48a1c0f328f4a7b3e55b",
+    "bytes": 5622
+  },
+  "artifact": {
+    "path": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\simma-system.html",
+    "sha256": "07c46a7c9467a544dbdacafc8fd7c6c1c62e469683cb07d98c5631c9aa35be8b",
+    "bytes": 850373
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\simma-system.finalize.json",
+    "summaryReceipt": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\simma-system.finalize-summary.json",
+    "browserCheckReceipt": "D:\\Coding\\simma\\.archify\\architecture-simma-system-20261108-071944\\simma-system.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-08T00:22:54.437Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 4953,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}
