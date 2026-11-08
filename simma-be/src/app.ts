@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { getEnv } from "./core/config/env.js";
 import { errorHandler } from "./core/errors/index.js";
+import { authRoutes } from "./modules/auth/auth.routes.js";
 import { setupRoutes } from "./modules/setup/setup.routes.js";
 
 export async function buildApp() {
@@ -31,6 +32,7 @@ export async function buildApp() {
   }));
 
   // Module routes
+  await app.register(authRoutes, { prefix: "/api/v1/auth" });
   await app.register(setupRoutes, { prefix: "/api/v1/setup" });
 
   return app;
