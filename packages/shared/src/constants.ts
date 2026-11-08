@@ -38,3 +38,19 @@ export type Gender = (typeof GENDER)[number];
 // Grade submission status
 export const GRADE_STATUS = ["draft", "submitted"] as const;
 export type GradeStatus = (typeof GRADE_STATUS)[number];
+
+// Student status
+export const STUDENT_STATUS = [
+  "aktif",
+  "tidak_aktif",
+  "aktif_tanpa_rombel",
+  "lulus",
+  "mutasi_keluar",
+  "do",
+] as const;
+export type StudentStatus = (typeof STUDENT_STATUS)[number];
+
+// Parent relation type
+export const PARENT_RELATION_TYPE = ["ayah", "ibu", "wali"] as const;
+export type ParentRelationType = (typeof PARENT_RELATION_TYPE)[number];
+

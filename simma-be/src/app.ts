@@ -5,6 +5,7 @@ import { getEnv } from "./core/config/env.js";
 import { errorHandler } from "./core/errors/index.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { setupRoutes } from "./modules/setup/setup.routes.js";
+import { studentRoutes } from "./modules/students/students.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -34,6 +35,7 @@ export async function buildApp() {
   // Module routes
   await app.register(authRoutes, { prefix: "/api/v1/auth" });
   await app.register(setupRoutes, { prefix: "/api/v1/setup" });
+  await app.register(studentRoutes, { prefix: "/api/v1/students" });
 
   return app;
 }

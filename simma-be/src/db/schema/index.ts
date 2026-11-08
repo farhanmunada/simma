@@ -7,6 +7,12 @@ export {
   classrooms,
   subjects,
 } from "./setup";
+export {
+  students,
+  parents,
+  studentParents,
+  classStudents,
+} from "./students";
 export type {
   Institution,
   NewInstitution,
@@ -21,3 +27,14 @@ export type {
   Subject,
   NewSubject,
 } from "./setup";
+export type {
+  Student,
+  NewStudent,
+  Parent,
+  NewParent,
+  StudentParent,
+  NewStudentParent,
+  ClassStudent,
+  NewClassStudent,
+} from "./students";
+
