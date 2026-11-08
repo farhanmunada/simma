@@ -12,6 +12,7 @@ build/
 .cache/
 coverage/
 *.log
+*.tsbuildinfo
 .turbo/
 .output/
 
