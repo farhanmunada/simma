@@ -9,23 +9,12 @@ import {
   useClassroomsReference,
   useSubjectsReference,
 } from "../api/grades.api";
-import {
-  formatAssessmentTypeLabel,
-  calculateLetterGrade,
-  getLetterGradeBadgeClass,
-} from "../types";
+import { formatAssessmentTypeLabel } from "../utils/grade-helpers";
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
-
-interface StudentRow {
-  studentId: string;
-  fullName: string;
-  nisn: string;
-  nis: string;
-  score: number | "";
-  feedback: string;
-}
+import { GradeSummaryStats } from "./GradeSummaryStats";
+import { GradeInputTable, type GradeInputRow } from "./GradeInputTable";
 
 export const GradeInputSheetPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,14 +29,12 @@ export const GradeInputSheetPage: React.FC = () => {
 
   const batchUpsertMutation = useBatchUpsertGrades();
 
-  const [rows, setRows] = useState<StudentRow[]>([]);
+  const [rows, setRows] = useState<GradeInputRow[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Initialize or merge student rows with existing grades
   useEffect(() => {
     if (!students || students.length === 0) {
-      // If no students returned via class query, fallback to existing grades if available
       if (existingGrades && existingGrades.length > 0) {
         setRows(
           existingGrades.map((g) => ({
@@ -57,6 +44,8 @@ export const GradeInputSheetPage: React.FC = () => {
             nis: g.student?.nis || "-",
             score: g.score,
             feedback: g.feedback || "",
+            originalScore: g.score,
+            originalFeedback: g.feedback || "",
           }))
         );
       }
@@ -65,7 +54,7 @@ export const GradeInputSheetPage: React.FC = () => {
 
     const gradeMap = new Map(existingGrades.map((g) => [g.studentId, g]));
 
-    const mergedRows: StudentRow[] = students.map((s) => {
+    const mergedRows: GradeInputRow[] = students.map((s) => {
       const existing = gradeMap.get(s.id);
       return {
         studentId: s.id,
@@ -74,6 +63,8 @@ export const GradeInputSheetPage: React.FC = () => {
         nis: s.nis || "-",
         score: existing !== undefined ? existing.score : "",
         feedback: existing?.feedback || "",
+        originalScore: existing !== undefined ? existing.score : "",
+        originalFeedback: existing?.feedback || "",
       };
     });
 
@@ -89,7 +80,6 @@ export const GradeInputSheetPage: React.FC = () => {
         const num = parseFloat(val);
         const max = assessment?.maxScore ?? 100;
         if (!isNaN(num)) {
-          // Clamp score between 0 and maxScore
           const clamped = Math.max(0, Math.min(num, max));
           next[index].score = clamped;
         }
@@ -149,9 +139,7 @@ export const GradeInputSheetPage: React.FC = () => {
         assessmentId: id,
         grades: validGrades,
       });
-      setSuccessMessage(
-        `Berhasil menyimpan ${validGrades.length} nilai siswa.`
-      );
+      setSuccessMessage(`Berhasil menyimpan ${validGrades.length} nilai siswa.`);
       setTimeout(() => setSuccessMessage(null), 4000);
     } catch (err: unknown) {
       const e = err as { message?: string };
@@ -178,72 +166,83 @@ export const GradeInputSheetPage: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Top Header Card */}
-      <Card className="p-3">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Link to="/grades">
-              <Button size="sm" variant="outline" className="h-8 px-2 text-xs flex items-center gap-1">
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Kembali</span>
-              </Button>
-            </Link>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-slate-900">
-                  {assessment?.title || "Lembar Input Nilai"}
-                </h2>
-                {assessment && (
-                  <Badge variant="info" size="sm">
-                    {formatAssessmentTypeLabel(assessment.type)}
-                  </Badge>
-                )}
-              </div>
-              <div className="text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
-                <span>Kelas: <strong className="text-slate-700">{getClassName(assessment?.classroomId)}</strong></span>
-                <span>Mapel: <strong className="text-slate-700">{getSubjectName(assessment?.subjectId)}</strong></span>
-                <span>Skor Maks: <strong className="text-slate-700 font-mono">{assessment?.maxScore ?? 100}</strong></span>
-                <span>Bobot: <strong className="text-slate-700 font-mono">{assessment?.weight ?? 1}x</strong></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleSetAllPerfect}
-              className="text-xs flex items-center gap-1"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Isi Maksimal</span>
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between pb-2">
+        <div className="flex items-center gap-2">
+          <Link to="/grades/assessments">
+            <Button variant="outline" size="sm" className="h-8 px-2 flex items-center gap-1">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Daftar Penilaian</span>
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="text-xs flex items-center gap-1"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-              <span>Reset</span>
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              isLoading={batchUpsertMutation.isPending}
-              onClick={handleSaveBatch}
-              className="flex items-center gap-1.5"
-            >
-              <Save className="w-4 h-4" />
-              <span>Simpan Massal</span>
-            </Button>
+          </Link>
+          <div>
+            <h1 className="text-lg font-bold text-slate-900 leading-tight">
+              {assessment?.title || "Lembar Input Nilai Siswa"}
+            </h1>
+            <p className="text-xs text-slate-500">
+              Kelas: <span className="font-medium text-slate-700">{getClassName(classroomId)}</span>{" "}
+              | Mapel:{" "}
+              <span className="font-medium text-slate-700">{getSubjectName(assessment?.subjectId)}</span>
+            </p>
           </div>
         </div>
-      </Card>
 
-      {/* Notifications */}
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            className="flex items-center gap-1 text-xs"
+            title="Kosongkan Semua Nilai"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Reset</span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleSetAllPerfect}
+            className="flex items-center gap-1 text-xs"
+            title={`Isi semua dengan ${assessment?.maxScore ?? 100}`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Set Maksimal</span>
+          </Button>
+          <Button
+            type="button"
+            isLoading={batchUpsertMutation.isPending}
+            onClick={handleSaveBatch}
+            className="flex items-center gap-1.5"
+          >
+            <Save className="w-4 h-4" />
+            <span>Simpan Nilai</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Assessment Info Pill */}
+      {assessment && (
+        <Card className="p-3 bg-slate-50/50">
+          <div className="flex flex-wrap items-center gap-4 text-xs">
+            <div>
+              <span className="text-slate-500">Tipe: </span>
+              <Badge variant="info">{formatAssessmentTypeLabel(assessment.type)}</Badge>
+            </div>
+            <div>
+              <span className="text-slate-500">Skor Maksimal: </span>
+              <span className="font-bold text-slate-800">{assessment.maxScore}</span>
+            </div>
+            <div>
+              <span className="text-slate-500">Bobot: </span>
+              <span className="font-bold text-slate-800">{assessment.weight}x</span>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Status Notifications */}
       {successMessage && (
         <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -257,116 +256,22 @@ export const GradeInputSheetPage: React.FC = () => {
       )}
 
       {/* Stats Summary Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-3 rounded-lg border border-slate-200">
-          <p className="text-[11px] text-slate-500 font-medium">Total Siswa</p>
-          <p className="text-lg font-bold text-slate-900 mt-0.5">{rows.length}</p>
-        </div>
-        <div className="bg-white p-3 rounded-lg border border-slate-200">
-          <p className="text-[11px] text-slate-500 font-medium">Sudah Dinilai</p>
-          <p className="text-lg font-bold text-emerald-600 mt-0.5">
-            {filledCount} <span className="text-xs font-normal text-slate-500">/ {rows.length}</span>
-          </p>
-        </div>
-        <div className="bg-white p-3 rounded-lg border border-slate-200">
-          <p className="text-[11px] text-slate-500 font-medium">Belum Dinilai</p>
-          <p className="text-lg font-bold text-amber-600 mt-0.5">
-            {rows.length - filledCount}
-          </p>
-        </div>
-        <div className="bg-white p-3 rounded-lg border border-slate-200">
-          <p className="text-[11px] text-slate-500 font-medium">Rata-rata Kelas</p>
-          <p className="text-lg font-bold text-slate-900 mt-0.5 font-mono">{averageScore}</p>
-        </div>
-      </div>
+      <GradeSummaryStats
+        totalStudents={rows.length}
+        filledCount={filledCount}
+        averageScore={averageScore}
+      />
 
       {/* Sheet Table */}
-      <Card>
-        {isLoading ? (
-          <div className="p-8 text-center text-slate-500 text-sm">
-            Memuat daftar siswa & lembar nilai...
-          </div>
-        ) : rows.length === 0 ? (
-          <div className="p-10 text-center text-slate-500 text-sm">
-            Tidak ada siswa terdaftar di kelas ini atau data siswa belum dikonfigurasi.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
-                  <th className="py-2.5 px-3 font-semibold w-12 text-center">No</th>
-                  <th className="py-2.5 px-3 font-semibold">Nama Siswa</th>
-                  <th className="py-2.5 px-3 font-semibold w-28">NISN / NIS</th>
-                  <th className="py-2.5 px-3 font-semibold w-36 text-center">
-                    Nilai (0-{assessment?.maxScore ?? 100})
-                  </th>
-                  <th className="py-2.5 px-3 font-semibold w-24 text-center">Predikat</th>
-                  <th className="py-2.5 px-3 font-semibold">Catatan / Feedback</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-800">
-                {rows.map((row, index) => {
-                  const hasScore = typeof row.score === "number";
-                  const letterGrade = hasScore ? calculateLetterGrade(row.score as number) : null;
+      <GradeInputTable
+        rows={rows}
+        maxScore={assessment?.maxScore ?? 100}
+        isLoading={isLoading}
+        onScoreChange={handleScoreChange}
+        onFeedbackChange={handleFeedbackChange}
+      />
 
-                  return (
-                    <tr key={row.studentId} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-2 px-3 text-center text-slate-500 font-mono">
-                        {index + 1}
-                      </td>
-                      <td className="py-2 px-3">
-                        <span className="font-medium text-slate-900">{row.fullName}</span>
-                      </td>
-                      <td className="py-2 px-3 font-mono text-slate-500 text-[11px]">
-                        {row.nisn !== "-" ? row.nisn : row.nis}
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        <input
-                          type="number"
-                          tabIndex={index + 1}
-                          min={0}
-                          max={assessment?.maxScore ?? 100}
-                          step="any"
-                          value={row.score}
-                          placeholder="-"
-                          onChange={(e) => handleScoreChange(index, e.target.value)}
-                          className="w-24 text-center font-mono font-semibold py-1 px-2 border border-slate-300 rounded focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 outline-none text-slate-900"
-                        />
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        {letterGrade ? (
-                          <span
-                            className={`inline-block px-2 py-0.5 text-xs font-bold rounded border ${getLetterGradeBadgeClass(
-                              letterGrade
-                            )}`}
-                          >
-                            {letterGrade}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 font-mono">-</span>
-                        )}
-                      </td>
-                      <td className="py-2 px-3">
-                        <input
-                          type="text"
-                          tabIndex={rows.length + index + 1}
-                          value={row.feedback}
-                          placeholder="Catatan guru (opsional)..."
-                          onChange={(e) => handleFeedbackChange(index, e.target.value)}
-                          className="w-full py-1 px-2 text-xs border border-slate-200 rounded focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 outline-none text-slate-700 placeholder:text-slate-400"
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-
-      {/* Bottom Sticky Action Bar on Mobile/Scroll */}
+      {/* Bottom Sticky Action Bar */}
       <div className="flex justify-end gap-2 pt-2">
         <Button
           type="button"
@@ -375,7 +280,7 @@ export const GradeInputSheetPage: React.FC = () => {
           className="flex items-center gap-1.5"
         >
           <Save className="w-4 h-4" />
-          <span>Simpan Nilai ({filledCount} Siswa)</span>
+          <span>Simpan Nilai</span>
         </Button>
       </div>
     </div>

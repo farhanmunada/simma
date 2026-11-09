@@ -1,4 +1,6 @@
 export * from "./types";
+export * from "./utils/grade-helpers";
+export * from "./utils/extractors";
 export * from "./api/grades.api";
 export * from "./components/AssessmentsListPage";
 export * from "./components/GradeInputSheetPage";
