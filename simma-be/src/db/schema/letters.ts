@@ -8,9 +8,9 @@ import {
   date,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
-import { students } from "./students.js";
-import { teachers } from "./setup.js";
+import { users } from "./users";
+import { students } from "./students";
+import { teachers } from "./setup";
 
 // ==========================================
 // 1. Master Klasifikasi Surat Kemenag (KMA 44/2010)
