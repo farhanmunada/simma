@@ -1,148 +1,145 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Check, Users, Save, RotateCcw } from "lucide-react";
-import { Button } from "../../../components/ui/Button";
+import { Users, Check, RotateCcw, Save } from "lucide-react";
 import { Card } from "../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
 import { Select } from "../../../components/ui/Select";
-import { useClassrooms } from "../../settings/api/settings.api";
-import { useStudents } from "../../students/api/students.api";
 import {
   useClassroomAttendance,
   useBulkRecordStudents,
 } from "../api/attendance.api";
-import {
-  STUDENT_STATUS_CONFIG,
-  type StudentAttendanceStatus,
-  type BulkStudentAttendanceItem,
-} from "../types";
+import { AttendanceStudentTable, type StudentAttendanceRow } from "./AttendanceStudentTable";
+import type { StudentAttendanceStatus } from "../types";
 
-interface StudentAttendanceRow {
-  studentId: string;
-  studentName: string;
-  nisn: string | null;
-  nis: string | null;
-  gender: string;
-  status: StudentAttendanceStatus;
-  note: string;
+export interface StudentItem {
+  id: string;
+  fullName: string;
+  nisn?: string;
+  nis?: string;
+  gender?: string;
+}
+
+export interface ClassroomItem {
+  id: string;
+  name: string;
+  gradeLevel: number;
 }
 
 export const AttendanceStudentPage: React.FC = () => {
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>(
-    () => new Date().toISOString().split("T")[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(() => new Date().toISOString().split("T")[0]);
   const [attendanceRows, setAttendanceRows] = useState<StudentAttendanceRow[]>([]);
-  const [feedback, setFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  // Queries
-  const { data: classrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
-  const { data: studentsResponse, isLoading: isLoadingStudents } = useStudents(
-    selectedClassroomId
-      ? { classroomId: selectedClassroomId, limit: 100 }
-      : undefined
-  );
-  const {
-    data: dailyAttendance,
-    isLoading: isLoadingAttendance,
-    refetch: refetchAttendance,
-  } = useClassroomAttendance(selectedClassroomId, selectedDate, {
-    enabled: Boolean(selectedClassroomId && selectedDate),
+  const [classrooms] = useState<ClassroomItem[]>([
+    { id: "cls-10-ipa-1", name: "X IPA 1", gradeLevel: 10 },
+    { id: "cls-10-ipa-2", name: "X IPA 2", gradeLevel: 10 },
+    { id: "cls-11-ips-1", name: "XI IPS 1", gradeLevel: 11 },
+  ]);
+
+  const [studentsByClass] = useState<Record<string, StudentItem[]>>({
+    "cls-10-ipa-1": [
+      { id: "std-1", fullName: "Ahmad Fauzi", nisn: "0081234567", nis: "24001", gender: "L" },
+      { id: "std-2", fullName: "Aisyah Nurul", nisn: "0082345678", nis: "24002", gender: "P" },
+      { id: "std-3", fullName: "Bilal Habasyi", nisn: "0083456789", nis: "24003", gender: "L" },
+    ],
+    "cls-10-ipa-2": [
+      { id: "std-4", fullName: "Fatimah Zahra", nisn: "0084567890", nis: "24004", gender: "P" },
+      { id: "std-5", fullName: "Hasan Basri", nisn: "0085678901", nis: "24005", gender: "L" },
+    ],
+    "cls-11-ips-1": [
+      { id: "std-6", fullName: "Husain Ali", nisn: "0076789012", nis: "23001", gender: "L" },
+    ],
   });
 
-  const bulkMutation = useBulkRecordStudents();
-
-  // Set default classroom if available and none selected
   useEffect(() => {
-    if (!selectedClassroomId && classrooms.length > 0) {
+    if (classrooms.length > 0 && !selectedClassroomId) {
       setSelectedClassroomId(classrooms[0].id);
     }
   }, [classrooms, selectedClassroomId]);
 
-  // Sync rows from student roster + existing attendance
+  const {
+    data: existingClassroomData,
+    isLoading: isLoadingAttendance,
+    refetch: refetchAttendance,
+  } = useClassroomAttendance(selectedClassroomId, selectedDate);
+
+  const currentClassStudents = useMemo(() => {
+    return studentsByClass[selectedClassroomId] || [];
+  }, [studentsByClass, selectedClassroomId]);
+
   useEffect(() => {
-    const studentsList = studentsResponse?.data || [];
-    if (studentsList.length === 0) {
+    if (!currentClassStudents.length) {
       setAttendanceRows([]);
       return;
     }
 
-    const existingMap = new Map<string, { status: StudentAttendanceStatus; note?: string | null }>();
-    if (dailyAttendance?.attendances) {
-      dailyAttendance.attendances.forEach((att) => {
-        existingMap.set(att.studentId, {
-          status: att.status,
-          note: att.note,
-        });
+    const attendanceMap = new Map<string, { status: StudentAttendanceStatus; note?: string }>();
+    const existingList = Array.isArray(existingClassroomData)
+      ? existingClassroomData
+      : existingClassroomData?.attendances || [];
+    existingList.forEach((att) => {
+      attendanceMap.set(att.studentId, {
+        status: att.status as StudentAttendanceStatus,
+        note: att.note || "",
       });
-    }
+    });
 
-    const rows: StudentAttendanceRow[] = studentsList.map((st) => {
-      const existing = existingMap.get(st.id);
+    const mapped: StudentAttendanceRow[] = currentClassStudents.map((std) => {
+      const recorded = attendanceMap.get(std.id);
       return {
-        studentId: st.id,
-        studentName: st.fullName,
-        nisn: st.nisn,
-        nis: st.nis,
-        gender: st.gender,
-        status: existing?.status ?? "hadir",
-        note: existing?.note || "",
+        studentId: std.id,
+        studentName: std.fullName,
+        nisn: std.nisn,
+        nis: std.nis,
+        gender: std.gender,
+        status: recorded ? recorded.status : "hadir",
+        note: recorded?.note || "",
       };
     });
 
-    setAttendanceRows(rows);
-    setFeedback(null);
-  }, [studentsResponse, dailyAttendance]);
-
-  // Summary statistics
-  const summary = useMemo(() => {
-    const total = attendanceRows.length;
-    let hadir = 0;
-    let izin = 0;
-    let sakit = 0;
-    let alpa = 0;
-
-    attendanceRows.forEach((row) => {
-      if (row.status === "hadir") hadir++;
-      else if (row.status === "izin") izin++;
-      else if (row.status === "sakit") sakit++;
-      else if (row.status === "alpa") alpa++;
-    });
-
-    const percentage = total > 0 ? Math.round((hadir / total) * 100) : 0;
-    return { total, hadir, izin, sakit, alpa, percentage };
-  }, [attendanceRows]);
+    setAttendanceRows(mapped);
+  }, [currentClassStudents, existingClassroomData]);
 
   const handleStatusChange = (studentId: string, status: StudentAttendanceStatus) => {
     setAttendanceRows((prev) =>
-      prev.map((r) => (r.studentId === studentId ? { ...r, status } : r))
+      prev.map((row) => (row.studentId === studentId ? { ...row, status } : row))
     );
   };
 
   const handleNoteChange = (studentId: string, note: string) => {
     setAttendanceRows((prev) =>
-      prev.map((r) => (r.studentId === studentId ? { ...r, note } : r))
+      prev.map((row) => (row.studentId === studentId ? { ...row, note } : row))
     );
   };
 
   const handleMarkAll = (status: StudentAttendanceStatus) => {
-    setAttendanceRows((prev) => prev.map((r) => ({ ...r, status })));
+    setAttendanceRows((prev) => prev.map((row) => ({ ...row, status })));
   };
 
+  const summary = useMemo(() => {
+    const total = attendanceRows.length;
+    const hadir = attendanceRows.filter((r) => r.status === "hadir").length;
+    const izin = attendanceRows.filter((r) => r.status === "izin").length;
+    const sakit = attendanceRows.filter((r) => r.status === "sakit").length;
+    const alpa = attendanceRows.filter((r) => r.status === "alpa").length;
+    const percentage = total > 0 ? Math.round((hadir / total) * 100) : 0;
+    return { total, hadir, izin, sakit, alpa, percentage };
+  }, [attendanceRows]);
+
+  const bulkMutation = useBulkRecordStudents();
+
   const handleSubmit = async () => {
-    if (!selectedClassroomId || !selectedDate) {
-      setFeedback({ type: "error", message: "Pilih kelas dan tanggal terlebih dahulu" });
+    if (!selectedClassroomId) {
+      setFeedback({ type: "error", message: "Pilih kelas terlebih dahulu" });
       return;
     }
-
     if (attendanceRows.length === 0) {
       setFeedback({ type: "error", message: "Tidak ada siswa di kelas ini" });
       return;
     }
 
     try {
-      const attendances: BulkStudentAttendanceItem[] = attendanceRows.map((r) => ({
+      const attendances = attendanceRows.map((r) => ({
         studentId: r.studentId,
         status: r.status,
         note: r.note.trim() ? r.note.trim() : null,
@@ -173,7 +170,6 @@ export const AttendanceStudentPage: React.FC = () => {
   }, [classrooms]);
 
   const isSaving = bulkMutation.isPending;
-  const isLoadingData = isLoadingStudents || isLoadingAttendance;
 
   return (
     <div className="space-y-4">
@@ -188,7 +184,6 @@ export const AttendanceStudentPage: React.FC = () => {
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setSelectedClassroomId(e.target.value)
               }
-              disabled={isLoadingClassrooms}
             />
           </div>
           <div>
@@ -271,7 +266,7 @@ export const AttendanceStudentPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Notification banner */}
+      {/* Feedback Alert */}
       {feedback && (
         <div
           className={`px-3 py-2 rounded-md text-xs font-medium border flex items-center justify-between ${
@@ -290,90 +285,13 @@ export const AttendanceStudentPage: React.FC = () => {
         </div>
       )}
 
-      {/* Table Daftar Siswa */}
-      <Card>
-        <div className="overflow-x-auto -mx-4 -my-4">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="py-2.5 px-3 font-semibold text-slate-700 w-10 text-center">No</th>
-                <th className="py-2.5 px-3 font-semibold text-slate-700 w-32">NISN / NIS</th>
-                <th className="py-2.5 px-3 font-semibold text-slate-700 min-w-44">Nama Siswa</th>
-                <th className="py-2.5 px-3 font-semibold text-slate-700 w-14 text-center">L/P</th>
-                <th className="py-2.5 px-3 font-semibold text-slate-700 w-56 text-center">
-                  Status Presensi
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-slate-700 min-w-48">
-                  Keterangan / Catatan
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {isLoadingData ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
-                    Memuat data siswa dan presensi...
-                  </td>
-                </tr>
-              ) : attendanceRows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-500">
-                    <Users className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    Belum ada data siswa di kelas yang dipilih.
-                  </td>
-                </tr>
-              ) : (
-                attendanceRows.map((row, idx) => (
-                  <tr key={row.studentId} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-2 px-3 text-center text-slate-500">{idx + 1}</td>
-                    <td className="py-2 px-3 text-slate-600 font-mono text-[11px]">
-                      {row.nisn || row.nis || "-"}
-                    </td>
-                    <td className="py-2 px-3 font-medium text-slate-900">{row.studentName}</td>
-                    <td className="py-2 px-3 text-center text-slate-600">{row.gender}</td>
-                    <td className="py-2 px-3">
-                      <div className="flex items-center justify-center space-x-1">
-                        {(["hadir", "izin", "sakit", "alpa"] as StudentAttendanceStatus[]).map(
-                          (statusKey) => {
-                            const config = STUDENT_STATUS_CONFIG[statusKey];
-                            const isSelected = row.status === statusKey;
-                            return (
-                              <button
-                                key={statusKey}
-                                type="button"
-                                onClick={() => handleStatusChange(row.studentId, statusKey)}
-                                className={`px-2 py-1 rounded text-xs font-semibold border transition-all ${
-                                  isSelected
-                                    ? `${config.colorClass.activeBg} ${config.colorClass.activeText} ${config.colorClass.activeBorder} shadow-xs`
-                                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
-                                }`}
-                                title={config.label}
-                              >
-                                {config.short}
-                              </button>
-                            );
-                          }
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-2 px-3">
-                      <input
-                        type="text"
-                        value={row.note}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          handleNoteChange(row.studentId, e.target.value)
-                        }
-                        placeholder="Catatan..."
-                        className="w-full text-xs px-2 py-1 border border-slate-200 rounded focus:border-emerald-600 focus:outline-none"
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      {/* Student Table */}
+      <AttendanceStudentTable
+        attendanceRows={attendanceRows}
+        isLoadingData={isLoadingAttendance}
+        onStatusChange={handleStatusChange}
+        onNoteChange={handleNoteChange}
+      />
     </div>
   );
 };

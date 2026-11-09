@@ -1,9 +1,6 @@
 import { eq, and, desc, gte, lte, count, sql } from "drizzle-orm";
 import { getDb } from "../../core/database/client.js";
-import {
-  attendanceStudents,
-  attendanceTeachers,
-} from "../../db/schema/attendance.js";
+import { attendanceStudents, attendanceTeachers } from "../../db/schema/attendance.js";
 import type {
   AttendanceStudent,
   NewAttendanceStudent,
@@ -28,19 +25,13 @@ export class AttendanceRepository {
     return row ?? null;
   }
 
-  async upsertStudentAttendance(
-    data: NewAttendanceStudent,
-  ): Promise<AttendanceStudent> {
+  async upsertStudentAttendance(data: NewAttendanceStudent): Promise<AttendanceStudent> {
     const db = getDb();
     const [row] = await db
       .insert(attendanceStudents)
       .values(data)
       .onConflictDoUpdate({
-        target: [
-          attendanceStudents.studentId,
-          attendanceStudents.classroomId,
-          attendanceStudents.date,
-        ],
+        target: [attendanceStudents.studentId, attendanceStudents.classroomId, attendanceStudents.date],
         set: {
           status: data.status,
           note: data.note,
@@ -52,29 +43,24 @@ export class AttendanceRepository {
     return row;
   }
 
-  async bulkUpsertStudentAttendance(
-    records: NewAttendanceStudent[],
-  ): Promise<AttendanceStudent[]> {
+  async bulkUpsertStudentAttendance(records: NewAttendanceStudent[]): Promise<AttendanceStudent[]> {
     if (records.length === 0) return [];
     const db = getDb();
-    const rows = await db
-      .insert(attendanceStudents)
-      .values(records)
-      .onConflictDoUpdate({
-        target: [
-          attendanceStudents.studentId,
-          attendanceStudents.classroomId,
-          attendanceStudents.date,
-        ],
-        set: {
-          status: sql`excluded.status`,
-          note: sql`excluded.note`,
-          teacherId: sql`excluded.teacher_id`,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return rows;
+    return await db.transaction(async (tx) => {
+      return await tx
+        .insert(attendanceStudents)
+        .values(records)
+        .onConflictDoUpdate({
+          target: [attendanceStudents.studentId, attendanceStudents.classroomId, attendanceStudents.date],
+          set: {
+            status: sql`excluded.status`,
+            note: sql`excluded.note`,
+            teacherId: sql`excluded.teacher_id`,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+    });
   }
 
   async updateStudentAttendance(
@@ -108,28 +94,13 @@ export class AttendanceRepository {
     const offset = (page - 1) * limit;
 
     const conditions = [];
-
-    if (params.studentId) {
-      conditions.push(eq(attendanceStudents.studentId, params.studentId));
-    }
-    if (params.classroomId) {
-      conditions.push(eq(attendanceStudents.classroomId, params.classroomId));
-    }
-    if (params.teacherId) {
-      conditions.push(eq(attendanceStudents.teacherId, params.teacherId));
-    }
-    if (params.status) {
-      conditions.push(eq(attendanceStudents.status, params.status));
-    }
-    if (params.date) {
-      conditions.push(eq(attendanceStudents.date, params.date));
-    }
-    if (params.startDate) {
-      conditions.push(gte(attendanceStudents.date, params.startDate));
-    }
-    if (params.endDate) {
-      conditions.push(lte(attendanceStudents.date, params.endDate));
-    }
+    if (params.studentId) conditions.push(eq(attendanceStudents.studentId, params.studentId));
+    if (params.classroomId) conditions.push(eq(attendanceStudents.classroomId, params.classroomId));
+    if (params.teacherId) conditions.push(eq(attendanceStudents.teacherId, params.teacherId));
+    if (params.status) conditions.push(eq(attendanceStudents.status, params.status));
+    if (params.date) conditions.push(eq(attendanceStudents.date, params.date));
+    if (params.startDate) conditions.push(gte(attendanceStudents.date, params.startDate));
+    if (params.endDate) conditions.push(lte(attendanceStudents.date, params.endDate));
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -146,10 +117,7 @@ export class AttendanceRepository {
       .limit(limit)
       .offset(offset);
 
-    return {
-      data,
-      total: totalResult?.count ?? 0,
-    };
+    return { data, total: totalResult?.count ?? 0 };
   }
 
   async findClassroomAttendanceByDate(
@@ -160,12 +128,7 @@ export class AttendanceRepository {
     return db
       .select()
       .from(attendanceStudents)
-      .where(
-        and(
-          eq(attendanceStudents.classroomId, classroomId),
-          eq(attendanceStudents.date, date),
-        ),
-      )
+      .where(and(eq(attendanceStudents.classroomId, classroomId), eq(attendanceStudents.date, date)))
       .orderBy(attendanceStudents.createdAt);
   }
 
@@ -176,12 +139,9 @@ export class AttendanceRepository {
   ): Promise<AttendanceStudent[]> {
     const db = getDb();
     const conditions = [eq(attendanceStudents.studentId, studentId)];
-    if (startDate) {
-      conditions.push(gte(attendanceStudents.date, startDate));
-    }
-    if (endDate) {
-      conditions.push(lte(attendanceStudents.date, endDate));
-    }
+    if (startDate) conditions.push(gte(attendanceStudents.date, startDate));
+    if (endDate) conditions.push(lte(attendanceStudents.date, endDate));
+
     return db
       .select()
       .from(attendanceStudents)
@@ -201,9 +161,7 @@ export class AttendanceRepository {
     return row ?? null;
   }
 
-  async upsertTeacherAttendance(
-    data: NewAttendanceTeacher,
-  ): Promise<AttendanceTeacher> {
+  async upsertTeacherAttendance(data: NewAttendanceTeacher): Promise<AttendanceTeacher> {
     const db = getDb();
     const [row] = await db
       .insert(attendanceTeachers)
@@ -220,24 +178,23 @@ export class AttendanceRepository {
     return row;
   }
 
-  async bulkUpsertTeacherAttendance(
-    records: NewAttendanceTeacher[],
-  ): Promise<AttendanceTeacher[]> {
+  async bulkUpsertTeacherAttendance(records: NewAttendanceTeacher[]): Promise<AttendanceTeacher[]> {
     if (records.length === 0) return [];
     const db = getDb();
-    const rows = await db
-      .insert(attendanceTeachers)
-      .values(records)
-      .onConflictDoUpdate({
-        target: [attendanceTeachers.teacherId, attendanceTeachers.date],
-        set: {
-          status: sql`excluded.status`,
-          note: sql`excluded.note`,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return rows;
+    return await db.transaction(async (tx) => {
+      return await tx
+        .insert(attendanceTeachers)
+        .values(records)
+        .onConflictDoUpdate({
+          target: [attendanceTeachers.teacherId, attendanceTeachers.date],
+          set: {
+            status: sql`excluded.status`,
+            note: sql`excluded.note`,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+    });
   }
 
   async updateTeacherAttendance(
@@ -271,22 +228,11 @@ export class AttendanceRepository {
     const offset = (page - 1) * limit;
 
     const conditions = [];
-
-    if (params.teacherId) {
-      conditions.push(eq(attendanceTeachers.teacherId, params.teacherId));
-    }
-    if (params.status) {
-      conditions.push(eq(attendanceTeachers.status, params.status));
-    }
-    if (params.date) {
-      conditions.push(eq(attendanceTeachers.date, params.date));
-    }
-    if (params.startDate) {
-      conditions.push(gte(attendanceTeachers.date, params.startDate));
-    }
-    if (params.endDate) {
-      conditions.push(lte(attendanceTeachers.date, params.endDate));
-    }
+    if (params.teacherId) conditions.push(eq(attendanceTeachers.teacherId, params.teacherId));
+    if (params.status) conditions.push(eq(attendanceTeachers.status, params.status));
+    if (params.date) conditions.push(eq(attendanceTeachers.date, params.date));
+    if (params.startDate) conditions.push(gte(attendanceTeachers.date, params.startDate));
+    if (params.endDate) conditions.push(lte(attendanceTeachers.date, params.endDate));
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -303,10 +249,7 @@ export class AttendanceRepository {
       .limit(limit)
       .offset(offset);
 
-    return {
-      data,
-      total: totalResult?.count ?? 0,
-    };
+    return { data, total: totalResult?.count ?? 0 };
   }
 
   async findTeacherAttendanceHistory(
@@ -316,12 +259,9 @@ export class AttendanceRepository {
   ): Promise<AttendanceTeacher[]> {
     const db = getDb();
     const conditions = [eq(attendanceTeachers.teacherId, teacherId)];
-    if (startDate) {
-      conditions.push(gte(attendanceTeachers.date, startDate));
-    }
-    if (endDate) {
-      conditions.push(lte(attendanceTeachers.date, endDate));
-    }
+    if (startDate) conditions.push(gte(attendanceTeachers.date, startDate));
+    if (endDate) conditions.push(lte(attendanceTeachers.date, endDate));
+
     return db
       .select()
       .from(attendanceTeachers)

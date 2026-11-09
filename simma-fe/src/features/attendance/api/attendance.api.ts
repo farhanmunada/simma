@@ -1,329 +1,205 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
   AttendanceStudent,
   AttendanceTeacher,
+  RecordStudentAttendanceDto,
+  RecordStudentAttendanceDto as CreateAttendanceStudentDto,
+  BulkStudentAttendanceDto,
+  UpdateStudentAttendanceDto,
+  UpdateStudentAttendanceDto as UpdateAttendanceStudentDto,
+  RecordTeacherAttendanceDto,
+  RecordTeacherAttendanceDto as CreateAttendanceTeacherDto,
+  BulkTeacherAttendanceDto,
+  UpdateTeacherAttendanceDto,
+  UpdateTeacherAttendanceDto as UpdateAttendanceTeacherDto,
+  StudentAttendanceQueryParams,
+  TeacherAttendanceQueryParams,
   StudentAttendanceSummary,
   TeacherAttendanceSummary,
   ClassroomDailyAttendance,
-  RecordStudentAttendanceDto,
-  UpdateStudentAttendanceDto,
-  BulkStudentAttendanceDto,
-  StudentAttendanceQueryParams,
-  PaginatedStudentAttendancesResponse,
-  RecordTeacherAttendanceDto,
-  UpdateTeacherAttendanceDto,
-  BulkTeacherAttendanceDto,
-  TeacherAttendanceQueryParams,
-  PaginatedTeacherAttendancesResponse,
 } from "../types";
 
-export function cleanEndpoint(ep: string): string {
-  if (ep.startsWith("/api/v1/")) {
-    return ep.replace("/api/v1", "");
-  }
-  return ep;
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
-function extractSingle<T>(res: unknown): T {
-  if (res && typeof res === "object") {
-    const payload = res as { data?: unknown };
-    if (payload.data !== undefined && payload.data !== null && typeof payload.data === "object" && !Array.isArray(payload.data)) {
-      return payload.data as T;
-    }
+export const cleanEndpoint = (endpoint: string): string =>
+  endpoint.startsWith("/api/v1/") ? endpoint.replace("/api/v1", "") : endpoint;
+
+function extractData<T>(res: unknown): T {
+  if (res && typeof res === "object" && "data" in (res as Record<string, unknown>)) {
+    const val = (res as { data: unknown }).data;
+    if (val !== undefined && val !== null) return val as T;
   }
   return res as T;
 }
 
-function extractList<T>(res: unknown): T[] {
-  if (Array.isArray(res)) return res as T[];
+function extractPaginated<T>(res: unknown): PaginatedResult<T> {
   if (res && typeof res === "object") {
-    const payload = res as { data?: unknown };
-    if (Array.isArray(payload.data)) return payload.data as T[];
-  }
-  return [];
-}
-
-function extractPaginatedStudent(res: unknown): PaginatedStudentAttendancesResponse {
-  if (res && typeof res === "object") {
-    const payload = res as { data?: unknown; total?: number; page?: number; limit?: number };
-    if (Array.isArray(payload.data)) {
+    const p = res as {
+      data?: unknown;
+      total?: number;
+      page?: number;
+      limit?: number;
+      meta?: { total?: number; page?: number; limit?: number };
+    };
+    if (Array.isArray(p.data)) {
       return {
-        data: payload.data as AttendanceStudent[],
-        total: payload.total ?? payload.data.length,
-        page: payload.page ?? 1,
-        limit: payload.limit ?? payload.data.length,
+        data: p.data as T[],
+        total: p.total ?? p.meta?.total ?? p.data.length,
+        page: p.page ?? p.meta?.page ?? 1,
+        limit: p.limit ?? p.meta?.limit ?? p.data.length,
       };
     }
   }
-  if (Array.isArray(res)) {
-    return {
-      data: res as AttendanceStudent[],
-      total: res.length,
-      page: 1,
-      limit: res.length,
-    };
-  }
+  if (Array.isArray(res)) return { data: res as T[], total: res.length, page: 1, limit: res.length };
   return { data: [], total: 0, page: 1, limit: 20 };
 }
-
-function extractPaginatedTeacher(res: unknown): PaginatedTeacherAttendancesResponse {
-  if (res && typeof res === "object") {
-    const payload = res as { data?: unknown; total?: number; page?: number; limit?: number };
-    if (Array.isArray(payload.data)) {
-      return {
-        data: payload.data as AttendanceTeacher[],
-        total: payload.total ?? payload.data.length,
-        page: payload.page ?? 1,
-        limit: payload.limit ?? payload.data.length,
-      };
-    }
-  }
-  if (Array.isArray(res)) {
-    return {
-      data: res as AttendanceTeacher[],
-      total: res.length,
-      page: 1,
-      limit: res.length,
-    };
-  }
-  return { data: [], total: 0, page: 1, limit: 20 };
-}
-
-// ----------------------------------------------------
-// 1. CLASSROOM ATTENDANCE & BULK STUDENT
-// ----------------------------------------------------
-
-export async function getClassroomAttendance(
-  classId: string,
-  date: string
-): Promise<ClassroomDailyAttendance> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/attendance/classroom/${classId}/date/${date}`)
-  );
-  return extractSingle<ClassroomDailyAttendance>(res);
-}
-
-export async function bulkRecordStudents(
-  data: BulkStudentAttendanceDto
-): Promise<AttendanceStudent[]> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/attendance/bulk"), {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-  return extractList<AttendanceStudent>(res);
-}
-
-export async function getStudentSummary(
-  studentId: string,
-  params?: { startDate?: string; endDate?: string }
-): Promise<StudentAttendanceSummary> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/attendance/student/${studentId}/summary`),
-    {
-      params: params as Record<string, string | number | boolean | undefined | null>,
-    }
-  );
-  return extractSingle<StudentAttendanceSummary>(res);
-}
-
-export async function getStudentAttendances(
-  params?: StudentAttendanceQueryParams
-): Promise<PaginatedStudentAttendancesResponse> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/attendance/students"), {
-    params: params as Record<string, string | number | boolean | undefined | null>,
-  });
-  return extractPaginatedStudent(res);
-}
-
-export async function getStudentAttendanceById(id: string): Promise<AttendanceStudent> {
-  const res = await apiClient<unknown>(cleanEndpoint(`/api/v1/attendance/students/${id}`));
-  return extractSingle<AttendanceStudent>(res);
-}
-
-export async function recordStudentAttendance(
-  data: RecordStudentAttendanceDto
-): Promise<AttendanceStudent> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/attendance/students"), {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-  return extractSingle<AttendanceStudent>(res);
-}
-
-export async function updateStudentAttendance(
-  id: string,
-  data: UpdateStudentAttendanceDto
-): Promise<AttendanceStudent> {
-  const res = await apiClient<unknown>(cleanEndpoint(`/api/v1/attendance/students/${id}`), {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
-  return extractSingle<AttendanceStudent>(res);
-}
-
-export async function deleteStudentAttendance(id: string): Promise<void> {
-  await apiClient<void>(cleanEndpoint(`/api/v1/attendance/students/${id}`), {
-    method: "DELETE",
-  });
-}
-
-// ----------------------------------------------------
-// 2. TEACHER ATTENDANCE & BULK TEACHER
-// ----------------------------------------------------
-
-export async function getTeacherAttendances(
-  params?: TeacherAttendanceQueryParams
-): Promise<PaginatedTeacherAttendancesResponse> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/attendance/teachers"), {
-    params: params as Record<string, string | number | boolean | undefined | null>,
-  });
-  return extractPaginatedTeacher(res);
-}
-
-export async function getTeacherDailyAttendance(
-  date: string
-): Promise<PaginatedTeacherAttendancesResponse> {
-  return getTeacherAttendances({ date });
-}
-
-export async function bulkRecordTeachers(
-  data: BulkTeacherAttendanceDto
-): Promise<AttendanceTeacher[]> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint("/api/v1/attendance/teachers/bulk"),
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-    }
-  );
-  return extractList<AttendanceTeacher>(res);
-}
-
-export async function getTeacherSummary(
-  teacherId: string,
-  params?: { startDate?: string; endDate?: string }
-): Promise<TeacherAttendanceSummary> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/attendance/teacher/${teacherId}/summary`),
-    {
-      params: params as Record<string, string | number | boolean | undefined | null>,
-    }
-  );
-  return extractSingle<TeacherAttendanceSummary>(res);
-}
-
-export async function getTeacherAttendanceById(id: string): Promise<AttendanceTeacher> {
-  const res = await apiClient<unknown>(cleanEndpoint(`/api/v1/attendance/teachers/${id}`));
-  return extractSingle<AttendanceTeacher>(res);
-}
-
-export async function recordTeacherAttendance(
-  data: RecordTeacherAttendanceDto
-): Promise<AttendanceTeacher> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/attendance/teachers"), {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-  return extractSingle<AttendanceTeacher>(res);
-}
-
-export async function updateTeacherAttendance(
-  id: string,
-  data: UpdateTeacherAttendanceDto
-): Promise<AttendanceTeacher> {
-  const res = await apiClient<unknown>(cleanEndpoint(`/api/v1/attendance/teachers/${id}`), {
-    method: "PATCH",
-    body: JSON.stringify(data),
-  });
-  return extractSingle<AttendanceTeacher>(res);
-}
-
-export async function deleteTeacherAttendance(id: string): Promise<void> {
-  await apiClient<void>(cleanEndpoint(`/api/v1/attendance/teachers/${id}`), {
-    method: "DELETE",
-  });
-}
-
-// ----------------------------------------------------
-// QUERY KEYS
-// ----------------------------------------------------
 
 export const attendanceQueryKeys = {
   all: ["attendance"] as const,
-  classroom: (classId: string, date: string) =>
-    [...attendanceQueryKeys.all, "classroom", classId, date] as const,
   students: () => [...attendanceQueryKeys.all, "students"] as const,
-  studentsList: (params?: StudentAttendanceQueryParams) =>
-    [...attendanceQueryKeys.students(), "list", params] as const,
-  studentDetail: (id: string) =>
-    [...attendanceQueryKeys.students(), "detail", id] as const,
-  studentSummary: (studentId: string, params?: { startDate?: string; endDate?: string }) =>
-    [...attendanceQueryKeys.students(), "summary", studentId, params] as const,
+  studentList: (params?: StudentAttendanceQueryParams) => [...attendanceQueryKeys.students(), "list", params] as const,
+  studentDetail: (id: string) => [...attendanceQueryKeys.students(), "detail", id] as const,
+  classroomDaily: (classId: string, date: string) => [...attendanceQueryKeys.students(), "classroom", classId, date] as const,
+  studentSummary: (id: string, params?: { startDate?: string; endDate?: string }) => [...attendanceQueryKeys.students(), "summary", id, params] as const,
   teachers: () => [...attendanceQueryKeys.all, "teachers"] as const,
-  teachersList: (params?: TeacherAttendanceQueryParams) =>
-    [...attendanceQueryKeys.teachers(), "list", params] as const,
-  teacherDetail: (id: string) =>
-    [...attendanceQueryKeys.teachers(), "detail", id] as const,
-  teacherSummary: (teacherId: string, params?: { startDate?: string; endDate?: string }) =>
-    [...attendanceQueryKeys.teachers(), "summary", teacherId, params] as const,
+  teacherList: (params?: TeacherAttendanceQueryParams) => [...attendanceQueryKeys.teachers(), "list", params] as const,
+  teacherDetail: (id: string) => [...attendanceQueryKeys.teachers(), "detail", id] as const,
+  teacherDaily: (date: string) => [...attendanceQueryKeys.teachers(), "daily", date] as const,
+  teacherSummary: (id: string, params?: { startDate?: string; endDate?: string }) => [...attendanceQueryKeys.teachers(), "summary", id, params] as const,
 };
 
-// ----------------------------------------------------
-// HOOKS
-// ----------------------------------------------------
+// --- Student Attendance API ---
 
-export function useClassroomAttendance(
-  classId?: string,
-  date?: string,
-  options?: { enabled?: boolean }
-) {
-  return useQuery({
-    queryKey: attendanceQueryKeys.classroom(classId || "", date || ""),
-    queryFn: () => getClassroomAttendance(classId!, date!),
-    enabled: Boolean(classId && date && (options?.enabled ?? true)),
-  });
+export async function getStudentAttendances(params?: StudentAttendanceQueryParams): Promise<PaginatedResult<AttendanceStudent>> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.STUDENTS, { params: params as Record<string, string | number> });
+  return extractPaginated<AttendanceStudent>(res);
 }
 
-export function useStudentSummary(
-  studentId?: string,
-  params?: { startDate?: string; endDate?: string },
-  options?: { enabled?: boolean }
-) {
-  return useQuery({
-    queryKey: attendanceQueryKeys.studentSummary(studentId || "", params),
-    queryFn: () => getStudentSummary(studentId!, params),
-    enabled: Boolean(studentId && (options?.enabled ?? true)),
-  });
+export async function getStudentAttendanceById(id: string): Promise<AttendanceStudent> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.STUDENT_DETAIL(id));
+  return extractData<AttendanceStudent>(res);
 }
+
+export async function recordStudentAttendance(data: CreateAttendanceStudentDto): Promise<AttendanceStudent> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.STUDENTS, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return extractData<AttendanceStudent>(res);
+}
+
+export async function bulkRecordStudents(data: BulkStudentAttendanceDto): Promise<AttendanceStudent[]> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.BULK_STUDENTS, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return Array.isArray(res) ? (res as AttendanceStudent[]) : extractData<AttendanceStudent[]>(res) || [];
+}
+
+export async function updateStudentAttendance(id: string, data: UpdateAttendanceStudentDto): Promise<AttendanceStudent> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.STUDENT_DETAIL(id), {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractData<AttendanceStudent>(res);
+}
+
+export async function deleteStudentAttendance(id: string): Promise<boolean> {
+  await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.STUDENT_DETAIL(id), { method: "DELETE" });
+  return true;
+}
+
+export async function getClassroomAttendance(classId: string, date: string): Promise<ClassroomDailyAttendance> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.CLASSROOM_DAILY(classId, date));
+  return extractData<ClassroomDailyAttendance>(res);
+}
+
+export async function getStudentSummary(studentId: string, params?: { startDate?: string; endDate?: string }): Promise<StudentAttendanceSummary> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.STUDENT_SUMMARY(studentId), { params });
+  return extractData<StudentAttendanceSummary>(res);
+}
+
+// --- Teacher Attendance API ---
+
+export async function getTeacherAttendances(params?: TeacherAttendanceQueryParams): Promise<PaginatedResult<AttendanceTeacher>> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.TEACHERS, { params: params as Record<string, string | number> });
+  return extractPaginated<AttendanceTeacher>(res);
+}
+
+export async function getTeacherAttendanceById(id: string): Promise<AttendanceTeacher> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.TEACHER_DETAIL(id));
+  return extractData<AttendanceTeacher>(res);
+}
+
+export async function recordTeacherAttendance(data: CreateAttendanceTeacherDto): Promise<AttendanceTeacher> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.TEACHERS, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return extractData<AttendanceTeacher>(res);
+}
+
+export async function bulkRecordTeachers(data: BulkTeacherAttendanceDto): Promise<AttendanceTeacher[]> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.BULK_TEACHERS, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return Array.isArray(res) ? (res as AttendanceTeacher[]) : extractData<AttendanceTeacher[]>(res) || [];
+}
+
+export async function updateTeacherAttendance(id: string, data: UpdateAttendanceTeacherDto): Promise<AttendanceTeacher> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.TEACHER_DETAIL(id), {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractData<AttendanceTeacher>(res);
+}
+
+export async function deleteTeacherAttendance(id: string): Promise<boolean> {
+  await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.TEACHER_DETAIL(id), { method: "DELETE" });
+  return true;
+}
+
+export async function getTeacherDailyAttendance(date: string): Promise<AttendanceTeacher[]> {
+  const res = await getTeacherAttendances({ date });
+  return res.data;
+}
+
+export async function getTeacherSummary(teacherId: string, params?: { startDate?: string; endDate?: string }): Promise<TeacherAttendanceSummary> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.ATTENDANCE.TEACHER_SUMMARY(teacherId), { params });
+  return extractData<TeacherAttendanceSummary>(res);
+}
+
+// --- TanStack Query Hooks ---
 
 export function useStudentAttendances(params?: StudentAttendanceQueryParams) {
+  return useQuery({ queryKey: attendanceQueryKeys.studentList(params), queryFn: () => getStudentAttendances(params) });
+}
+
+export function useStudentAttendanceById(id: string) {
+  return useQuery({ queryKey: attendanceQueryKeys.studentDetail(id), queryFn: () => getStudentAttendanceById(id), enabled: Boolean(id) });
+}
+
+export function useClassroomAttendance(classroomId: string, date: string) {
   return useQuery({
-    queryKey: attendanceQueryKeys.studentsList(params),
-    queryFn: () => getStudentAttendances(params),
+    queryKey: attendanceQueryKeys.classroomDaily(classroomId, date),
+    queryFn: () => getClassroomAttendance(classroomId, date),
+    enabled: Boolean(classroomId && date),
   });
 }
 
-export function useStudentAttendanceById(id?: string, options?: { enabled?: boolean }) {
+export function useStudentSummary(studentId: string, params?: { startDate?: string; endDate?: string }) {
   return useQuery({
-    queryKey: attendanceQueryKeys.studentDetail(id || ""),
-    queryFn: () => getStudentAttendanceById(id!),
-    enabled: Boolean(id && (options?.enabled ?? true)),
-  });
-}
-
-export function useBulkRecordStudents() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: bulkRecordStudents,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.classroom(variables.classroomId, variables.date),
-      });
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.students(),
-      });
-    },
+    queryKey: attendanceQueryKeys.studentSummary(studentId, params),
+    queryFn: () => getStudentSummary(studentId, params),
+    enabled: Boolean(studentId),
   });
 }
 
@@ -331,26 +207,25 @@ export function useRecordStudentAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: recordStudentAttendance,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.classroom(variables.classroomId, variables.date),
-      });
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.students(),
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.students() }),
+  });
+}
+
+export function useBulkRecordStudents() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkRecordStudents,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.students() }),
   });
 }
 
 export function useUpdateStudentAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateStudentAttendanceDto }) =>
-      updateStudentAttendance(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.all,
-      });
+    mutationFn: ({ id, data }: { id: string; data: UpdateAttendanceStudentDto }) => updateStudentAttendance(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.studentDetail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.students() });
     },
   });
 }
@@ -358,62 +233,28 @@ export function useUpdateStudentAttendance() {
 export function useDeleteStudentAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteStudentAttendance,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.all,
-      });
-    },
+    mutationFn: (id: string) => deleteStudentAttendance(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.students() }),
   });
 }
 
 export function useTeacherAttendances(params?: TeacherAttendanceQueryParams) {
-  return useQuery({
-    queryKey: attendanceQueryKeys.teachersList(params),
-    queryFn: () => getTeacherAttendances(params),
-  });
+  return useQuery({ queryKey: attendanceQueryKeys.teacherList(params), queryFn: () => getTeacherAttendances(params) });
 }
 
-export function useTeacherDailyAttendance(
-  date: string,
-  options?: { enabled?: boolean }
-) {
-  return useQuery({
-    queryKey: attendanceQueryKeys.teachersList({ date }),
-    queryFn: () => getTeacherDailyAttendance(date),
-    enabled: options?.enabled ?? Boolean(date),
-  });
+export function useTeacherAttendanceById(id: string) {
+  return useQuery({ queryKey: attendanceQueryKeys.teacherDetail(id), queryFn: () => getTeacherAttendanceById(id), enabled: Boolean(id) });
 }
 
-export function useTeacherSummary(
-  teacherId?: string,
-  params?: { startDate?: string; endDate?: string },
-  options?: { enabled?: boolean }
-) {
-  return useQuery({
-    queryKey: attendanceQueryKeys.teacherSummary(teacherId || "", params),
-    queryFn: () => getTeacherSummary(teacherId!, params),
-    enabled: Boolean(teacherId && (options?.enabled ?? true)),
-  });
+export function useTeacherDailyAttendance(date: string) {
+  return useQuery({ queryKey: attendanceQueryKeys.teacherDaily(date), queryFn: () => getTeacherDailyAttendance(date), enabled: Boolean(date) });
 }
 
-export function useTeacherAttendanceById(id?: string, options?: { enabled?: boolean }) {
+export function useTeacherSummary(teacherId: string, params?: { startDate?: string; endDate?: string }) {
   return useQuery({
-    queryKey: attendanceQueryKeys.teacherDetail(id || ""),
-    queryFn: () => getTeacherAttendanceById(id!),
-    enabled: Boolean(id && (options?.enabled ?? true)),
-  });
-}
-
-export function useBulkRecordTeachers() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: bulkRecordTeachers,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.teachers(),
-      });
-    },
+    queryKey: attendanceQueryKeys.teacherSummary(teacherId, params),
+    queryFn: () => getTeacherSummary(teacherId, params),
+    enabled: Boolean(teacherId),
   });
 }
 
@@ -421,23 +262,25 @@ export function useRecordTeacherAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: recordTeacherAttendance,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.teachers(),
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.teachers() }),
+  });
+}
+
+export function useBulkRecordTeachers() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkRecordTeachers,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.teachers() }),
   });
 }
 
 export function useUpdateTeacherAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTeacherAttendanceDto }) =>
-      updateTeacherAttendance(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.teachers(),
-      });
+    mutationFn: ({ id, data }: { id: string; data: UpdateAttendanceTeacherDto }) => updateTeacherAttendance(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.teacherDetail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.teachers() });
     },
   });
 }
@@ -445,11 +288,7 @@ export function useUpdateTeacherAttendance() {
 export function useDeleteTeacherAttendance() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteTeacherAttendance,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: attendanceQueryKeys.teachers(),
-      });
-    },
+    mutationFn: (id: string) => deleteTeacherAttendance(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceQueryKeys.teachers() }),
   });
 }
