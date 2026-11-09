@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate, Link, useLocation } from "react-router";
+import { SetupWizardPage } from "./components/SetupWizardPage";
 import { AcademicYearsPage } from "./components/AcademicYearsPage";
 import { SemestersPage } from "./components/SemestersPage";
 import { ClassroomsPage } from "./components/ClassroomsPage";
@@ -7,6 +8,7 @@ import { SubjectsPage } from "./components/SubjectsPage";
 import { TeachersPage } from "./components/TeachersPage";
 
 const tabs = [
+  { name: "Wizard Inisialisasi", href: "/settings/wizard" },
   { name: "Tahun Ajaran", href: "/settings/academic-years" },
   { name: "Semester", href: "/settings/semesters" },
   { name: "Kelas & Rombel", href: "/settings/classrooms" },
@@ -44,6 +46,7 @@ export const SettingsRoutes: React.FC = () => {
       {/* Child Routes */}
       <Routes>
         <Route index element={<Navigate to="academic-years" replace />} />
+        <Route path="wizard" element={<SetupWizardPage />} />
         <Route path="academic-years" element={<AcademicYearsPage />} />
         <Route path="semesters" element={<SemestersPage />} />
         <Route path="classrooms" element={<ClassroomsPage />} />

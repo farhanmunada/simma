@@ -41,4 +41,22 @@ describe("Settings Feature Module", () => {
     expect(typeof getSubjects).toBe("function");
     expect(typeof getTeachers).toBe("function");
   });
+
+  it("should export SetupWizardPage and step components", async () => {
+    const { SetupWizardPage } = await import("./components/SetupWizardPage");
+    const { SchoolIdentityStep } = await import("./components/steps/SchoolIdentityStep");
+    const { AcademicYearStep } = await import("./components/steps/AcademicYearStep");
+    const { SemesterStep } = await import("./components/steps/SemesterStep");
+    const { ClassroomSetupStep } = await import("./components/steps/ClassroomSetupStep");
+    const { AdminUserStep } = await import("./components/steps/AdminUserStep");
+    const { SetupSummaryStep } = await import("./components/steps/SetupSummaryStep");
+
+    expect(typeof SetupWizardPage).toBe("function");
+    expect(typeof SchoolIdentityStep).toBe("function");
+    expect(typeof AcademicYearStep).toBe("function");
+    expect(typeof SemesterStep).toBe("function");
+    expect(typeof ClassroomSetupStep).toBe("function");
+    expect(typeof AdminUserStep).toBe("function");
+    expect(typeof SetupSummaryStep).toBe("function");
+  });
 });
