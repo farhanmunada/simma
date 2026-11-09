@@ -8,8 +8,10 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
   };
 
   // Institutions
+  app.get("/institution", authGuard, setupController.getInstitution);
   app.get("/institutions", authGuard, setupController.getInstitution);
   app.get("/institutions/:id", authGuard, setupController.getInstitutionById);
+  app.post("/institution", authGuard, setupController.createInstitution);
   app.post("/institutions", authGuard, setupController.createInstitution);
   app.patch("/institutions/:id", authGuard, setupController.updateInstitution);
 
