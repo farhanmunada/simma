@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
   Student,
   CreateStudentDto,
@@ -12,10 +13,6 @@ import type {
   PaginatedStudentsResponse,
   PaginationMeta,
 } from "../types";
-
-function normalizePath(endpoint: string): string {
-  return endpoint.replace(/^\/?api\/v1/, "");
-}
 
 function extractPaginatedStudents(res: unknown): PaginatedStudentsResponse {
   if (res && typeof res === "object") {
@@ -76,22 +73,19 @@ function extractList<T>(res: unknown): T[] {
 export async function getStudents(
   params?: StudentQueryParams
 ): Promise<PaginatedStudentsResponse> {
-  const path = normalizePath("/students");
-  const res = await apiClient<unknown>(path, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.LIST, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractPaginatedStudents(res);
 }
 
 export async function getStudentById(id: string): Promise<Student> {
-  const path = normalizePath(`/students/${id}`);
-  const res = await apiClient<unknown>(path);
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.DETAIL(id));
   return extractSingle<Student>(res);
 }
 
 export async function createStudent(data: CreateStudentDto): Promise<Student> {
-  const path = normalizePath("/students");
-  const res = await apiClient<unknown>(path, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.CREATE, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -102,8 +96,7 @@ export async function updateStudent(
   id: string,
   data: UpdateStudentDto
 ): Promise<Student> {
-  const path = normalizePath(`/students/${id}`);
-  const res = await apiClient<unknown>(path, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.UPDATE(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -111,15 +104,13 @@ export async function updateStudent(
 }
 
 export async function deleteStudent(id: string): Promise<void> {
-  const path = normalizePath(`/students/${id}`);
-  await apiClient<void>(path, {
+  await apiClient<void>(API_ENDPOINTS.STUDENTS.DELETE(id), {
     method: "DELETE",
   });
 }
 
 export async function getStudentParents(id: string): Promise<StudentParentDetail[]> {
-  const path = normalizePath(`/students/${id}/parents`);
-  const res = await apiClient<unknown>(path);
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.PARENTS(id));
   return extractList<StudentParentDetail>(res);
 }
 
@@ -127,8 +118,7 @@ export async function createAndLinkParent(
   studentId: string,
   data: CreateAndLinkParentDto | AddStudentParentDto
 ): Promise<StudentParentDetail> {
-  const path = normalizePath(`/students/${studentId}/parents`);
-  const res = await apiClient<unknown>(path, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.PARENTS(studentId), {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -138,8 +128,7 @@ export async function createAndLinkParent(
 export async function assignClassroom(
   data: AssignClassroomDto
 ): Promise<{ assignedCount?: number }> {
-  const path = normalizePath("/students/assign-classroom");
-  const res = await apiClient<unknown>(path, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.STUDENTS.ASSIGN_CLASSROOM, {
     method: "POST",
     body: JSON.stringify(data),
   });

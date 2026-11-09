@@ -35,7 +35,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/students/${id}`,
     DELETE: (id: string) => `/students/${id}`,
     PARENTS: (id: string) => `/students/${id}/parents`,
-    ASSIGN_CLASSROOM: (id: string) => `/students/${id}/classroom`,
+    ASSIGN_CLASSROOM: "/students/assign-classroom",
   },
   TAHFIDZ: {
     LIST: "/tahfidz",

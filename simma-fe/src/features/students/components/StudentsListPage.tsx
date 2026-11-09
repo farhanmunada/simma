@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
-import { Plus, Search, Trash2, Eye, Users } from "lucide-react";
+import { Plus, Trash2, Eye, Users } from "lucide-react";
 import {
   useStudents,
   useCreateStudent,
@@ -16,20 +16,9 @@ import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
 import { Modal } from "../../../components/ui/Modal";
-import { Input } from "../../../components/ui/Input";
-import { Select } from "../../../components/ui/Select";
-
-const STATUS_BADGE_MAP: Record<
-  StudentStatus,
-  { variant: "success" | "warning" | "danger" | "info" | "neutral"; label: string }
-> = {
-  aktif: { variant: "success", label: "Aktif" },
-  lulus: { variant: "info", label: "Lulus" },
-  mutasi_keluar: { variant: "warning", label: "Mutasi Keluar" },
-  do: { variant: "danger", label: "Drop Out" },
-  tidak_aktif: { variant: "danger", label: "Tidak Aktif" },
-  aktif_tanpa_rombel: { variant: "neutral", label: "Non-Rombel" },
-};
+import { StudentFilterToolbar } from "./StudentFilterToolbar";
+import { CreateStudentModal } from "./CreateStudentModal";
+import { STATUS_BADGE_MAP } from "./StudentProfileCard";
 
 export const StudentsListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -44,18 +33,6 @@ export const StudentsListPage: React.FC = () => {
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Student | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-
-  // Form State
-  const [nik, setNik] = useState("");
-  const [nisn, setNisn] = useState("");
-  const [nis, setNis] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [birthPlace, setBirthPlace] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState<Gender>("L");
-  const [motherName, setMotherName] = useState("");
-  const [status, setStatus] = useState<StudentStatus>("aktif");
 
   const queryParams = useMemo(() => {
     return {
@@ -74,72 +51,15 @@ export const StudentsListPage: React.FC = () => {
   const students = data?.data || [];
   const meta = data?.meta || { page: 1, limit: 20, total: 0, totalPages: 1 };
 
-  const handleOpenAddModal = () => {
-    setNik("");
-    setNisn("");
-    setNis("");
-    setFullName("");
-    setBirthPlace("");
-    setBirthDate("");
-    setGender("L");
-    setMotherName("");
-    setStatus("aktif");
-    setFormError(null);
-    setIsAddModalOpen(true);
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedStatus("");
+    setSelectedGender("");
+    setPage(1);
   };
 
-  const handleCloseAddModal = () => {
-    setIsAddModalOpen(false);
-    setFormError(null);
-  };
-
-  const validateForm = (): string | null => {
-    if (!nik.trim()) return "NIK wajib diisi.";
-    if (nik.trim().length !== 16 || !/^\d{16}$/.test(nik.trim())) {
-      return "NIK harus tepat 16 digit angka.";
-    }
-    if (!fullName.trim()) return "Nama lengkap siswa wajib diisi.";
-    if (!birthPlace.trim()) return "Tempat lahir wajib diisi.";
-    if (!birthDate.trim()) return "Tanggal lahir wajib diisi.";
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate.trim())) {
-      return "Format tanggal lahir harus YYYY-MM-DD.";
-    }
-    if (!motherName.trim()) return "Nama ibu kandung wajib diisi.";
-    if (nisn.trim() && (nisn.trim().length !== 10 || !/^\d{10}$/.test(nisn.trim()))) {
-      return "NISN harus tepat 10 digit angka jika diisi.";
-    }
-    return null;
-  };
-
-  const handleCreateStudent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-
-    const validationMsg = validateForm();
-    if (validationMsg) {
-      setFormError(validationMsg);
-      return;
-    }
-
-    const payload: CreateStudentDto = {
-      nik: nik.trim(),
-      nisn: nisn.trim() || null,
-      nis: nis.trim() || null,
-      fullName: fullName.trim(),
-      birthPlace: birthPlace.trim(),
-      birthDate: birthDate.trim(),
-      gender,
-      motherName: motherName.trim(),
-      status,
-    };
-
-    try {
-      await createMutation.mutateAsync(payload);
-      setIsAddModalOpen(false);
-    } catch (err: unknown) {
-      const apiErr = err as { message?: string };
-      setFormError(apiErr?.message || "Gagal mendaftarkan siswa baru.");
-    }
+  const handleCreateStudent = async (payload: CreateStudentDto) => {
+    await createMutation.mutateAsync(payload);
   };
 
   const handleDeleteStudent = async () => {
@@ -164,7 +84,7 @@ export const StudentsListPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" onClick={handleOpenAddModal}>
+          <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
             <Plus className="w-3.5 h-3.5 mr-1" />
             Tambah Siswa
           </Button>
@@ -172,77 +92,24 @@ export const StudentsListPage: React.FC = () => {
       </div>
 
       {/* Filter Bar */}
-      <Card className="p-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Cari Nama / NISN / NIK..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setPage(1);
-              }}
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600"
-            />
-          </div>
-
-          <div>
-            <Select
-              value={selectedStatus}
-              onChange={(e) => {
-                setSelectedStatus(e.target.value);
-                setPage(1);
-              }}
-              options={[
-                { value: "", label: "Semua Status" },
-                { value: "aktif", label: "Aktif" },
-                { value: "aktif_tanpa_rombel", label: "Aktif Non-Rombel" },
-                { value: "lulus", label: "Lulus" },
-                { value: "mutasi_keluar", label: "Mutasi Keluar" },
-                { value: "tidak_aktif", label: "Tidak Aktif" },
-                { value: "do", label: "Drop Out" },
-              ]}
-              className="py-1.5 text-xs"
-            />
-          </div>
-
-          <div>
-            <Select
-              value={selectedGender}
-              onChange={(e) => {
-                setSelectedGender(e.target.value);
-                setPage(1);
-              }}
-              options={[
-                { value: "", label: "Semua Jenis Kelamin" },
-                { value: "L", label: "Laki-laki (L)" },
-                { value: "P", label: "Perempuan (P)" },
-              ]}
-              className="py-1.5 text-xs"
-            />
-          </div>
-
-          <div className="flex items-center">
-            {(searchTerm || selectedStatus || selectedGender) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedStatus("");
-                  setSelectedGender("");
-                  setPage(1);
-                }}
-                className="text-xs text-slate-500"
-              >
-                Reset Filter
-              </Button>
-            )}
-          </div>
-        </div>
-      </Card>
+      <StudentFilterToolbar
+        searchTerm={searchTerm}
+        onSearchChange={(val) => {
+          setSearchTerm(val);
+          setPage(1);
+        }}
+        selectedStatus={selectedStatus}
+        onStatusChange={(val) => {
+          setSelectedStatus(val);
+          setPage(1);
+        }}
+        selectedGender={selectedGender}
+        onGenderChange={(val) => {
+          setSelectedGender(val);
+          setPage(1);
+        }}
+        onReset={handleResetFilters}
+      />
 
       {/* Table Data */}
       <Card className="overflow-hidden p-0">
@@ -377,123 +244,12 @@ export const StudentsListPage: React.FC = () => {
       </Card>
 
       {/* Modal Tambah Siswa */}
-      <Modal
+      <CreateStudentModal
         isOpen={isAddModalOpen}
-        onClose={handleCloseAddModal}
-        title="Tambah Siswa Baru"
-        maxWidth="lg"
-      >
-        <form onSubmit={handleCreateStudent} className="space-y-3">
-          {formError && (
-            <div className="p-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-md">
-              {formError}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input
-              label="NIK (16 Digit)*"
-              value={nik}
-              onChange={(e) => setNik(e.target.value)}
-              maxLength={16}
-              placeholder="3201xxxxxxxxxxxx"
-              required
-            />
-            <Input
-              label="NISN (10 Digit)"
-              value={nisn}
-              onChange={(e) => setNisn(e.target.value)}
-              maxLength={10}
-              placeholder="00xxxxxxxx"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input
-              label="Nama Lengkap Siswa*"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Contoh: Ahmad Fauzi"
-              required
-            />
-            <Input
-              label="NIS Lokal"
-              value={nis}
-              onChange={(e) => setNis(e.target.value)}
-              placeholder="Contoh: 2026001"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input
-              label="Tempat Lahir*"
-              value={birthPlace}
-              onChange={(e) => setBirthPlace(e.target.value)}
-              placeholder="Contoh: Bandung"
-              required
-            />
-            <Input
-              label="Tanggal Lahir*"
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Select
-              label="Jenis Kelamin*"
-              value={gender}
-              onChange={(e) => setGender(e.target.value as Gender)}
-              options={[
-                { value: "L", label: "Laki-laki" },
-                { value: "P", label: "Perempuan" },
-              ]}
-              required
-            />
-            <Select
-              label="Status Awal*"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as StudentStatus)}
-              options={[
-                { value: "aktif", label: "Aktif" },
-                { value: "aktif_tanpa_rombel", label: "Aktif Non-Rombel" },
-                { value: "tidak_aktif", label: "Tidak Aktif" },
-              ]}
-              required
-            />
-          </div>
-
-          <div>
-            <Input
-              label="Nama Ibu Kandung*"
-              value={motherName}
-              onChange={(e) => setMotherName(e.target.value)}
-              placeholder="Nama lengkap ibu kandung"
-              required
-            />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCloseAddModal}
-            >
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              isLoading={createMutation.isPending}
-            >
-              Simpan Siswa
-            </Button>
-          </div>
-        </form>
-      </Modal>
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={handleCreateStudent}
+        isLoading={createMutation.isPending}
+      />
 
       {/* Modal Konfirmasi Hapus */}
       <Modal
