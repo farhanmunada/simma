@@ -1,13 +1,27 @@
-import { eq, and, or, ilike, count, desc, isNull } from "drizzle-orm";
-import { getDb } from "../../core/database/client.js";
 import {
-  institutions,
-  academicYears,
-  semesters,
-  classrooms,
-  subjects,
-  teachers,
-} from "../../db/schema/setup";
+  institutionRepository,
+  InstitutionRepository,
+} from "./repositories/institution.repository.js";
+import {
+  academicYearsRepository,
+  AcademicYearsRepository,
+} from "./repositories/academic-years.repository.js";
+import {
+  semestersRepository,
+  SemestersRepository,
+} from "./repositories/semesters.repository.js";
+import {
+  classroomsRepository,
+  ClassroomsRepository,
+} from "./repositories/classrooms.repository.js";
+import {
+  subjectsRepository,
+  SubjectsRepository,
+} from "./repositories/subjects.repository.js";
+import {
+  teachersRepository,
+  TeachersRepository,
+} from "./repositories/teachers.repository.js";
 import type {
   Institution,
   NewInstitution,
@@ -23,41 +37,43 @@ import type {
   NewTeacher,
 } from "./setup.types.js";
 
+export {
+  InstitutionRepository,
+  AcademicYearsRepository,
+  SemestersRepository,
+  ClassroomsRepository,
+  SubjectsRepository,
+  TeachersRepository,
+};
+
 export class SetupRepository {
+  constructor(
+    public readonly institutions: InstitutionRepository = institutionRepository,
+    public readonly academicYears: AcademicYearsRepository = academicYearsRepository,
+    public readonly semesters: SemestersRepository = semestersRepository,
+    public readonly classrooms: ClassroomsRepository = classroomsRepository,
+    public readonly subjects: SubjectsRepository = subjectsRepository,
+    public readonly teachers: TeachersRepository = teachersRepository,
+  ) {}
+
   // --- Institutions ---
   async findFirstInstitution(): Promise<Institution | null> {
-    const db = getDb();
-    const [row] = await db.select().from(institutions).limit(1);
-    return row ?? null;
+    return this.institutions.findFirstInstitution();
   }
 
   async findInstitutionById(id: string): Promise<Institution | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(institutions)
-      .where(eq(institutions.id, id))
-      .limit(1);
-    return row ?? null;
+    return this.institutions.findInstitutionById(id);
   }
 
   async createInstitution(data: NewInstitution): Promise<Institution> {
-    const db = getDb();
-    const [row] = await db.insert(institutions).values(data).returning();
-    return row;
+    return this.institutions.createInstitution(data);
   }
 
   async updateInstitution(
     id: string,
     data: Partial<NewInstitution>,
   ): Promise<Institution | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(institutions)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(institutions.id, id))
-      .returning();
-    return row ?? null;
+    return this.institutions.updateInstitution(id, data);
   }
 
   // --- Academic Years ---
@@ -67,87 +83,30 @@ export class SetupRepository {
     search?: string;
     isActive?: boolean;
   }): Promise<{ data: AcademicYear[]; total: number }> {
-    const db = getDb();
-    const conditions = [];
-
-    if (params.search) {
-      conditions.push(ilike(academicYears.name, `%${params.search}%`));
-    }
-    if (params.isActive !== undefined) {
-      conditions.push(eq(academicYears.isActive, params.isActive));
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (params.page - 1) * params.limit;
-
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(academicYears)
-      .where(whereClause);
-    const total = totalRow ? Number(totalRow.count) : 0;
-
-    const rows = await db
-      .select()
-      .from(academicYears)
-      .where(whereClause)
-      .orderBy(desc(academicYears.createdAt))
-      .limit(params.limit)
-      .offset(offset);
-
-    return { data: rows, total };
+    return this.academicYears.findAcademicYears(params);
   }
 
   async findAcademicYearById(id: string): Promise<AcademicYear | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(academicYears)
-      .where(eq(academicYears.id, id))
-      .limit(1);
-    return row ?? null;
+    return this.academicYears.findAcademicYearById(id);
   }
 
   async createAcademicYear(data: NewAcademicYear): Promise<AcademicYear> {
-    const db = getDb();
-    const [row] = await db.insert(academicYears).values(data).returning();
-    return row;
+    return this.academicYears.createAcademicYear(data);
   }
 
   async updateAcademicYear(
     id: string,
     data: Partial<NewAcademicYear>,
   ): Promise<AcademicYear | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(academicYears)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(academicYears.id, id))
-      .returning();
-    return row ?? null;
+    return this.academicYears.updateAcademicYear(id, data);
   }
 
   async deleteAcademicYear(id: string): Promise<boolean> {
-    const db = getDb();
-    const result = await db
-      .delete(academicYears)
-      .where(eq(academicYears.id, id))
-      .returning();
-    return result.length > 0;
+    return this.academicYears.deleteAcademicYear(id);
   }
 
   async setActiveAcademicYear(id: string): Promise<AcademicYear | null> {
-    const db = getDb();
-    return await db.transaction(async (tx) => {
-      await tx
-        .update(academicYears)
-        .set({ isActive: false, updatedAt: new Date() });
-      const [row] = await tx
-        .update(academicYears)
-        .set({ isActive: true, updatedAt: new Date() })
-        .where(eq(academicYears.id, id))
-        .returning();
-      return row ?? null;
-    });
+    return this.academicYears.setActiveAcademicYear(id);
   }
 
   // --- Semesters ---
@@ -157,87 +116,30 @@ export class SetupRepository {
     academicYearId?: string;
     isActive?: boolean;
   }): Promise<{ data: Semester[]; total: number }> {
-    const db = getDb();
-    const conditions = [];
-
-    if (params.academicYearId) {
-      conditions.push(eq(semesters.academicYearId, params.academicYearId));
-    }
-    if (params.isActive !== undefined) {
-      conditions.push(eq(semesters.isActive, params.isActive));
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (params.page - 1) * params.limit;
-
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(semesters)
-      .where(whereClause);
-    const total = totalRow ? Number(totalRow.count) : 0;
-
-    const rows = await db
-      .select()
-      .from(semesters)
-      .where(whereClause)
-      .orderBy(desc(semesters.createdAt))
-      .limit(params.limit)
-      .offset(offset);
-
-    return { data: rows, total };
+    return this.semesters.findSemesters(params);
   }
 
   async findSemesterById(id: string): Promise<Semester | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(semesters)
-      .where(eq(semesters.id, id))
-      .limit(1);
-    return row ?? null;
+    return this.semesters.findSemesterById(id);
   }
 
   async createSemester(data: NewSemester): Promise<Semester> {
-    const db = getDb();
-    const [row] = await db.insert(semesters).values(data).returning();
-    return row;
+    return this.semesters.createSemester(data);
   }
 
   async updateSemester(
     id: string,
     data: Partial<NewSemester>,
   ): Promise<Semester | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(semesters)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(semesters.id, id))
-      .returning();
-    return row ?? null;
+    return this.semesters.updateSemester(id, data);
   }
 
   async deleteSemester(id: string): Promise<boolean> {
-    const db = getDb();
-    const result = await db
-      .delete(semesters)
-      .where(eq(semesters.id, id))
-      .returning();
-    return result.length > 0;
+    return this.semesters.deleteSemester(id);
   }
 
   async setActiveSemester(id: string): Promise<Semester | null> {
-    const db = getDb();
-    return await db.transaction(async (tx) => {
-      await tx
-        .update(semesters)
-        .set({ isActive: false, updatedAt: new Date() });
-      const [row] = await tx
-        .update(semesters)
-        .set({ isActive: true, updatedAt: new Date() })
-        .where(eq(semesters.id, id))
-        .returning();
-      return row ?? null;
-    });
+    return this.semesters.setActiveSemester(id);
   }
 
   // --- Classrooms ---
@@ -248,75 +150,26 @@ export class SetupRepository {
     gradeLevel?: number;
     search?: string;
   }): Promise<{ data: Classroom[]; total: number }> {
-    const db = getDb();
-    const conditions = [];
-
-    if (params.semesterId) {
-      conditions.push(eq(classrooms.semesterId, params.semesterId));
-    }
-    if (params.gradeLevel) {
-      conditions.push(eq(classrooms.gradeLevel, params.gradeLevel));
-    }
-    if (params.search) {
-      conditions.push(ilike(classrooms.name, `%${params.search}%`));
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (params.page - 1) * params.limit;
-
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(classrooms)
-      .where(whereClause);
-    const total = totalRow ? Number(totalRow.count) : 0;
-
-    const rows = await db
-      .select()
-      .from(classrooms)
-      .where(whereClause)
-      .orderBy(desc(classrooms.createdAt))
-      .limit(params.limit)
-      .offset(offset);
-
-    return { data: rows, total };
+    return this.classrooms.findClassrooms(params);
   }
 
   async findClassroomById(id: string): Promise<Classroom | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(classrooms)
-      .where(eq(classrooms.id, id))
-      .limit(1);
-    return row ?? null;
+    return this.classrooms.findClassroomById(id);
   }
 
   async createClassroom(data: NewClassroom): Promise<Classroom> {
-    const db = getDb();
-    const [row] = await db.insert(classrooms).values(data).returning();
-    return row;
+    return this.classrooms.createClassroom(data);
   }
 
   async updateClassroom(
     id: string,
     data: Partial<NewClassroom>,
   ): Promise<Classroom | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(classrooms)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(classrooms.id, id))
-      .returning();
-    return row ?? null;
+    return this.classrooms.updateClassroom(id, data);
   }
 
   async deleteClassroom(id: string): Promise<boolean> {
-    const db = getDb();
-    const result = await db
-      .delete(classrooms)
-      .where(eq(classrooms.id, id))
-      .returning();
-    return result.length > 0;
+    return this.classrooms.deleteClassroom(id);
   }
 
   // --- Subjects ---
@@ -327,90 +180,30 @@ export class SetupRepository {
     group?: string;
     search?: string;
   }): Promise<{ data: Subject[]; total: number }> {
-    const db = getDb();
-    const conditions = [];
-
-    if (params.phase) {
-      conditions.push(eq(subjects.phase, params.phase));
-    }
-    if (params.group) {
-      conditions.push(eq(subjects.group, params.group));
-    }
-    if (params.search) {
-      conditions.push(
-        or(
-          ilike(subjects.name, `%${params.search}%`),
-          ilike(subjects.code, `%${params.search}%`),
-        ),
-      );
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (params.page - 1) * params.limit;
-
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(subjects)
-      .where(whereClause);
-    const total = totalRow ? Number(totalRow.count) : 0;
-
-    const rows = await db
-      .select()
-      .from(subjects)
-      .where(whereClause)
-      .orderBy(desc(subjects.createdAt))
-      .limit(params.limit)
-      .offset(offset);
-
-    return { data: rows, total };
+    return this.subjects.findSubjects(params);
   }
 
   async findSubjectById(id: string): Promise<Subject | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(subjects)
-      .where(eq(subjects.id, id))
-      .limit(1);
-    return row ?? null;
+    return this.subjects.findSubjectById(id);
   }
 
   async findSubjectByCode(code: string): Promise<Subject | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(subjects)
-      .where(eq(subjects.code, code))
-      .limit(1);
-    return row ?? null;
+    return this.subjects.findSubjectByCode(code);
   }
 
   async createSubject(data: NewSubject): Promise<Subject> {
-    const db = getDb();
-    const [row] = await db.insert(subjects).values(data).returning();
-    return row;
+    return this.subjects.createSubject(data);
   }
 
   async updateSubject(
     id: string,
     data: Partial<NewSubject>,
   ): Promise<Subject | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(subjects)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(subjects.id, id))
-      .returning();
-    return row ?? null;
+    return this.subjects.updateSubject(id, data);
   }
 
   async deleteSubject(id: string): Promise<boolean> {
-    const db = getDb();
-    const result = await db
-      .delete(subjects)
-      .where(eq(subjects.id, id))
-      .returning();
-    return result.length > 0;
+    return this.subjects.deleteSubject(id);
   }
 
   // --- Teachers ---
@@ -421,98 +214,33 @@ export class SetupRepository {
     employmentType?: string;
     includeDeleted?: boolean;
   }): Promise<{ data: Teacher[]; total: number }> {
-    const db = getDb();
-    const conditions = [];
-
-    if (!params.includeDeleted) {
-      conditions.push(isNull(teachers.deletedAt));
-    }
-    if (params.employmentType) {
-      conditions.push(eq(teachers.employmentType, params.employmentType));
-    }
-    if (params.search) {
-      conditions.push(
-        or(
-          ilike(teachers.fullName, `%${params.search}%`),
-          ilike(teachers.nik, `%${params.search}%`),
-        ),
-      );
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (params.page - 1) * params.limit;
-
-    const [totalRow] = await db
-      .select({ count: count() })
-      .from(teachers)
-      .where(whereClause);
-    const total = totalRow ? Number(totalRow.count) : 0;
-
-    const rows = await db
-      .select()
-      .from(teachers)
-      .where(whereClause)
-      .orderBy(desc(teachers.createdAt))
-      .limit(params.limit)
-      .offset(offset);
-
-    return { data: rows, total };
+    return this.teachers.findTeachers(params);
   }
 
   async findTeacherById(
     id: string,
     includeDeleted = false,
   ): Promise<Teacher | null> {
-    const db = getDb();
-    const conditions = [eq(teachers.id, id)];
-    if (!includeDeleted) {
-      conditions.push(isNull(teachers.deletedAt));
-    }
-    const [row] = await db
-      .select()
-      .from(teachers)
-      .where(and(...conditions))
-      .limit(1);
-    return row ?? null;
+    return this.teachers.findTeacherById(id, includeDeleted);
   }
 
   async findTeacherByNik(nik: string): Promise<Teacher | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(teachers)
-      .where(eq(teachers.nik, nik))
-      .limit(1);
-    return row ?? null;
+    return this.teachers.findTeacherByNik(nik);
   }
 
   async createTeacher(data: NewTeacher): Promise<Teacher> {
-    const db = getDb();
-    const [row] = await db.insert(teachers).values(data).returning();
-    return row;
+    return this.teachers.createTeacher(data);
   }
 
   async updateTeacher(
     id: string,
     data: Partial<NewTeacher>,
   ): Promise<Teacher | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(teachers)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(teachers.id, id))
-      .returning();
-    return row ?? null;
+    return this.teachers.updateTeacher(id, data);
   }
 
   async softDeleteTeacher(id: string): Promise<boolean> {
-    const db = getDb();
-    const [row] = await db
-      .update(teachers)
-      .set({ deletedAt: new Date(), updatedAt: new Date() })
-      .where(eq(teachers.id, id))
-      .returning();
-    return Boolean(row);
+    return this.teachers.softDeleteTeacher(id);
   }
 }
 

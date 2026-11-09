@@ -105,6 +105,59 @@ export interface CreateTeacherDto {
 
 export type UpdateTeacherDto = Partial<CreateTeacherDto>;
 
+export interface Institution {
+  id?: string;
+  nsm: string;
+  npsn: string;
+  name: string;
+  level?: "MA";
+  status: "NEGERI" | "SWASTA";
+  address?: string | null;
+  village?: string | null;
+  district?: string | null;
+  city?: string | null;
+  province?: string | null;
+  headmasterName?: string | null;
+  headmasterNip?: string | null;
+  accreditation?: "A" | "B" | "C" | "BELUM" | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SetupWizardData {
+  institution: {
+    nsm: string;
+    npsn: string;
+    name: string;
+    status: "NEGERI" | "SWASTA";
+    level: "MA";
+    address: string;
+    headmasterName: string;
+    headmasterNip?: string;
+    accreditation: "A" | "B" | "C" | "BELUM";
+  };
+  academicYear: {
+    name: string;
+    startDate: string;
+    endDate: string;
+  };
+  semester: {
+    type: 1 | 2;
+    startDate: string;
+    endDate: string;
+  };
+  classrooms: Array<{
+    name: string;
+    gradeLevel: number;
+    capacity: number;
+  }>;
+  adminUser: {
+    name: string;
+    email: string;
+    role: string;
+  };
+}
+
 export interface QueryFilterParams {
   page?: number;
   limit?: number;
