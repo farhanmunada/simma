@@ -65,7 +65,7 @@ describe("Tahfidz Feature Module", () => {
   });
 
   it("should validate 114 Quran Surahs and getSurahName helper", async () => {
-    const { QURAN_SURAHS, getSurahName } = await import("./types");
+    const { QURAN_SURAHS, getSurahName } = await import("./utils");
 
     expect(QURAN_SURAHS).toHaveLength(114);
     expect(QURAN_SURAHS[0].name).toBe("Al-Fatihah");

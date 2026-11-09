@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
   TahfidzRecord,
   CreateTahfidzRecordDto,
@@ -13,13 +14,6 @@ import type {
   StudentTahfidzHistory,
   PaginatedResult,
 } from "../types";
-
-function cleanEndpoint(ep: string): string {
-  if (ep.startsWith("/api/v1/")) {
-    return ep.replace("/api/v1", "");
-  }
-  return ep;
-}
 
 function extractSingle<T>(res: unknown): T {
   if (res && typeof res === "object") {
@@ -41,10 +35,7 @@ function extractPaginated<T>(res: unknown): PaginatedResult<T> {
   if (res && typeof res === "object") {
     const obj = res as { data?: unknown; meta?: PaginatedResult<T>["meta"] };
     const list = Array.isArray(obj.data) ? (obj.data as T[]) : [];
-    return {
-      data: list,
-      meta: obj.meta,
-    };
+    return { data: list, meta: obj.meta };
   }
   return { data: [], meta: { page: 1, limit: 10, total: 0, totalPages: 0 } };
 }
@@ -56,21 +47,21 @@ function extractPaginated<T>(res: unknown): PaginatedResult<T> {
 export async function getTahfidzRecords(
   params?: TahfidzQueryParams
 ): Promise<PaginatedResult<TahfidzRecord>> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/tahfidz"), {
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.LIST, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractPaginated<TahfidzRecord>(res);
 }
 
 export async function getTahfidzRecordById(id: string): Promise<TahfidzRecord> {
-  const res = await apiClient<unknown>(cleanEndpoint(`/api/v1/tahfidz/${id}`));
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.DETAIL(id));
   return extractSingle<TahfidzRecord>(res);
 }
 
 export async function createTahfidzRecord(
   data: CreateTahfidzRecordDto
 ): Promise<TahfidzRecord> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/tahfidz"), {
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.CREATE, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -81,7 +72,7 @@ export async function updateTahfidzRecord(
   id: string,
   data: UpdateTahfidzRecordDto
 ): Promise<TahfidzRecord> {
-  const res = await apiClient<unknown>(cleanEndpoint(`/api/v1/tahfidz/${id}`), {
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.UPDATE(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -89,7 +80,7 @@ export async function updateTahfidzRecord(
 }
 
 export async function deleteTahfidzRecord(id: string): Promise<void> {
-  await apiClient<void>(cleanEndpoint(`/api/v1/tahfidz/${id}`), {
+  await apiClient<void>(API_ENDPOINTS.TAHFIDZ.DELETE(id), {
     method: "DELETE",
   });
 }
@@ -101,18 +92,14 @@ export async function deleteTahfidzRecord(id: string): Promise<void> {
 export async function getStudentTahfidzHistory(
   studentId: string
 ): Promise<StudentTahfidzHistory> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/tahfidz/student/${studentId}`)
-  );
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.STUDENT_HISTORY(studentId));
   return extractSingle<StudentTahfidzHistory>(res);
 }
 
 export async function getStudentTahfidzProgress(
   studentId: string
 ): Promise<StudentTahfidzProgress> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/tahfidz/student/${studentId}/progress`)
-  );
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.STUDENT_PROGRESS(studentId));
   return extractSingle<StudentTahfidzProgress>(res);
 }
 
@@ -123,23 +110,21 @@ export async function getStudentTahfidzProgress(
 export async function getTasmiExams(
   params?: TasmiQueryParams
 ): Promise<PaginatedResult<TasmiExam>> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/tahfidz/tasmi"), {
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.TASMI_LIST, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractPaginated<TasmiExam>(res);
 }
 
 export async function getTasmiExamById(id: string): Promise<TasmiExam> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/tahfidz/tasmi/${id}`)
-  );
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.TASMI_DETAIL(id));
   return extractSingle<TasmiExam>(res);
 }
 
 export async function createTasmiExam(
   data: CreateTasmiExamDto
 ): Promise<TasmiExam> {
-  const res = await apiClient<unknown>(cleanEndpoint("/api/v1/tahfidz/tasmi"), {
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.TASMI_CREATE, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -150,18 +135,15 @@ export async function updateTasmiExam(
   id: string,
   data: UpdateTasmiExamDto
 ): Promise<TasmiExam> {
-  const res = await apiClient<unknown>(
-    cleanEndpoint(`/api/v1/tahfidz/tasmi/${id}`),
-    {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }
-  );
+  const res = await apiClient<unknown>(API_ENDPOINTS.TAHFIDZ.TASMI_UPDATE(id), {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
   return extractSingle<TasmiExam>(res);
 }
 
 export async function deleteTasmiExam(id: string): Promise<void> {
-  await apiClient<void>(cleanEndpoint(`/api/v1/tahfidz/tasmi/${id}`), {
+  await apiClient<void>(API_ENDPOINTS.TAHFIDZ.TASMI_DELETE(id), {
     method: "DELETE",
   });
 }
@@ -172,18 +154,12 @@ export async function deleteTasmiExam(id: string): Promise<void> {
 
 export const tahfidzQueryKeys = {
   all: ["tahfidz"] as const,
-  records: (params?: TahfidzQueryParams) =>
-    [...tahfidzQueryKeys.all, "records", params] as const,
-  recordDetail: (id: string) =>
-    [...tahfidzQueryKeys.all, "record", id] as const,
-  studentHistory: (studentId: string) =>
-    [...tahfidzQueryKeys.all, "student-history", studentId] as const,
-  studentProgress: (studentId: string) =>
-    [...tahfidzQueryKeys.all, "student-progress", studentId] as const,
-  tasmiList: (params?: TasmiQueryParams) =>
-    [...tahfidzQueryKeys.all, "tasmi", params] as const,
-  tasmiDetail: (id: string) =>
-    [...tahfidzQueryKeys.all, "tasmi-detail", id] as const,
+  records: (params?: TahfidzQueryParams) => [...tahfidzQueryKeys.all, "records", params] as const,
+  recordDetail: (id: string) => [...tahfidzQueryKeys.all, "record", id] as const,
+  studentHistory: (studentId: string) => [...tahfidzQueryKeys.all, "student-history", studentId] as const,
+  studentProgress: (studentId: string) => [...tahfidzQueryKeys.all, "student-progress", studentId] as const,
+  tasmiList: (params?: TasmiQueryParams) => [...tahfidzQueryKeys.all, "tasmi", params] as const,
+  tasmiDetail: (id: string) => [...tahfidzQueryKeys.all, "tasmi-detail", id] as const,
 };
 
 export function useTahfidzRecords(params?: TahfidzQueryParams) {
@@ -208,12 +184,8 @@ export function useCreateTahfidzRecord() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...tahfidzQueryKeys.all, "records"] });
       if (variables.studentId) {
-        queryClient.invalidateQueries({
-          queryKey: tahfidzQueryKeys.studentProgress(variables.studentId),
-        });
-        queryClient.invalidateQueries({
-          queryKey: tahfidzQueryKeys.studentHistory(variables.studentId),
-        });
+        queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.studentProgress(variables.studentId) });
+        queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.studentHistory(variables.studentId) });
       }
     },
   });
@@ -222,17 +194,12 @@ export function useCreateTahfidzRecord() {
 export function useUpdateTahfidzRecord() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTahfidzRecordDto }) =>
-      updateTahfidzRecord(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateTahfidzRecordDto }) => updateTahfidzRecord(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...tahfidzQueryKeys.all, "records"] });
-      queryClient.invalidateQueries({
-        queryKey: tahfidzQueryKeys.recordDetail(variables.id),
-      });
+      queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.recordDetail(variables.id) });
       if (variables.data.studentId) {
-        queryClient.invalidateQueries({
-          queryKey: tahfidzQueryKeys.studentProgress(variables.data.studentId),
-        });
+        queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.studentProgress(variables.data.studentId) });
       }
     },
   });
@@ -287,12 +254,8 @@ export function useCreateTasmiExam() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...tahfidzQueryKeys.all, "tasmi"] });
       if (variables.studentId) {
-        queryClient.invalidateQueries({
-          queryKey: tahfidzQueryKeys.studentProgress(variables.studentId),
-        });
-        queryClient.invalidateQueries({
-          queryKey: tahfidzQueryKeys.studentHistory(variables.studentId),
-        });
+        queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.studentProgress(variables.studentId) });
+        queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.studentHistory(variables.studentId) });
       }
     },
   });
@@ -301,17 +264,12 @@ export function useCreateTasmiExam() {
 export function useUpdateTasmiExam() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTasmiExamDto }) =>
-      updateTasmiExam(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateTasmiExamDto }) => updateTasmiExam(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [...tahfidzQueryKeys.all, "tasmi"] });
-      queryClient.invalidateQueries({
-        queryKey: tahfidzQueryKeys.tasmiDetail(variables.id),
-      });
+      queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.tasmiDetail(variables.id) });
       if (variables.data.studentId) {
-        queryClient.invalidateQueries({
-          queryKey: tahfidzQueryKeys.studentProgress(variables.data.studentId),
-        });
+        queryClient.invalidateQueries({ queryKey: tahfidzQueryKeys.studentProgress(variables.data.studentId) });
       }
     },
   });
