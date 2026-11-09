@@ -2,9 +2,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import bcrypt from "bcrypt";
+import { eq } from "drizzle-orm";
 import { getDb } from "../../core/database/client.js";
 import { students, parents, studentParents } from "../../db/schema/students.js";
+import { ppdbApplicants } from "../../db/schema/ppdb.js";
 import { PpdbRepository } from "./ppdb.repository.js";
+import { generatePpdbCardPdf } from "./ppdb.pdf.js";
 import {
   NotFoundError,
   ConflictError,
@@ -529,80 +532,111 @@ export class PpdbService {
 
     const db = getDb();
 
-    // 1. Insert into students table (Buku Induk)
-    // Sesuai PRD F-SIS-04 & F-SIS-13: Status awal siswa baru adalah 'aktif_tanpa_rombel'
-    const [newStudent] = await db
-      .insert(students)
-      .values({
-        nik: applicant.nik,
-        nisn: applicant.nisn,
-        nis: applicant.registrationNumber,
-        fullName: applicant.fullName,
-        birthPlace: applicant.birthPlace,
-        birthDate: applicant.birthDate,
-        gender: applicant.gender,
-        motherName: applicant.motherName,
-        status: "aktif_tanpa_rombel",
-        emisData: {
-          previousSchoolType: applicant.previousSchoolType,
-          previousSchoolName: applicant.previousSchoolName,
-          chosenMajor: applicant.chosenMajor,
-          religion: applicant.religion,
-          phone: applicant.phone,
-          email: applicant.email,
-          address: applicant.address,
-          registrationNumber: applicant.registrationNumber,
-        },
-      })
-      .returning();
-
-    // 2. Insert mother into parents table
-    const [mother] = await db
-      .insert(parents)
-      .values({
-        name: applicant.motherName,
-        phone: applicant.motherPhone || null,
-        address: applicant.address || null,
-        gender: "P",
-      })
-      .returning();
-
-    await db.insert(studentParents).values({
-      studentId: newStudent.id,
-      parentId: mother.id,
-      relationType: "ibu",
-      isGuardian: !applicant.fatherName,
-    });
-
-    // 3. Insert father if provided
-    if (applicant.fatherName) {
-      const [father] = await db
-        .insert(parents)
+    // Sesuai PRD F-PDB-10 & Aturan 7.4: Eksekusi atomik dalam transaksi database terisolasi
+    const result = await db.transaction(async (tx) => {
+      // 1. Insert into students table (Buku Induk)
+      // Sesuai PRD F-SIS-04 & F-SIS-13: Status awal siswa baru adalah 'aktif_tanpa_rombel'
+      const [newStudent] = await tx
+        .insert(students)
         .values({
-          name: applicant.fatherName,
-          phone: applicant.fatherPhone || null,
-          address: applicant.address || null,
-          gender: "L",
+          nik: applicant.nik,
+          nisn: applicant.nisn,
+          nis: applicant.registrationNumber,
+          fullName: applicant.fullName,
+          birthPlace: applicant.birthPlace,
+          birthDate: applicant.birthDate,
+          gender: applicant.gender,
+          motherName: applicant.motherName,
+          status: "aktif_tanpa_rombel",
+          emisData: {
+            previousSchoolType: applicant.previousSchoolType,
+            previousSchoolName: applicant.previousSchoolName,
+            chosenMajor: applicant.chosenMajor,
+            religion: applicant.religion,
+            phone: applicant.phone,
+            email: applicant.email,
+            address: applicant.address,
+            registrationNumber: applicant.registrationNumber,
+          },
         })
         .returning();
 
-      await db.insert(studentParents).values({
-        studentId: newStudent.id,
-        parentId: father.id,
-        relationType: "ayah",
-        isGuardian: true,
-      });
-    }
+      // 2. Insert mother into parents table
+      const [mother] = await tx
+        .insert(parents)
+        .values({
+          name: applicant.motherName,
+          phone: applicant.motherPhone || null,
+          address: applicant.address || null,
+          gender: "P",
+        })
+        .returning();
 
-    // 4. Update applicant status to enrolled and link studentId
-    const updatedApplicant = await this.ppdbRepo.setEnrolled(
-      id,
-      newStudent.id
+      await tx.insert(studentParents).values({
+        studentId: newStudent.id,
+        parentId: mother.id,
+        relationType: "ibu",
+        isGuardian: !applicant.fatherName,
+      });
+
+      // 3. Insert father if provided
+      if (applicant.fatherName) {
+        const [father] = await tx
+          .insert(parents)
+          .values({
+            name: applicant.fatherName,
+            phone: applicant.fatherPhone || null,
+            address: applicant.address || null,
+            gender: "L",
+          })
+          .returning();
+
+        await tx.insert(studentParents).values({
+          studentId: newStudent.id,
+          parentId: father.id,
+          relationType: "ayah",
+          isGuardian: true,
+        });
+      }
+
+      // 4. Update applicant status to enrolled and link studentId
+      const [updatedApplicant] = await tx
+        .update(ppdbApplicants)
+        .set({
+          status: "enrolled",
+          studentId: newStudent.id,
+          enrolledAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(ppdbApplicants.id, id))
+        .returning();
+
+      return {
+        student: newStudent,
+        applicant: updatedApplicant,
+      };
+    });
+
+    return result;
+  }
+
+  // 5. Generator Kartu Tanda Peserta PPDB Resmi (PDF) - PRD F-PDB-06
+  async getApplicantCardPdf(id: string): Promise<{
+    buffer: Buffer;
+    fileName: string;
+    applicant: PpdbApplicant;
+  }> {
+    const applicant = await this.getApplicantById(id);
+    const activeYear = await this.ppdbRepo.getActiveAcademicYear();
+    const pdfBuffer = generatePpdbCardPdf(
+      applicant,
+      activeYear?.name || "2025/2026"
     );
 
     return {
-      student: newStudent,
-      applicant: updatedApplicant,
+      buffer: pdfBuffer,
+      fileName: `kartu-peserta-${applicant.registrationNumber}.pdf`,
+      applicant,
     };
   }
 

@@ -194,6 +194,13 @@ describe("PpdbService", () => {
         service.updateStatus(mockApplicant.id, { status: "rejected" })
       ).rejects.toThrow(ValidationError);
     });
+
+    it("should generate valid PDF buffer for applicant card", async () => {
+      const result = await service.getApplicantCardPdf(mockApplicant.id);
+      expect(result.buffer).toBeInstanceOf(Buffer);
+      expect(result.fileName).toContain(mockApplicant.registrationNumber);
+      expect(result.buffer.toString("utf-8")).toContain("%PDF-1.4");
+    });
   });
 });
 

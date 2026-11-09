@@ -480,6 +480,16 @@ export const PpdbDashboardPage: React.FC = () => {
                 type="button"
                 variant="outline"
                 size="sm"
+                onClick={() => {
+                  window.open(`/api/v1/ppdb/applicants/${activeApplicant.id}/card/pdf`, "_blank");
+                }}
+              >
+                Cetak Kartu PDF
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => setActiveApplicant(null)}
               >
                 Tutup

@@ -35,6 +35,7 @@ export const ppdbRoutes: FastifyPluginAsync = async (app) => {
   app.get("/portal/me", candidateGuard, controller.getMyApplication);
   app.put("/portal/me", candidateGuard, controller.updateMyApplication);
   app.post("/portal/me/finalize", candidateGuard, controller.finalizeMyApplication);
+  app.get("/portal/me/card/pdf", candidateGuard, controller.downloadMyCardPdf);
   app.post("/portal/me/documents", candidateGuard, controller.uploadDocument);
   app.delete("/portal/me/documents/:id", candidateGuard, controller.deleteDocument);
 
@@ -51,6 +52,7 @@ export const ppdbRoutes: FastifyPluginAsync = async (app) => {
   app.get("/stats", readAuthGuard, controller.getStats);
   app.get("/applicants", readAuthGuard, controller.getApplicants);
   app.get("/applicants/:id", readAuthGuard, controller.getApplicantById);
+  app.get("/applicants/:id/card/pdf", readAuthGuard, controller.downloadApplicantCardPdf);
   app.patch("/documents/:id/verify", writeAuthGuard, controller.verifyDocument);
   app.patch("/applicants/:id/status", writeAuthGuard, controller.updateStatus);
   app.post("/applicants/:id/enroll", writeAuthGuard, controller.enroll);

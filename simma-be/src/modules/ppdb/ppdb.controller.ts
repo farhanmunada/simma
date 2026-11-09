@@ -250,4 +250,31 @@ export class PpdbController {
       message: "Data pendaftar berhasil dihapus",
     });
   };
+
+  // Calon Siswa: Download Kartu Peserta PDF (PRD F-PDB-06)
+  downloadMyCardPdf = async (req: FastifyRequest, reply: FastifyReply) => {
+    if (!req.user || req.user.role !== "calon_siswa") {
+      throw new UnauthorizedError(
+        "Hanya calon siswa terautentikasi yang dapat mengunduh kartu tanda peserta"
+      );
+    }
+    const { buffer, fileName } = await this.service.getApplicantCardPdf(
+      req.user.sub
+    );
+    reply.header("Content-Type", "application/pdf");
+    reply.header("Content-Disposition", `inline; filename="${fileName}"`);
+    return reply.send(buffer);
+  };
+
+  // Internal: Download Kartu Peserta PDF by Applicant ID (PRD F-PDB-06)
+  downloadApplicantCardPdf = async (
+    req: FastifyRequest,
+    reply: FastifyReply
+  ) => {
+    const { id } = parseData(IdParamSchema, req.params);
+    const { buffer, fileName } = await this.service.getApplicantCardPdf(id);
+    reply.header("Content-Type", "application/pdf");
+    reply.header("Content-Disposition", `inline; filename="${fileName}"`);
+    return reply.send(buffer);
+  };
 }

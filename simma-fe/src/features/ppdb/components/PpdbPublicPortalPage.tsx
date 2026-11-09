@@ -217,7 +217,7 @@ export const PpdbPublicPortalPage: React.FC = () => {
         <div className="max-w-4xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Penerimaan Peserta Didik Baru Tahun Ajaran {publicInfo?.academicYear?.name || "2025/2026"}</span>
+            <span>Penerimaan Peserta Didik Baru Tahun Ajaran {publicInfo?.academicYear || "2025/2026"}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
             Portal Pendaftaran Mandiri Calon Santri & Siswa Baru
@@ -309,14 +309,25 @@ export const PpdbPublicPortalPage: React.FC = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-700/80">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="w-full sm:w-auto px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-md text-xs font-semibold flex items-center justify-center space-x-2 transition-colors"
-                >
-                  <Printer className="w-4 h-4" />
-                  <span>Cetak Tanda Bukti</span>
-                </button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.open(`/api/v1/ppdb/applicants/${registeredResult.id}/card/pdf`, "_blank");
+                    }}
+                    className="w-full sm:w-auto px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-md text-xs font-semibold flex items-center justify-center space-x-2 transition-colors"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Unduh Kartu PDF</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="w-full sm:w-auto px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-md text-xs font-semibold flex items-center justify-center space-x-2 transition-colors"
+                  >
+                    <span>Print Layar</span>
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
@@ -724,6 +735,19 @@ export const PpdbPublicPortalPage: React.FC = () => {
                             })}
                           </span>
                         </div>
+                      </div>
+
+                      <div className="pt-2 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.open(`/api/v1/ppdb/applicants/${statusResult.id}/card/pdf`, "_blank");
+                          }}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-xs font-semibold flex items-center space-x-2 transition-colors"
+                        >
+                          <Printer className="w-4 h-4" />
+                          <span>Unduh Kartu Tanda Peserta (PDF Resmi)</span>
+                        </button>
                       </div>
                     </div>
                   );
