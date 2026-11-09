@@ -22,11 +22,13 @@ import {
 import { useSemesters, useClassrooms, useAcademicYears } from "../../settings/api/settings.api";
 import { useStudents } from "../../students/api/students.api";
 import {
-  getLetterGradeBadgeClass,
-  formatSemesterType,
   type ExtracurricularItem,
   type AchievementItem,
 } from "../types";
+import {
+  getLetterGradeBadgeClass,
+  formatSemesterType,
+} from "../utils";
 
 export const StudentReportCardPage: React.FC = () => {
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>("");

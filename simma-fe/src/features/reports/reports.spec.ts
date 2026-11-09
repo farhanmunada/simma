@@ -77,7 +77,7 @@ describe("Reports & Legger RDM Feature Module", () => {
       calculateLetterGrade,
       getLetterGradeBadgeClass,
       formatSemesterType,
-    } = await import("./types");
+    } = await import("./utils");
 
     // Letter grade thresholds
     expect(calculateLetterGrade(95)).toBe("A");
@@ -103,7 +103,7 @@ describe("Reports & Legger RDM Feature Module", () => {
   });
 
   it("should generate RFC 4180 CSV with UTF-8 BOM for classroom legger", async () => {
-    const { generateLeggerCsvContent } = await import("./types");
+    const { generateLeggerCsvContent } = await import("./utils");
 
     const mockLegger: ClassroomLegger = {
       classroom: {

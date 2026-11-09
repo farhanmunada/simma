@@ -16,10 +16,12 @@ import { Select } from "../../../components/ui/Select";
 import { useClassroomLegger } from "../api/reports.api";
 import { useSemesters, useClassrooms, useAcademicYears } from "../../settings/api/settings.api";
 import {
-  formatSemesterType,
-  exportLeggerToCsv,
   type LeggerQueryParams,
 } from "../types";
+import {
+  formatSemesterType,
+  exportLeggerToCsv,
+} from "../utils";
 
 export const ClassroomLeggerPage: React.FC = () => {
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>("");
