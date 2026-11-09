@@ -172,32 +172,26 @@ export class StudentsService {
     input: CreateAndLinkParentInput,
   ): Promise<StudentParentDetail> {
     await this.getStudentById(studentId);
-    const parent = await this.repo.createParent({
-      nik: input.parent.nik ?? null,
-      name: input.parent.name,
-      birthPlace: input.parent.birthPlace ?? null,
-      birthDate: input.parent.birthDate ?? null,
-      gender: input.parent.gender ?? null,
-      education: input.parent.education ?? null,
-      occupation: input.parent.occupation ?? null,
-      income: input.parent.income ?? null,
-      phone: input.parent.phone ?? null,
-      address: input.parent.address ?? null,
-      emisData: input.parent.emisData ?? {},
-    });
-
-    await this.repo.linkStudentParent({
+    return await this.repo.createAndLinkParent(
       studentId,
-      parentId: parent.id,
-      relationType: input.relationType,
-      isGuardian: input.isGuardian ?? false,
-    });
-
-    return {
-      ...parent,
-      relationType: input.relationType,
-      isGuardian: input.isGuardian ?? false,
-    };
+      {
+        nik: input.parent.nik ?? null,
+        name: input.parent.name,
+        birthPlace: input.parent.birthPlace ?? null,
+        birthDate: input.parent.birthDate ?? null,
+        gender: input.parent.gender ?? null,
+        education: input.parent.education ?? null,
+        occupation: input.parent.occupation ?? null,
+        income: input.parent.income ?? null,
+        phone: input.parent.phone ?? null,
+        address: input.parent.address ?? null,
+        emisData: input.parent.emisData ?? {},
+      },
+      {
+        relationType: input.relationType,
+        isGuardian: input.isGuardian ?? false,
+      },
+    );
   }
 
   async assignClassroom(
