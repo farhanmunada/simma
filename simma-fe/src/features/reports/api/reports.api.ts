@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
   StudentReportCard,
   ClassroomLegger,
@@ -8,13 +9,6 @@ import type {
   LeggerQueryParams,
   ReportNotesBodyInput,
 } from "../types";
-
-function cleanEndpoint(ep: string): string {
-  if (ep.startsWith("/api/v1/")) {
-    return ep.replace("/api/v1", "");
-  }
-  return ep;
-}
 
 function extractSingle<T>(res: unknown): T {
   if (res && typeof res === "object") {
@@ -56,7 +50,7 @@ export async function getStudentReportCard(
     if (params.includeAttendance !== undefined) queryParams.includeAttendance = params.includeAttendance;
   }
 
-  const endpoint = cleanEndpoint(`/api/v1/reports/student/${studentId}/semester/${semesterId}`);
+  const endpoint = API_ENDPOINTS.REPORTS.STUDENT_CARD(studentId, semesterId);
   const res = await apiClient<unknown>(endpoint, {
     params: queryParams,
   });
@@ -65,13 +59,13 @@ export async function getStudentReportCard(
 
 /**
  * Fetch PDF Report Card as Blob
- * GET /api/v1/reports/student/:studentId/semester/:semesterId/pdf
+ * GET /reports/student/:studentId/semester/:semesterId/pdf
  */
 export async function getStudentReportPdf(
   studentId: string,
   semesterId: string
 ): Promise<Blob> {
-  const endpoint = cleanEndpoint(`/api/v1/reports/student/${studentId}/semester/${semesterId}/pdf`);
+  const endpoint = API_ENDPOINTS.REPORTS.STUDENT_PDF(studentId, semesterId);
   const res = await apiClient<Blob>(endpoint, {
     responseType: "blob",
   });
@@ -99,7 +93,7 @@ export async function downloadStudentReportPdf(
 
 /**
  * Fetch Classroom Legger
- * GET /api/v1/reports/classroom/:classroomId/semester/:semesterId/legger
+ * GET /reports/classroom/:classroomId/semester/:semesterId/legger
  */
 export async function getClassroomLegger(
   classroomId: string,
@@ -112,7 +106,7 @@ export async function getClassroomLegger(
     if (params.order) queryParams.order = params.order;
   }
 
-  const endpoint = cleanEndpoint(`/api/v1/reports/classroom/${classroomId}/semester/${semesterId}/legger`);
+  const endpoint = API_ENDPOINTS.REPORTS.CLASSROOM_LEGGER(classroomId, semesterId);
   const res = await apiClient<unknown>(endpoint, {
     params: queryParams,
   });
@@ -121,13 +115,13 @@ export async function getClassroomLegger(
 
 /**
  * Save Student Notes, Attitudes, Extracurriculars, & Achievements
- * POST /api/v1/reports/student/:studentId/notes
+ * POST /reports/student/:studentId/notes
  */
 export async function saveStudentNotes(
   studentId: string,
   data: ReportNotesBodyInput
 ): Promise<StudentReportNotes> {
-  const endpoint = cleanEndpoint(`/api/v1/reports/student/${studentId}/notes`);
+  const endpoint = API_ENDPOINTS.REPORTS.STUDENT_NOTES(studentId);
   const res = await apiClient<unknown>(endpoint, {
     method: "POST",
     body: JSON.stringify(data),
