@@ -2,6 +2,7 @@ import { eq, and, or, ilike, count, desc } from "drizzle-orm";
 import { getDb } from "../../core/database/client.js";
 import { ppdbApplicants, ppdbDocuments } from "../../db/schema/ppdb.js";
 import { academicYears } from "../../db/schema/setup.js";
+import { PpdbDocumentRepository } from "./ppdb-document.repository.js";
 import type {
   PpdbApplicant,
   NewPpdbApplicant,
@@ -10,6 +11,7 @@ import type {
 } from "./ppdb.types.js";
 
 export class PpdbRepository {
+  private readonly documentRepo = new PpdbDocumentRepository();
   async getActiveAcademicYear(): Promise<{ id: string; name: string } | null> {
     const db = getDb();
     const [row] = await db
@@ -167,28 +169,15 @@ export class PpdbRepository {
 
   // Documents
   async createDocument(data: NewPpdbDocument): Promise<PpdbDocument> {
-    const db = getDb();
-    const [row] = await db.insert(ppdbDocuments).values(data).returning();
-    return row;
+    return this.documentRepo.createDocument(data);
   }
 
   async findDocumentsByApplicantId(applicantId: string): Promise<PpdbDocument[]> {
-    const db = getDb();
-    return db
-      .select()
-      .from(ppdbDocuments)
-      .where(eq(ppdbDocuments.applicantId, applicantId))
-      .orderBy(desc(ppdbDocuments.createdAt));
+    return this.documentRepo.findDocumentsByApplicantId(applicantId);
   }
 
   async findDocumentById(id: string): Promise<PpdbDocument | null> {
-    const db = getDb();
-    const [row] = await db
-      .select()
-      .from(ppdbDocuments)
-      .where(eq(ppdbDocuments.id, id))
-      .limit(1);
-    return row || null;
+    return this.documentRepo.findDocumentById(id);
   }
 
   async updateDocumentVerification(
@@ -197,25 +186,11 @@ export class PpdbRepository {
     notes?: string | null,
     verifiedBy?: string | null
   ): Promise<PpdbDocument | null> {
-    const db = getDb();
-    const [row] = await db
-      .update(ppdbDocuments)
-      .set({
-        verificationStatus: status,
-        verificationNotes: notes || null,
-        verifiedBy: verifiedBy || null,
-        verifiedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(ppdbDocuments.id, id))
-      .returning();
-    return row || null;
+    return this.documentRepo.updateDocumentVerification(id, status, notes, verifiedBy);
   }
 
   async deleteDocument(id: string): Promise<boolean> {
-    const db = getDb();
-    const res = await db.delete(ppdbDocuments).where(eq(ppdbDocuments.id, id));
-    return (res.rowCount ?? 0) > 0;
+    return this.documentRepo.deleteDocument(id);
   }
 
   async updateStatus(
