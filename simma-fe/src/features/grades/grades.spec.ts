@@ -67,7 +67,7 @@ describe("Grades & Assessments Feature Module", () => {
       formatAssessmentTypeLabel,
       getLetterGradeBadgeClass,
       ASSESSMENT_TYPE_OPTIONS,
-    } = await import("./types");
+    } = await import("./utils");
 
     // Predicates
     expect(calculateLetterGrade(95)).toBe("A");

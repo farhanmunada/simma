@@ -1,8 +1,7 @@
-import {
-  NotFoundError,
-  ValidationError,
-} from "../../core/errors/index.js";
 import { GradesRepository, gradesRepository } from "./grades.repository.js";
+import { AssessmentsService } from "./services/assessments.service.js";
+import { StudentGradesService } from "./services/student-grades.service.js";
+import { SemesterGradesService } from "./services/semester-grades.service.js";
 import type {
   Assessment,
   StudentGrade,
@@ -14,319 +13,135 @@ import type {
   UpdateAssessmentInput,
   AssessmentQueryParams,
   CreateStudentGradeInput,
-  UpdateStudentGradeInput,
   BatchUpsertGradesInput,
+  UpdateStudentGradeInput,
   StudentGradeQueryParams,
   CreateSemesterGradeInput,
   UpdateSemesterGradeInput,
-  CalculateSemesterGradeInput,
   SemesterGradeQueryParams,
+  CalculateSemesterGradeInput,
 } from "./grades.schema.js";
-import { calculateLetterGrade } from "@simma/shared";
 import type { PaginatedResponse } from "@simma/shared";
 
-export class GradesService {
-  constructor(private readonly repo: GradesRepository = gradesRepository) {}
+export { AssessmentsService } from "./services/assessments.service.js";
+export { StudentGradesService } from "./services/student-grades.service.js";
+export { SemesterGradesService } from "./services/semester-grades.service.js";
 
-  // --- Assessments ---
+export class GradesService {
+  private readonly assessmentsService: AssessmentsService;
+  private readonly studentGradesService: StudentGradesService;
+  private readonly semesterGradesService: SemesterGradesService;
+
+  constructor(private readonly repo: GradesRepository = gradesRepository) {
+    this.assessmentsService = new AssessmentsService(this.repo);
+    this.studentGradesService = new StudentGradesService(this.repo);
+    this.semesterGradesService = new SemesterGradesService(this.repo);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Assessments
+  // ---------------------------------------------------------------------------
 
   async getAssessmentById(id: string): Promise<Assessment> {
-    const assessment = await this.repo.findAssessmentById(id);
-    if (!assessment) {
-      throw new NotFoundError("Penilaian", id);
-    }
-    return assessment;
+    return this.assessmentsService.getAssessmentById(id);
   }
 
   async createAssessment(
     input: CreateAssessmentInput,
     authTeacherId?: string | null,
   ): Promise<Assessment> {
-    const teacherId = input.teacherId ?? authTeacherId ?? null;
-
-    return this.repo.createAssessment({
-      subjectId: input.subjectId,
-      classroomId: input.classroomId,
-      teacherId,
-      academicYearId: input.academicYearId,
-      semesterId: input.semesterId,
-      type: input.type,
-      title: input.title,
-      maxScore: input.maxScore,
-      weight: input.weight,
-    });
+    return this.assessmentsService.createAssessment(input, authTeacherId);
   }
 
   async updateAssessment(
     id: string,
     input: UpdateAssessmentInput,
   ): Promise<Assessment> {
-    await this.getAssessmentById(id);
-
-    const updated = await this.repo.updateAssessment(id, {
-      ...(input.subjectId !== undefined && { subjectId: input.subjectId }),
-      ...(input.classroomId !== undefined && { classroomId: input.classroomId }),
-      ...(input.teacherId !== undefined && { teacherId: input.teacherId }),
-      ...(input.academicYearId !== undefined && {
-        academicYearId: input.academicYearId,
-      }),
-      ...(input.semesterId !== undefined && { semesterId: input.semesterId }),
-      ...(input.type !== undefined && { type: input.type }),
-      ...(input.title !== undefined && { title: input.title }),
-      ...(input.maxScore !== undefined && { maxScore: input.maxScore }),
-      ...(input.weight !== undefined && { weight: input.weight }),
-    });
-
-    if (!updated) {
-      throw new NotFoundError("Penilaian", id);
-    }
-    return updated;
+    return this.assessmentsService.updateAssessment(id, input);
   }
 
   async deleteAssessment(id: string): Promise<void> {
-    await this.getAssessmentById(id);
-
-    const hasGrades = await this.repo.hasGradesForAssessment(id);
-    if (hasGrades) {
-      throw new ValidationError(
-        "Tidak dapat menghapus penilaian yang sudah memiliki nilai siswa",
-      );
-    }
-
-    const deleted = await this.repo.deleteAssessment(id);
-    if (!deleted) {
-      throw new NotFoundError("Penilaian", id);
-    }
+    return this.assessmentsService.deleteAssessment(id);
   }
 
   async getAssessments(
     query: AssessmentQueryParams,
   ): Promise<PaginatedResponse<Assessment>> {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
-    const { data, total } = await this.repo.findAssessments(query);
-
-    return {
-      data,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit) || 1,
-      },
-    };
+    return this.assessmentsService.getAssessments(query);
   }
 
-  // --- Student Grades ---
+  // ---------------------------------------------------------------------------
+  // Student Grades
+  // ---------------------------------------------------------------------------
 
   async getStudentGradeById(id: string): Promise<StudentGrade> {
-    const grade = await this.repo.findStudentGradeById(id);
-    if (!grade) {
-      throw new NotFoundError("Nilai siswa", id);
-    }
-    return grade;
+    return this.studentGradesService.getStudentGradeById(id);
   }
 
   async createStudentGrade(input: CreateStudentGradeInput): Promise<StudentGrade> {
-    await this.getAssessmentById(input.assessmentId);
-
-    return this.repo.upsertStudentGrade({
-      assessmentId: input.assessmentId,
-      studentId: input.studentId,
-      score: input.score,
-      feedback: input.feedback ?? null,
-    });
+    return this.studentGradesService.createStudentGrade(input);
   }
 
   async batchUpsertGrades(input: BatchUpsertGradesInput): Promise<StudentGrade[]> {
-    await this.getAssessmentById(input.assessmentId);
-
-    return this.repo.batchUpsertStudentGrades(input.assessmentId, input.grades);
+    return this.studentGradesService.batchUpsertGrades(input);
   }
 
   async updateStudentGrade(
     id: string,
     input: UpdateStudentGradeInput,
   ): Promise<StudentGrade> {
-    await this.getStudentGradeById(id);
-
-    const updated = await this.repo.updateStudentGrade(id, {
-      ...(input.score !== undefined && { score: input.score }),
-      ...(input.feedback !== undefined && { feedback: input.feedback }),
-    });
-
-    if (!updated) {
-      throw new NotFoundError("Nilai siswa", id);
-    }
-    return updated;
+    return this.studentGradesService.updateStudentGrade(id, input);
   }
 
   async deleteStudentGrade(id: string): Promise<void> {
-    await this.getStudentGradeById(id);
-    const deleted = await this.repo.deleteStudentGrade(id);
-    if (!deleted) {
-      throw new NotFoundError("Nilai siswa", id);
-    }
+    return this.studentGradesService.deleteStudentGrade(id);
   }
 
   async getStudentGrades(
     query: StudentGradeQueryParams,
   ): Promise<PaginatedResponse<StudentGrade>> {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 50;
-    const { data, total } = await this.repo.findStudentGrades(query);
-
-    return {
-      data,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit) || 1,
-      },
-    };
+    return this.studentGradesService.getStudentGrades(query);
   }
 
   async getGradesByAssessmentId(assessmentId: string): Promise<StudentGrade[]> {
-    await this.getAssessmentById(assessmentId);
-    return this.repo.findStudentGradesByAssessmentId(assessmentId);
+    return this.studentGradesService.getGradesByAssessmentId(assessmentId);
   }
 
-  // --- Semester Grades ---
+  // ---------------------------------------------------------------------------
+  // Semester Grades
+  // ---------------------------------------------------------------------------
 
   async getSemesterGradeById(id: string): Promise<SemesterGrade> {
-    const grade = await this.repo.findSemesterGradeById(id);
-    if (!grade) {
-      throw new NotFoundError("Nilai semester", id);
-    }
-    return grade;
+    return this.semesterGradesService.getSemesterGradeById(id);
   }
 
   async createOrUpsertSemesterGrade(
     input: CreateSemesterGradeInput,
   ): Promise<SemesterGrade> {
-    const letterGrade =
-      input.letterGrade ?? calculateLetterGrade(input.finalScore);
-
-    return this.repo.upsertSemesterGrade({
-      studentId: input.studentId,
-      classroomId: input.classroomId,
-      subjectId: input.subjectId,
-      semesterId: input.semesterId,
-      finalScore: input.finalScore,
-      letterGrade,
-    });
+    return this.semesterGradesService.createOrUpsertSemesterGrade(input);
   }
 
   async updateSemesterGrade(
     id: string,
     input: UpdateSemesterGradeInput,
   ): Promise<SemesterGrade> {
-    await this.getSemesterGradeById(id);
-
-    let letterGrade = input.letterGrade;
-    if (input.finalScore !== undefined && !letterGrade) {
-      letterGrade = calculateLetterGrade(input.finalScore);
-    }
-
-    const updated = await this.repo.updateSemesterGrade(id, {
-      ...(input.finalScore !== undefined && { finalScore: input.finalScore }),
-      ...(letterGrade !== undefined && { letterGrade }),
-    });
-
-    if (!updated) {
-      throw new NotFoundError("Nilai semester", id);
-    }
-    return updated;
+    return this.semesterGradesService.updateSemesterGrade(id, input);
   }
 
   async deleteSemesterGrade(id: string): Promise<void> {
-    await this.getSemesterGradeById(id);
-    const deleted = await this.repo.deleteSemesterGrade(id);
-    if (!deleted) {
-      throw new NotFoundError("Nilai semester", id);
-    }
+    return this.semesterGradesService.deleteSemesterGrade(id);
   }
 
   async getSemesterGrades(
     query: SemesterGradeQueryParams,
   ): Promise<PaginatedResponse<SemesterGrade>> {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 50;
-    const { data, total } = await this.repo.findSemesterGrades(query);
-
-    return {
-      data,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit) || 1,
-      },
-    };
+    return this.semesterGradesService.getSemesterGrades(query);
   }
 
   async calculateSemesterGrades(
     input: CalculateSemesterGradeInput,
   ): Promise<BatchCalculationResponse> {
-    const rawScores = await this.repo.findAssessmentScoresForClassroomSubject(
-      input.classroomId,
-      input.subjectId,
-      input.semesterId,
-    );
-
-    if (rawScores.length === 0) {
-      return { calculatedCount: 0, grades: [] };
-    }
-
-    // Group scores per student and calculate weighted average
-    const studentMap = new Map<
-      string,
-      { totalWeightedScore: number; totalWeight: number }
-    >();
-
-    for (const item of rawScores) {
-      const current = studentMap.get(item.studentId) ?? {
-        totalWeightedScore: 0,
-        totalWeight: 0,
-      };
-
-      const max = item.maxScore > 0 ? item.maxScore : 100;
-      const normalizedScore = (item.score / max) * 100;
-      const weight = item.weight > 0 ? item.weight : 1;
-
-      current.totalWeightedScore += normalizedScore * weight;
-      current.totalWeight += weight;
-
-      studentMap.set(item.studentId, current);
-    }
-
-    const results: SemesterGrade[] = [];
-
-    for (const [studentId, data] of studentMap.entries()) {
-      const finalScore =
-        data.totalWeight > 0
-          ? Math.round((data.totalWeightedScore / data.totalWeight) * 100) / 100
-          : 0;
-
-      const letterGrade = calculateLetterGrade(finalScore);
-
-      const saved = await this.repo.upsertSemesterGrade({
-        studentId,
-        classroomId: input.classroomId,
-        subjectId: input.subjectId,
-        semesterId: input.semesterId,
-        finalScore,
-        letterGrade,
-      });
-
-      results.push(saved);
-    }
-
-    return {
-      calculatedCount: results.length,
-      grades: results,
-    };
+    return this.semesterGradesService.calculateSemesterGrades(input);
   }
 }
 

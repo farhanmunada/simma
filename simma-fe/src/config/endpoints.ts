@@ -73,6 +73,7 @@ export const API_ENDPOINTS = {
     ASSESSMENT_DETAIL: (id: string) => `/grades/assessments/${id}`,
     ASSESSMENT_GRADES: (id: string) => `/grades/assessments/${id}/grades`,
     BATCH_UPSERT: "/grades/batch",
+    SEMESTER: "/grades/semester",
     SEMESTERS: "/grades/semesters",
     SEMESTER_DETAIL: (id: string) => `/grades/semesters/${id}`,
     SEMESTER_CALCULATE: "/grades/semester/calculate",
