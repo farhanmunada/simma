@@ -10,6 +10,7 @@ import { AttendanceRoutes } from "./features/attendance";
 import { GradesRoutes } from "./features/grades";
 import { ReportsRoutes } from "./features/reports";
 import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
+import { LettersRoutes } from "./features/letters";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,6 +73,7 @@ export function App() {
             <Route path="attendance/*" element={<AttendanceRoutes />} />
             <Route path="grades/*" element={<GradesRoutes />} />
             <Route path="reports/*" element={<ReportsRoutes />} />
+            <Route path="letters/*" element={<LettersRoutes />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

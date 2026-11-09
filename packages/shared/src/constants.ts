@@ -96,3 +96,69 @@ export type StudentStatus = (typeof STUDENT_STATUS)[number];
 export const PARENT_RELATION_TYPE = ["ayah", "ibu", "wali"] as const;
 export type ParentRelationType = (typeof PARENT_RELATION_TYPE)[number];
 
+// Letters & Correspondence (Modul 03 - Tata Usaha)
+export const LETTER_SECURITY_DEGREES = ["B", "R", "SR"] as const;
+export type LetterSecurityDegree = (typeof LETTER_SECURITY_DEGREES)[number];
+
+export const DISPOSITION_URGENCY = ["biasa", "segera", "sangat_segera"] as const;
+export type DispositionUrgency = (typeof DISPOSITION_URGENCY)[number];
+
+export const DISPOSITION_INSTRUCTIONS = [
+  "tindak_lanjuti",
+  "tanggapi",
+  "hadiri",
+  "koordinasikan",
+  "arsipkan",
+  "lainnya",
+] as const;
+export type DispositionInstruction = (typeof DISPOSITION_INSTRUCTIONS)[number];
+
+export const DISPOSITION_STATUS = [
+  "pending",
+  "in_progress",
+  "completed",
+] as const;
+export type DispositionStatus = (typeof DISPOSITION_STATUS)[number];
+
+export const INCOMING_LETTER_STATUS = [
+  "waiting_disposition",
+  "disposed",
+  "completed",
+] as const;
+export type IncomingLetterStatus = (typeof INCOMING_LETTER_STATUS)[number];
+
+export const OUTGOING_LETTER_STATUS = [
+  "draft",
+  "signed",
+  "sent",
+  "archived",
+] as const;
+export type OutgoingLetterStatus = (typeof OUTGOING_LETTER_STATUS)[number];
+
+export const LETTER_TEMPLATE_TYPES = [
+  "custom",
+  "active_student",
+  "duty_teacher",
+  "skkb",
+  "parent_invitation",
+] as const;
+export type LetterTemplateType = (typeof LETTER_TEMPLATE_TYPES)[number];
+
+export const DEFAULT_SATKER_CODE = "Ma.13.04";
+
+// Delivery Methods & Urgency aliases
+export const DELIVERY_METHODS = ["kurir", "pos", "email", "langsung", "lainnya"] as const;
+export type DeliveryMethod = (typeof DELIVERY_METHODS)[number];
+
+export const LETTER_URGENCIES = DISPOSITION_URGENCY;
+export type LetterUrgency = DispositionUrgency;
+
+export const LETTER_STATUSES = [
+  ...INCOMING_LETTER_STATUS,
+  ...OUTGOING_LETTER_STATUS,
+  ...DISPOSITION_STATUS,
+] as const;
+export type LetterStatus = IncomingLetterStatus | OutgoingLetterStatus | DispositionStatus;
+
+
+
