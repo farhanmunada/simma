@@ -17,6 +17,14 @@ export { tahfidzRecords, tasmiExams } from "./tahfidz";
 export { attendanceStudents, attendanceTeachers } from "./attendance";
 export { assessments, studentGrades, grades, semesterGrades } from "./grades";
 export { ppdbApplicants, ppdbDocuments } from "./ppdb";
+export {
+  letterClassifications,
+  incomingLetters,
+  dispositions,
+  letterSequences,
+  outgoingLetters,
+  expeditionBooks,
+} from "./letters";
 export type {
   Institution,
   NewInstitution,
@@ -67,3 +75,17 @@ export type {
   PpdbDocument,
   NewPpdbDocument,
 } from "./ppdb";
+export type {
+  LetterClassification,
+  NewLetterClassification,
+  IncomingLetter,
+  NewIncomingLetter,
+  Disposition,
+  NewDisposition,
+  LetterSequence,
+  NewLetterSequence,
+  OutgoingLetter,
+  NewOutgoingLetter,
+  ExpeditionBook,
+  NewExpeditionBook,
+} from "./letters";

@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   GraduationCap,
   FileSpreadsheet,
+  Mail,
   ChevronDown,
   ChevronRight,
   LogOut,
@@ -27,6 +28,18 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Tata Usaha & Surat",
+    icon: Mail,
+    roles: ["super_admin", "admin_tu", "kepala_madrasah"],
+    subItems: [
+      { title: "Surat Masuk", href: "/letters/incoming" },
+      { title: "Disposisi Kamad", href: "/letters/dispositions" },
+      { title: "Surat Keluar", href: "/letters/outgoing" },
+      { title: "Buku Ekspedisi", href: "/letters/expeditions" },
+      { title: "Klasifikasi KMA 44", href: "/letters/classifications" },
+    ],
   },
   {
     title: "Master Data",
