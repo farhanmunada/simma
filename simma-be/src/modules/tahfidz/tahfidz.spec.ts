@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
 
 // Set environment variables before any module loads
 process.env.NODE_ENV = "test";
@@ -407,19 +407,29 @@ describe("Tahfidz Module", () => {
   });
 
   describe("API Routes & Auth Guards", () => {
+    let app: any;
+
+    beforeAll(async () => {
+      app = await buildApp();
+      await app.ready();
+    }, 30000);
+
+    afterAll(async () => {
+      if (app) {
+        await app.close();
+      }
+    });
+
     it("returns 401 when request is unauthenticated", async () => {
-      const app = await buildApp();
       const res = await app.inject({
         method: "GET",
         url: "/api/v1/tahfidz",
       });
 
       expect(res.statusCode).toBe(401);
-      await app.close();
     });
 
     it("returns 403 when user lacks required role to record setoran", async () => {
-      const app = await buildApp();
       // Role 'guru_mapel' is not in writeRoles for tahfidz recording
       const token = await signAccessToken({
         sub: "33333333-3333-3333-3333-333333333333",
@@ -450,11 +460,9 @@ describe("Tahfidz Module", () => {
       });
 
       expect(res.statusCode).toBe(403);
-      await app.close();
     });
 
     it("allows guru_tahfidz or super_admin to pass guard check", async () => {
-      const app = await buildApp();
       const token = await signAccessToken({
         sub: "44444444-4444-4444-4444-444444444444",
         username: "ustadz_hafizh",
@@ -473,7 +481,6 @@ describe("Tahfidz Module", () => {
       });
 
       expect(res.statusCode).toBe(400); // Validation error, not Auth 401/403
-      await app.close();
     });
   });
 });
