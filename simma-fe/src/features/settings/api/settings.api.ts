@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
   AcademicYear,
   CreateAcademicYearDto,
@@ -18,17 +19,6 @@ import type {
   UpdateTeacherDto,
   QueryFilterParams,
 } from "../types";
-
-// Helper request wrapper to target /setup endpoints
-async function settingsRequest<T>(
-  endpoint: string,
-  options: Parameters<typeof apiClient>[1] = {}
-): Promise<T> {
-  const target = endpoint.startsWith("/setup/")
-    ? endpoint
-    : endpoint.replace("/settings/", "/setup/");
-  return await apiClient<T>(target, options);
-}
 
 function extractList<T>(res: unknown): T[] {
   if (Array.isArray(res)) return res as T[];
@@ -53,19 +43,19 @@ function extractSingle<T>(res: unknown): T {
 // 1. ACADEMIC YEARS
 // ----------------------------------------------------
 export async function getAcademicYears(params?: QueryFilterParams): Promise<AcademicYear[]> {
-  const res = await settingsRequest<unknown>("/settings/academic-years", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.ACADEMIC_YEARS, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractList<AcademicYear>(res);
 }
 
 export async function getAcademicYearById(id: string): Promise<AcademicYear> {
-  const res = await settingsRequest<unknown>(`/settings/academic-years/${id}`);
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.ACADEMIC_YEAR_DETAIL(id));
   return extractSingle<AcademicYear>(res);
 }
 
 export async function createAcademicYear(data: CreateAcademicYearDto): Promise<AcademicYear> {
-  const res = await settingsRequest<unknown>("/settings/academic-years", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.ACADEMIC_YEARS, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -74,12 +64,12 @@ export async function createAcademicYear(data: CreateAcademicYearDto): Promise<A
 
 export async function patchAcademicYearStatus(id: string, isActive: boolean = true): Promise<AcademicYear> {
   const endpoint = isActive
-    ? `/setup/academic-years/${id}/set-active`
-    : `/setup/academic-years/${id}`;
+    ? API_ENDPOINTS.SETUP.ACADEMIC_YEAR_SET_ACTIVE(id)
+    : API_ENDPOINTS.SETUP.ACADEMIC_YEAR_DETAIL(id);
   const options = isActive
     ? { method: "PATCH" }
     : { method: "PATCH", body: JSON.stringify({ isActive: false }) };
-  const res = await settingsRequest<unknown>(endpoint, options);
+  const res = await apiClient<unknown>(endpoint, options);
   return extractSingle<AcademicYear>(res);
 }
 
@@ -87,7 +77,7 @@ export async function updateAcademicYear(
   id: string,
   data: UpdateAcademicYearDto
 ): Promise<AcademicYear> {
-  const res = await settingsRequest<unknown>(`/settings/academic-years/${id}`, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.ACADEMIC_YEAR_DETAIL(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -95,7 +85,7 @@ export async function updateAcademicYear(
 }
 
 export async function deleteAcademicYear(id: string): Promise<{ success: boolean }> {
-  return await settingsRequest<{ success: boolean }>(`/settings/academic-years/${id}`, {
+  return await apiClient<{ success: boolean }>(API_ENDPOINTS.SETUP.ACADEMIC_YEAR_DETAIL(id), {
     method: "DELETE",
   });
 }
@@ -104,19 +94,19 @@ export async function deleteAcademicYear(id: string): Promise<{ success: boolean
 // 2. SEMESTERS
 // ----------------------------------------------------
 export async function getSemesters(params?: QueryFilterParams): Promise<Semester[]> {
-  const res = await settingsRequest<unknown>("/settings/semesters", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SEMESTERS, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractList<Semester>(res);
 }
 
 export async function getSemesterById(id: string): Promise<Semester> {
-  const res = await settingsRequest<unknown>(`/settings/semesters/${id}`);
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SEMESTER_DETAIL(id));
   return extractSingle<Semester>(res);
 }
 
 export async function createSemester(data: CreateSemesterDto): Promise<Semester> {
-  const res = await settingsRequest<unknown>("/settings/semesters", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SEMESTERS, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -125,12 +115,12 @@ export async function createSemester(data: CreateSemesterDto): Promise<Semester>
 
 export async function patchSemesterStatus(id: string, isActive: boolean = true): Promise<Semester> {
   const endpoint = isActive
-    ? `/setup/semesters/${id}/set-active`
-    : `/setup/semesters/${id}`;
+    ? API_ENDPOINTS.SETUP.SEMESTER_SET_ACTIVE(id)
+    : API_ENDPOINTS.SETUP.SEMESTER_DETAIL(id);
   const options = isActive
     ? { method: "PATCH" }
     : { method: "PATCH", body: JSON.stringify({ isActive: false }) };
-  const res = await settingsRequest<unknown>(endpoint, options);
+  const res = await apiClient<unknown>(endpoint, options);
   return extractSingle<Semester>(res);
 }
 
@@ -138,7 +128,7 @@ export async function updateSemester(
   id: string,
   data: UpdateSemesterDto
 ): Promise<Semester> {
-  const res = await settingsRequest<unknown>(`/settings/semesters/${id}`, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SEMESTER_DETAIL(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -146,7 +136,7 @@ export async function updateSemester(
 }
 
 export async function deleteSemester(id: string): Promise<{ success: boolean }> {
-  return await settingsRequest<{ success: boolean }>(`/settings/semesters/${id}`, {
+  return await apiClient<{ success: boolean }>(API_ENDPOINTS.SETUP.SEMESTER_DETAIL(id), {
     method: "DELETE",
   });
 }
@@ -155,19 +145,19 @@ export async function deleteSemester(id: string): Promise<{ success: boolean }> 
 // 3. CLASSROOMS
 // ----------------------------------------------------
 export async function getClassrooms(params?: QueryFilterParams): Promise<Classroom[]> {
-  const res = await settingsRequest<unknown>("/settings/classrooms", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.CLASSROOMS, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractList<Classroom>(res);
 }
 
 export async function getClassroomById(id: string): Promise<Classroom> {
-  const res = await settingsRequest<unknown>(`/settings/classrooms/${id}`);
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.CLASSROOM_DETAIL(id));
   return extractSingle<Classroom>(res);
 }
 
 export async function createClassroom(data: CreateClassroomDto): Promise<Classroom> {
-  const res = await settingsRequest<unknown>("/settings/classrooms", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.CLASSROOMS, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -178,7 +168,7 @@ export async function updateClassroom(
   id: string,
   data: UpdateClassroomDto
 ): Promise<Classroom> {
-  const res = await settingsRequest<unknown>(`/settings/classrooms/${id}`, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.CLASSROOM_DETAIL(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -186,7 +176,7 @@ export async function updateClassroom(
 }
 
 export async function deleteClassroom(id: string): Promise<{ success: boolean }> {
-  return await settingsRequest<{ success: boolean }>(`/settings/classrooms/${id}`, {
+  return await apiClient<{ success: boolean }>(API_ENDPOINTS.SETUP.CLASSROOM_DETAIL(id), {
     method: "DELETE",
   });
 }
@@ -195,19 +185,19 @@ export async function deleteClassroom(id: string): Promise<{ success: boolean }>
 // 4. SUBJECTS
 // ----------------------------------------------------
 export async function getSubjects(params?: QueryFilterParams): Promise<Subject[]> {
-  const res = await settingsRequest<unknown>("/settings/subjects", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SUBJECTS, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractList<Subject>(res);
 }
 
 export async function getSubjectById(id: string): Promise<Subject> {
-  const res = await settingsRequest<unknown>(`/settings/subjects/${id}`);
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SUBJECT_DETAIL(id));
   return extractSingle<Subject>(res);
 }
 
 export async function createSubject(data: CreateSubjectDto): Promise<Subject> {
-  const res = await settingsRequest<unknown>("/settings/subjects", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SUBJECTS, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -218,7 +208,7 @@ export async function updateSubject(
   id: string,
   data: UpdateSubjectDto
 ): Promise<Subject> {
-  const res = await settingsRequest<unknown>(`/settings/subjects/${id}`, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.SUBJECT_DETAIL(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -226,7 +216,7 @@ export async function updateSubject(
 }
 
 export async function deleteSubject(id: string): Promise<{ success: boolean }> {
-  return await settingsRequest<{ success: boolean }>(`/settings/subjects/${id}`, {
+  return await apiClient<{ success: boolean }>(API_ENDPOINTS.SETUP.SUBJECT_DETAIL(id), {
     method: "DELETE",
   });
 }
@@ -235,19 +225,19 @@ export async function deleteSubject(id: string): Promise<{ success: boolean }> {
 // 5. TEACHERS
 // ----------------------------------------------------
 export async function getTeachers(params?: QueryFilterParams): Promise<Teacher[]> {
-  const res = await settingsRequest<unknown>("/settings/teachers", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.TEACHERS, {
     params: params as Record<string, string | number | boolean | undefined | null>,
   });
   return extractList<Teacher>(res);
 }
 
 export async function getTeacherById(id: string): Promise<Teacher> {
-  const res = await settingsRequest<unknown>(`/settings/teachers/${id}`);
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.TEACHER_DETAIL(id));
   return extractSingle<Teacher>(res);
 }
 
 export async function createTeacher(data: CreateTeacherDto): Promise<Teacher> {
-  const res = await settingsRequest<unknown>("/settings/teachers", {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.TEACHERS, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -258,7 +248,7 @@ export async function updateTeacher(
   id: string,
   data: UpdateTeacherDto
 ): Promise<Teacher> {
-  const res = await settingsRequest<unknown>(`/settings/teachers/${id}`, {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.TEACHER_DETAIL(id), {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -266,7 +256,7 @@ export async function updateTeacher(
 }
 
 export async function deleteTeacher(id: string): Promise<{ success: boolean }> {
-  return await settingsRequest<{ success: boolean }>(`/settings/teachers/${id}`, {
+  return await apiClient<{ success: boolean }>(API_ENDPOINTS.SETUP.TEACHER_DETAIL(id), {
     method: "DELETE",
   });
 }
