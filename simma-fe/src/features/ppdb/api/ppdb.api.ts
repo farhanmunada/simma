@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
   PpdbApplicant,
   PpdbApplicantsResponse,
@@ -32,7 +33,7 @@ export const useRegisterAccount = () => {
       apiClient<{
         applicant: PpdbApplicant;
         token: string;
-      }>("/ppdb/portal/register", {
+      }>(API_ENDPOINTS.PPDB.PORTAL_REGISTER, {
         method: "POST",
         body: JSON.stringify(data),
       }),
@@ -45,7 +46,7 @@ export const useLoginCalonSiswa = () => {
       apiClient<{
         applicant: PpdbApplicant;
         token: string;
-      }>("/ppdb/portal/login", {
+      }>(API_ENDPOINTS.PPDB.PORTAL_LOGIN, {
         method: "POST",
         body: JSON.stringify(data),
       }),
@@ -55,7 +56,7 @@ export const useLoginCalonSiswa = () => {
 export const useMyApplication = () => {
   return useQuery<PpdbApplicant>({
     queryKey: ["ppdb", "portal", "me"],
-    queryFn: () => apiClient<PpdbApplicant>("/ppdb/portal/me"),
+    queryFn: () => apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.PORTAL_ME),
   });
 };
 
@@ -63,7 +64,7 @@ export const useUpdateMyApplication = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: UpdateApplicantFormInput) =>
-      apiClient<PpdbApplicant>("/ppdb/portal/me", {
+      apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.PORTAL_UPDATE, {
         method: "PUT",
         body: JSON.stringify(data),
       }),
@@ -77,7 +78,7 @@ export const useFinalizeMyApplication = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>
-      apiClient<PpdbApplicant>("/ppdb/portal/me/finalize", {
+      apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.PORTAL_FINALIZE, {
         method: "POST",
       }),
     onSuccess: () => {
@@ -94,7 +95,7 @@ export const useUploadDocument = () => {
       formData.append("file", file);
       formData.append("documentType", documentType);
 
-      return apiClient<PpdbDocument>("/ppdb/portal/me/documents", {
+      return apiClient<PpdbDocument>(API_ENDPOINTS.PPDB.PORTAL_DOCUMENTS, {
         method: "POST",
         body: formData,
       });
@@ -109,7 +110,7 @@ export const useDeleteDocument = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (documentId: string) =>
-      apiClient<{ message: string }>(`/ppdb/portal/me/documents/${documentId}`, {
+      apiClient<{ message: string }>(API_ENDPOINTS.PPDB.PORTAL_DOCUMENT_DELETE(documentId), {
         method: "DELETE",
       }),
     onSuccess: () => {
@@ -122,7 +123,7 @@ export const useDeleteDocument = () => {
 export const usePpdbPublicInfo = () => {
   return useQuery<PpdbPublicInfo>({
     queryKey: ["ppdb", "public-info"],
-    queryFn: () => apiClient<PpdbPublicInfo>("/ppdb/public-info"),
+    queryFn: () => apiClient<PpdbPublicInfo>(API_ENDPOINTS.PPDB.PUBLIC_INFO),
     staleTime: 1000 * 60 * 10,
   });
 };
@@ -131,7 +132,7 @@ export const useRegisterApplicant = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: RegisterApplicantInput) =>
-      apiClient<PpdbApplicant>("/ppdb/register", {
+      apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.REGISTER_ACCOUNT, {
         method: "POST",
         body: JSON.stringify(data),
       }),
@@ -145,7 +146,7 @@ export const useRegisterApplicant = () => {
 export const useCheckPpdbStatus = () => {
   return useMutation({
     mutationFn: (input: CheckStatusQueryParams) =>
-      apiClient<PpdbApplicant>("/ppdb/check-status", {
+      apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.CHECK_STATUS, {
         params: {
           registrationNumber: input.registrationNumber,
           nikOrNisn: input.nikOrNisn,
@@ -158,7 +159,7 @@ export const useCheckPpdbStatus = () => {
 export const usePpdbStats = () => {
   return useQuery<PpdbStats>({
     queryKey: ["ppdb", "stats"],
-    queryFn: () => apiClient<PpdbStats>("/ppdb/stats"),
+    queryFn: () => apiClient<PpdbStats>(API_ENDPOINTS.PPDB.STATS),
   });
 };
 
@@ -166,7 +167,7 @@ export const usePpdbApplicants = (params: PpdbQueryParams = {}) => {
   return useQuery<PpdbApplicantsResponse>({
     queryKey: ["ppdb", "applicants", params],
     queryFn: () =>
-      apiClient<PpdbApplicantsResponse>("/ppdb/applicants", {
+      apiClient<PpdbApplicantsResponse>(API_ENDPOINTS.PPDB.APPLICANTS, {
         params: {
           search: params.search,
           status: params.status,
@@ -185,7 +186,7 @@ export const usePpdbApplicant = (id: string | undefined) => {
     queryKey: ["ppdb", "applicants", id],
     queryFn: () => {
       if (!id) throw new Error("ID pendaftar diperlukan");
-      return apiClient<PpdbApplicant>(`/ppdb/applicants/${id}`);
+      return apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.APPLICANT_DETAIL(id));
     },
     enabled: Boolean(id),
   });
@@ -201,7 +202,7 @@ export const useVerifyDocument = () => {
       documentId: string;
       data: VerifyDocumentInput;
     }) =>
-      apiClient<PpdbDocument>(`/ppdb/documents/${documentId}/verify`, {
+      apiClient<PpdbDocument>(API_ENDPOINTS.PPDB.DOCUMENT_VERIFY(documentId), {
         method: "PATCH",
         body: JSON.stringify(data),
       }),
@@ -221,7 +222,7 @@ export const useUpdateApplicantStatus = () => {
       id: string;
       data: UpdateApplicantStatusInput;
     }) =>
-      apiClient<PpdbApplicant>(`/ppdb/applicants/${id}/status`, {
+      apiClient<PpdbApplicant>(API_ENDPOINTS.PPDB.APPLICANT_STATUS(id), {
         method: "PATCH",
         body: JSON.stringify(data),
       }),
@@ -237,7 +238,7 @@ export const useEnrollApplicant = () => {
   return useMutation({
     mutationFn: (id: string) =>
       apiClient<{ studentId: string; message: string }>(
-        `/ppdb/applicants/${id}/enroll`,
+        API_ENDPOINTS.PPDB.APPLICANT_ENROLL(id),
         {
           method: "POST",
         }
@@ -254,7 +255,7 @@ export const useDeleteApplicant = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) =>
-      apiClient<void>(`/ppdb/applicants/${id}`, {
+      apiClient<void>(API_ENDPOINTS.PPDB.APPLICANT_DELETE(id), {
         method: "DELETE",
       }),
     onSuccess: () => {

@@ -1,9 +1,9 @@
 # Laporan Audit & Code Review Arsitektur SIMMA
 
-> **Tanggal:** 8 November 2026  
+> **Tanggal:** 9 November 2026  
 > **Auditor:** Agent Code Reviewer (Clean Code & Architecture Gatekeeper)  
-> **Cakupan:** `simma-be`, `simma-fe`, `packages/shared` *(Fitur PPDB dikecualikan sesuai instruksi)*  
-> **Status Verifikasi:** Typecheck Hijau (`tsc --noEmit`), Test Hijau (BE: 151 passed, FE: 44 passed, Total: 195 tests)
+> **Cakupan:** `simma-be`, `simma-fe`, `packages/shared` *(Termasuk audit lengkap Modul PPDB Madrasah)*  
+> **Status Verifikasi:** Typecheck Hijau (`tsc --noEmit`), Test Hijau (BE: 163 passed, FE: 47 passed, Total: 210 tests)
 
 ---
 
@@ -15,13 +15,13 @@ Pemeriksaan menyeluruh dilakukan terhadap seluruh repositori monorepo SIMMA. Str
 
 | Sub-Project | Jumlah File | Total Baris (LOC) | Rata-rata LOC/File | Status Batas 300 Baris |
 |---|---|---|---|---|
-| **`simma-be`** (Backend) | 69 file | 11.409 baris | 165 baris | 3 file melanggar (>300 LOC) |
-| **`simma-fe`** (Frontend) | 71 file | 16.019 baris | 225 baris | **17 file melanggar (>300 LOC)** |
-| **`packages/shared`** | 10 file | 893 baris | 89 baris | Memenuhi standar (sangat ramping) |
-| **Total Keseluruhan** | **150 file** | **28.321 baris** | **188 baris** | **20 file butuh pemecahan** |
+| **`simma-be`** (Backend) | 77 file | 13.520 baris | 175 baris | 5 file melanggar (>300 LOC) |
+| **`simma-fe`** (Frontend) | 78 file | 18.320 baris | 234 baris | **19 file melanggar (>300 LOC)** |
+| **`packages/shared`** | 11 file | 1.063 baris | 96 baris | Memenuhi standar (sangat ramping) |
+| **Total Keseluruhan** | **166 file** | **32.903 baris** | **198 baris** | **24 file butuh pemecahan** |
 
 > **Temuan Utama:**  
-> Backend relatif modular dan terstruktur rapi per domain. Masalah bloated file terbesar berpusat di **`simma-fe`**, khususnya halaman-halaman laporan, rekap, dan master data yang menggabungkan modal dialog, filter, tabel matriks, kalkulasi lokal, dan layout cetak ke dalam satu file komponen tunggal (*God Component*).
+> Backend relatif modular dan terstruktur rapi per domain. Masalah bloated file terbesar berpusat di **`simma-fe`**, khususnya halaman-halaman laporan, rekap, form wizard publik PPDB, dan master data yang menggabungkan modal dialog, filter, tabel matriks, kalkulasi lokal, dan layout cetak ke dalam satu file komponen tunggal (*God Component*). Di sisi backend, `ppdb.service.ts` membengkak (674 LOC) karena menangani multi-domain (auth calon siswa, upload berkas terenkripsi UUID, verifikasi berkas panitia TU, generasi PDF, dan mutasi transaksional Buku Induk).
 
 ---
 
@@ -34,23 +34,25 @@ Sesuai standar Clean Code (*Single Responsibility Principle* dan batas maksimal 
 | No | File | LOC | Masalah Utama | Rekomendasi Pemecahan |
 |---|---|---|---|---|
 | 1 | `src/features/reports/components/StudentReportCardPage.tsx` | **1.027** | *God Component*: menyatukan selector kelas, preview kartu rapor interaktif, form modal catatan wali kelas, kalkulasi deskripsi, dan 300 baris markup khusus print CSS. | Pecah menjadi 5 file:<br>1. `ReportCardFilterBar.tsx` (~80 baris)<br>2. `ReportCardPreview.tsx` (~220 baris)<br>3. `ReportCardPrintLayout.tsx` (~260 baris)<br>4. `EditReportNotesModal.tsx` (~180 baris)<br>5. `useReportCardState.ts` (custom hook ~150 baris) |
-| 2 | `src/features/attendance/components/AttendanceRecapPage.tsx` | **682** | Menyatukan tab rekap siswa, tab rekap guru, filter tanggal, tabel matriks, serta 2 modal detail rekap siswa & guru. | Pecah menjadi 4 file:<br>1. `StudentAttendanceRecapTable.tsx` (~180 baris)<br>2. `TeacherAttendanceRecapTable.tsx` (~180 baris)<br>3. `StudentAttendanceDetailModal.tsx` (~140 baris)<br>4. `TeacherAttendanceDetailModal.tsx` (~140 baris) |
-| 3 | `src/features/reports/components/ClassroomLeggerPage.tsx` | **592** | Menyatukan kartu agregasi nilai, tabel matriks besar (siswa x mapel), fungsi kalkulasi peringkat, dan layout print legger. | Pecah menjadi 3 file:<br>1. `LeggerSummaryCards.tsx` (~110 baris)<br>2. `LeggerMatrixTable.tsx` (~260 baris)<br>3. `LeggerPrintView.tsx` (~180 baris) |
-| 4 | `src/features/students/components/StudentDetailPage.tsx` | **568** | Menggabungkan identitas siswa, tab wali murid, modal mutasi status, dan modal tambah wali. | Pecah menjadi 4 file:<br>1. `StudentIdentityCard.tsx` (~160 baris)<br>2. `StudentParentsTab.tsx` (~150 baris)<br>3. `StudentStatusModal.tsx` (~120 baris)<br>4. `AddParentModal.tsx` (~130 baris) |
-| 5 | `src/features/settings/components/SubjectsPage.tsx` | **563** | Menyatukan tabel master mata pelajaran Kemenag, filter kelompok mapel, modal tambah/edit, dan dialog konfirmasi hapus. | Pecah menjadi:<br>1. `SubjectsTable.tsx` (~200 baris)<br>2. `SubjectFormModal.tsx` (~160 baris) |
-| 6 | `src/features/tahfidz/components/TahfidzRecordsPage.tsx` | **535** | Menggabungkan histori setoran hafalan, kalkulasi skor tajwid/makhroj, dan modal input setoran harian. | Pecah menjadi:<br>1. `TahfidzRecordsTable.tsx` (~220 baris)<br>2. `TahfidzRecordFormModal.tsx` (~190 baris) |
-| 7 | `src/features/students/components/StudentsListPage.tsx` | **534** | Menyatukan filter NISN/status, pagination, tabel siswa, dan modal pendaftaran siswa baru. | Pecah menjadi:<br>1. `StudentsTable.tsx` (~220 baris)<br>2. `CreateStudentModal.tsx` (~200 baris) |
-| 8 | `src/features/settings/components/ClassroomsPage.tsx` | **534** | Menyatukan tabel rombel, form modal assign wali kelas, dan kuota siswa. | Pecah menjadi:<br>1. `ClassroomsTable.tsx` (~210 baris)<br>2. `ClassroomFormModal.tsx` (~180 baris) |
-| 9 | `src/features/settings/api/settings.api.ts` | **529** | Menggabungkan 5 domain berbeda (Institution, Academic Years, Semesters, Classrooms, Subjects, Teachers) ke dalam 1 file API. | Pecah menjadi folder `src/features/settings/api/`:<br>1. `academic-years.api.ts`<br>2. `semesters.api.ts`<br>3. `classrooms.api.ts`<br>4. `subjects.api.ts`<br>5. `teachers.api.ts`<br>6. `institution.api.ts` |
-| 10 | `src/features/tahfidz/components/TasmiExamsPage.tsx` | **496** | Menggabungkan daftar ujian tasmi', modal penilaian penguji, dan status kelulusan. | Pecah menjadi `TasmiExamsTable.tsx` dan `TasmiExamFormModal.tsx` |
-| 11 | `src/features/grades/components/AssessmentsListPage.tsx` | **442** | Manajemen asesmen (tugas, UH, UTS, UAS) dan modal pembuatannya. | Pecah menjadi `AssessmentsTable.tsx` dan `AssessmentFormModal.tsx` |
-| 12 | `src/features/settings/components/AcademicYearsPage.tsx` | **429** | Tabel tahun ajaran dan modal aktivasi/edit. | Pecah menjadi `AcademicYearsTable.tsx` dan `AcademicYearModal.tsx` |
-| 13 | `src/features/settings/components/SemestersPage.tsx` | **425** | Tabel semester dan modal aktivasi/edit. | Pecah menjadi `SemestersTable.tsx` dan `SemesterModal.tsx` |
-| 14 | `src/features/settings/components/TeachersPage.tsx` | **418** | Tabel guru dan modal input GTK. | Pecah menjadi `TeachersTable.tsx` dan `TeacherModal.tsx` |
-| 15 | `src/features/grades/components/SemesterGradesPage.tsx` | **392** | Rangkuman nilai akhir semester dan kalkulasi rapor. | Pisahkan tabel nilai dan modal batch calculate. |
-| 16 | `src/features/grades/components/GradeInputSheetPage.tsx` | **384** | Matriks spreadsheet input nilai siswa per asesmen. | Pisahkan baris input spreadsheet ke `GradeInputRow.tsx`. |
-| 17 | `src/features/attendance/components/AttendanceStudentPage.tsx` | **380** | Input presensi harian siswa per kelas. | Pisahkan baris tabel presensi ke `StudentAttendanceRow.tsx`. |
-| 18 | `src/features/attendance/components/AttendanceTeacherPage.tsx` | **340** | Presensi harian guru & staf. | Pisahkan baris presensi ke `TeacherAttendanceRow.tsx`. |
+| 2 | `src/features/ppdb/components/PpdbPublicPortalPage.tsx` | **767** | *God Component*: Menyatukan alur registrasi multi-step wizard (Data Diri, Orang Tua, Asal Madrasah/SMP, Unggah Berkas Persyaratan), cek status mandiri, dan form login akun calon siswa. | Pecah menjadi sub-komponen wizard:<br>1. `PpdbStepIdentity.tsx` (~160 baris)<br>2. `PpdbStepParents.tsx` (~140 baris)<br>3. `PpdbStepSchool.tsx` (~110 baris)<br>4. `PpdbStepUpload.tsx` (~180 baris)<br>5. `PpdbStatusTracker.tsx` (~120 baris)<br>6. `PpdbCandidateAuthModal.tsx` (~110 baris) |
+| 3 | `src/features/attendance/components/AttendanceRecapPage.tsx` | **682** | Menyatukan tab rekap siswa, tab rekap guru, filter tanggal, tabel matriks, serta 2 modal detail rekap siswa & guru. | Pecah menjadi 4 file:<br>1. `StudentAttendanceRecapTable.tsx` (~180 baris)<br>2. `TeacherAttendanceRecapTable.tsx` (~180 baris)<br>3. `StudentAttendanceDetailModal.tsx` (~140 baris)<br>4. `TeacherAttendanceDetailModal.tsx` (~140 baris) |
+| 4 | `src/features/reports/components/ClassroomLeggerPage.tsx` | **592** | Menyatukan kartu agregasi nilai, tabel matriks besar (siswa x mapel), fungsi kalkulasi peringkat, dan layout print legger. | Pecah menjadi 3 file:<br>1. `LeggerSummaryCards.tsx` (~110 baris)<br>2. `LeggerMatrixTable.tsx` (~260 baris)<br>3. `LeggerPrintView.tsx` (~180 baris) |
+| 5 | `src/features/students/components/StudentDetailPage.tsx` | **568** | Menggabungkan identitas siswa, tab wali murid, modal mutasi status, dan modal tambah wali. | Pecah menjadi 4 file:<br>1. `StudentIdentityCard.tsx` (~160 baris)<br>2. `StudentParentsTab.tsx` (~150 baris)<br>3. `StudentStatusModal.tsx` (~120 baris)<br>4. `AddParentModal.tsx` (~130 baris) |
+| 6 | `src/features/settings/components/SubjectsPage.tsx` | **563** | Menyatukan tabel master mata pelajaran Kemenag, filter kelompok mapel, modal tambah/edit, dan dialog konfirmasi hapus. | Pecah menjadi:<br>1. `SubjectsTable.tsx` (~200 baris)<br>2. `SubjectFormModal.tsx` (~160 baris) |
+| 7 | `src/features/ppdb/components/PpdbDashboardPage.tsx` | **537** | Menyatukan kartu metrik statistik pendaftar, filter tabel multi-jalur/status, modal detail verifikasi berkas per-dokumen, dan modal mutasi ke Buku Induk Siswa. | Pecah menjadi:<br>1. `PpdbApplicantsTable.tsx` (~200 baris)<br>2. `PpdbApplicantDetailModal.tsx` (~190 baris)<br>3. `PpdbStatsCards.tsx` (~90 baris) |
+| 8 | `src/features/tahfidz/components/TahfidzRecordsPage.tsx` | **535** | Menggabungkan histori setoran hafalan, kalkulasi skor tajwid/makhroj, dan modal input setoran harian. | Pecah menjadi:<br>1. `TahfidzRecordsTable.tsx` (~220 baris)<br>2. `TahfidzRecordFormModal.tsx` (~190 baris) |
+| 9 | `src/features/students/components/StudentsListPage.tsx` | **534** | Menyatukan filter NISN/status, pagination, tabel siswa, dan modal pendaftaran siswa baru. | Pecah menjadi:<br>1. `StudentsTable.tsx` (~220 baris)<br>2. `CreateStudentModal.tsx` (~200 baris) |
+| 10 | `src/features/settings/components/ClassroomsPage.tsx` | **534** | Menyatukan tabel rombel, form modal assign wali kelas, dan kuota siswa. | Pecah menjadi:<br>1. `ClassroomsTable.tsx` (~210 baris)<br>2. `ClassroomFormModal.tsx` (~180 baris) |
+| 11 | `src/features/settings/api/settings.api.ts` | **529** | Menggabungkan 5 domain berbeda (Institution, Academic Years, Semesters, Classrooms, Subjects, Teachers) ke dalam 1 file API. | Pecah menjadi folder `src/features/settings/api/`:<br>1. `academic-years.api.ts`<br>2. `semesters.api.ts`<br>3. `classrooms.api.ts`<br>4. `subjects.api.ts`<br>5. `teachers.api.ts`<br>6. `institution.api.ts` |
+| 12 | `src/features/tahfidz/components/TasmiExamsPage.tsx` | **496** | Menggabungkan daftar ujian tasmi', modal penilaian penguji, dan status kelulusan. | Pecah menjadi `TasmiExamsTable.tsx` dan `TasmiExamFormModal.tsx` |
+| 13 | `src/features/grades/components/AssessmentsListPage.tsx` | **442** | Manajemen asesmen (tugas, UH, UTS, UAS) dan modal pembuatannya. | Pecah menjadi `AssessmentsTable.tsx` dan `AssessmentFormModal.tsx` |
+| 14 | `src/features/settings/components/AcademicYearsPage.tsx` | **429** | Tabel tahun ajaran dan modal aktivasi/edit. | Pecah menjadi `AcademicYearsTable.tsx` dan `AcademicYearModal.tsx` |
+| 15 | `src/features/settings/components/SemestersPage.tsx` | **425** | Tabel semester dan modal aktivasi/edit. | Pecah menjadi `SemestersTable.tsx` dan `SemesterModal.tsx` |
+| 16 | `src/features/settings/components/TeachersPage.tsx` | **418** | Tabel guru dan modal input GTK. | Pecah menjadi `TeachersTable.tsx` dan `TeacherModal.tsx` |
+| 17 | `src/features/grades/components/SemesterGradesPage.tsx` | **392** | Rangkuman nilai akhir semester dan kalkulasi rapor. | Pisahkan tabel nilai dan modal batch calculate. |
+| 18 | `src/features/grades/components/GradeInputSheetPage.tsx` | **384** | Matriks spreadsheet input nilai siswa per asesmen. | Pisahkan baris input spreadsheet ke `GradeInputRow.tsx`. |
+| 19 | `src/features/attendance/components/AttendanceStudentPage.tsx` | **380** | Input presensi harian siswa per kelas. | Pisahkan baris tabel presensi ke `StudentAttendanceRow.tsx`. |
+| 20 | `src/features/attendance/components/AttendanceTeacherPage.tsx` | **340** | Presensi harian guru & staf. | Pisahkan baris presensi ke `TeacherAttendanceRow.tsx`. |
 
 ---
 
@@ -58,9 +60,11 @@ Sesuai standar Clean Code (*Single Responsibility Principle* dan batas maksimal 
 
 | No | File | LOC | Masalah Utama | Rekomendasi Pemecahan |
 |---|---|---|---|---|
-| 1 | `src/modules/setup/setup.repository.ts` | **520** | Menggabungkan 6 model database Drizzle dalam 1 repository tunggal (institution, academicYears, semesters, classrooms, subjects, teachers). | Pecah menjadi sub-repository:<br>1. `academic-years.repo.ts`<br>2. `semesters.repo.ts`<br>3. `classrooms.repo.ts`<br>4. `subjects.repo.ts`<br>5. `teachers.repo.ts`<br>*(atau pertahankan satu file jika masih di bawah 600 baris, namun modul lain rata-rata <300 baris)* |
-| 2 | `src/modules/setup/setup.service.ts` | **450** | Berisi seluruh business logic validasi & transaksi untuk 6 entitas setup sekaligus. | Pecah sejalan dengan repository: pisahkan logic rombel & guru ke service mandiri. |
-| 3 | `src/modules/grades/grades.service.ts` | **333** | Logika kalkulasi bobot asesmen dan semester grade calculation. | Pisahkan fungsi kalkulasi murni bobot nilai ke `grades.calculator.ts`. |
+| 1 | `src/modules/ppdb/ppdb.service.ts` | **674** | Menggabungkan autentikasi calon siswa (bcrypt/JWT), registrasi pendaftar, upload multipart & sanitasi berkas UUID fisik, verifikasi berkas oleh panitia TU, generasi PDF resmi, dan mutasi atomik transaksional Buku Induk Siswa. | Pecah menjadi modul terisolasi:<br>1. `ppdb-auth.service.ts` (~120 baris)<br>2. `ppdb-document.service.ts` (~180 baris)<br>3. `ppdb-enrollment.service.ts` (~160 baris)<br>4. `ppdb.service.ts` (koordinator ~210 baris) |
+| 2 | `src/modules/setup/setup.repository.ts` | **520** | Menggabungkan 6 model database Drizzle dalam 1 repository tunggal (institution, academicYears, semesters, classrooms, subjects, teachers). | Pecah menjadi sub-repository:<br>1. `academic-years.repo.ts`<br>2. `semesters.repo.ts`<br>3. `classrooms.repo.ts`<br>4. `subjects.repo.ts`<br>5. `teachers.repo.ts`<br>*(atau pertahankan satu file jika masih di bawah 600 baris, namun modul lain rata-rata <300 baris)* |
+| 3 | `src/modules/setup/setup.service.ts` | **450** | Berisi seluruh business logic validasi & transaksi untuk 6 entitas setup sekaligus. | Pecah sejalan dengan repository: pisahkan logic rombel & guru ke service mandiri. |
+| 4 | `src/modules/grades/grades.service.ts` | **333** | Logika kalkulasi bobot asesmen dan semester grade calculation. | Pisahkan fungsi kalkulasi murni bobot nilai ke `grades.calculator.ts`. |
+| 5 | `src/modules/ppdb/ppdb.repository.ts` | **305** | Operasi database multi-tabel (`ppdbApplicants`, `ppdbDocuments`, `academicYears`, `students`, `parents`) dan agregasi statistik multi-jalur. | Pisahkan fungsi query dokumen ke `ppdb-document.repository.ts`. |
 
 ---
 
@@ -225,6 +229,29 @@ export const API_ENDPOINTS = {
     STUDENT_NOTES: (studentId: string) => `/reports/student/${studentId}/notes`,
     CLASSROOM_LEGGER: (classroomId: string, semesterId: string) => `/reports/classroom/${classroomId}/semester/${semesterId}/legger`,
   },
+  PPDB: {
+    PUBLIC_INFO: "/ppdb/public-info",
+    STATS: "/ppdb/stats",
+    REGISTER_ACCOUNT: "/ppdb/register",
+    LOGIN: "/ppdb/login",
+    PORTAL_REGISTER: "/ppdb/portal/register",
+    PORTAL_LOGIN: "/ppdb/portal/login",
+    CHECK_STATUS: "/ppdb/check-status",
+    PORTAL_ME: "/ppdb/portal/me",
+    PORTAL_UPDATE: "/ppdb/portal/me",
+    PORTAL_FINALIZE: "/ppdb/portal/me/finalize",
+    PORTAL_CARD_PDF: "/ppdb/portal/me/card/pdf",
+    PORTAL_DOCUMENTS: "/ppdb/portal/me/documents",
+    PORTAL_DOCUMENT_DELETE: (id: string) => `/ppdb/portal/me/documents/${id}`,
+    PORTAL_DOCUMENT_FILE: (id: string) => `/ppdb/documents/${id}/file`,
+    APPLICANTS: "/ppdb/applicants",
+    APPLICANT_DETAIL: (id: string) => `/ppdb/applicants/${id}`,
+    APPLICANT_STATUS: (id: string) => `/ppdb/applicants/${id}/status`,
+    APPLICANT_ENROLL: (id: string) => `/ppdb/applicants/${id}/enroll`,
+    APPLICANT_DELETE: (id: string) => `/ppdb/applicants/${id}`,
+    APPLICANT_CARD_PDF: (id: string) => `/ppdb/applicants/${id}/card/pdf`,
+    DOCUMENT_VERIFY: (id: string) => `/ppdb/documents/${id}/verify`,
+  },
 } as const;
 ```
 
@@ -232,8 +259,10 @@ export const API_ENDPOINTS = {
 
 ## 6. Checklist Aksi Tindak Lanjut untuk Tim Pengembang
 
-1. [ ] **Refactoring God Components di FE:** Pecah `StudentReportCardPage.tsx` (1.027 baris) dan `AttendanceRecapPage.tsx` (682 baris) sesuai panduan bagian 2.1.
-2. [ ] **Pindahkan Fungsi CSV:** Pindahkan `exportLeggerToCsv` dari `simma-fe/src/features/reports/types.ts` ke `src/lib/csv-exporter.ts`.
-3. [ ] **Adopsi Centralized Endpoints:** Migrasikan pemanggilan string literal endpoint di `features/*/api/*.ts` ke `API_ENDPOINTS` dari `simma-fe/src/config/endpoints.ts`.
-4. [ ] **Konsolidasi Response Wrapper:** Standarisasi fungsi unwrap data di `api-client.ts` agar modul feature tidak lagi menduplikasi `extractList` / `extractSingle`.
-5. [ ] **Setup ESLint Flat Config:** Tambahkan `eslint.config.js` di root/sub-package agar `pnpm -r run lint` berjalan dengan ESLint v9.
+1. [ ] **Refactoring God Components di FE:** Pecah `StudentReportCardPage.tsx` (1.027 baris), `PpdbPublicPortalPage.tsx` (767 baris), dan `AttendanceRecapPage.tsx` (682 baris) sesuai panduan bagian 2.1.
+2. [ ] **Refactoring Multi-Domain Service di BE:** Pecah `ppdb.service.ts` (674 baris) menjadi sub-layanan mandiri (`ppdb-auth`, `ppdb-document`, `ppdb-enrollment`).
+3. [ ] **Pindahkan Fungsi CSV:** Pindahkan `exportLeggerToCsv` dari `simma-fe/src/features/reports/types.ts` ke `src/lib/csv-exporter.ts`.
+4. [x] **Adopsi Centralized Endpoints PPDB:** Migrasikan pemanggilan string literal endpoint PPDB di `features/ppdb/api/ppdb.api.ts` ke `API_ENDPOINTS.PPDB` dari `simma-fe/src/config/endpoints.ts`.
+5. [ ] **Adopsi Centralized Endpoints Modul Lain:** Selesaikan migrasi pemanggilan string literal di fitur tersisa (`settings`, `students`, `attendance`, `grades`, `tahfidz`, `reports`).
+6. [ ] **Konsolidasi Response Wrapper:** Standarisasi fungsi unwrap data di `api-client.ts` agar modul feature tidak lagi menduplikasi `extractList` / `extractSingle`.
+7. [ ] **Setup ESLint Flat Config:** Tambahkan `eslint.config.js` di root/sub-package agar `pnpm -r run lint` berjalan dengan ESLint v9.

@@ -274,3 +274,42 @@ pnpm --filter simma-be run db:migrate    # Run migration
 9. Catat evaluasi di agent-eval.md
 10. Mulai wave N+1
 ```
+
+---
+
+## 13. Aturan Wajib Clean Code (Enforced Post-Audit)
+
+Seluruh agent pengembang (Worker maupun Leader) **WAJIB** mematuhi 6 aturan dasar clean code berikut (merujuk audit `docs/CODE_REVIEW.md`):
+
+### 13.1 Batas Maksimal 300 Baris (LOC) per File (Anti God-Component)
+- File komponen UI, service, atau repository **DILARANG melebihi 300 baris kode**.
+- Jika suatu fitur memiliki formulir multi-langkah (*wizard*), tabel data, kartu metrik, atau modal interaktif, **WAJIB dipecah** menjadi sub-komponen terisolasi dalam folder `components/`.
+- Pisahkan state kompleks atau mutasi query panjang ke dalam custom hooks tersendiri (`hooks/use<Feature>.ts`).
+- Dilarang keras menaruh CSS cetak (@media print) atau tata letak cetak dokumen fisik ratusan baris langsung di dalam komponen halaman utama; buat berkas layout cetak terpisah (contoh: `<Feature>PrintLayout.tsx`).
+
+### 13.2 Berkas `types.ts` Wajib 100% Deklaratif
+- Berkas `types.ts` hanya boleh berisi definisi tipe TypeScript murni: `type`, `interface`, dan `enum` Zod infer.
+- **DILARANG KERAS** menyisipkan fungsi manipulasi DOM (`document.createElement`, manipulasi blob browser), fungsi pembantu kalkulasi, atau pemanggilan API di dalam `types.ts`.
+- Tempatkan fungsi penolong/utilitas di `src/lib/` atau direktori `utils/` modul terkait.
+
+### 13.3 Wajib Menggunakan Centralized API Endpoints Registry
+- Dilarang keras *hardcoded* string URL endpoint di dalam API client atau komponen (contoh: `apiClient("/ppdb/applicants")` ❌).
+- Seluruh endpoint wajib didaftarkan dan dikonsumsi melalui konstanta terpusat `API_ENDPOINTS` di `simma-fe/src/config/endpoints.ts` (contoh: `apiClient(API_ENDPOINTS.PPDB.APPLICANTS)` ✔️).
+
+### 13.4 Integritas Transaksi Database Atomik (Multi-Table)
+- Setiap operasi mutasi data di backend yang melibatkan 2 tabel atau lebih (misal: mutasi kelulusan pendaftar PPDB ke tabel `students`, `parents`, `studentParents`, dan update status `ppdbApplicants`) **WAJIB dibungkus transaksi atomik**:
+  ```ts
+  await db.transaction(async (tx) => {
+    // operasi mutasi aman menggunakan tx
+  });
+  ```
+- Dilarang menjalankan serangkaian `insert` tanpa transaksi yang dapat menyebabkan *partial write* saat terjadi kegagalan.
+
+### 13.5 Prinsip DRY & Single Source of Truth
+- Skema validasi DTO, enum domain, konstanta status, dan formula skor/bobot madrasah dilarang diduplikasi secara terpisah di FE dan BE.
+- Wajib didefinisikan satu kali di `packages/shared` (`@simma/shared`) lalu dikonsumsi bersama oleh `simma-be` dan `simma-fe`.
+
+### 13.6 Standardisasi Konsumsi API & Penanganan Error
+- FE dilarang memanipulasi struktur response secara ad-hoc per-fitur jika sudah ditangani oleh wrapper `apiClient`.
+- Backend wajib melempar error menggunakan hierarki `AppError` terstruktur (`NotFoundError`, `BadRequestError`, `ForbiddenError`, `ConflictError`) agar HTTP status code dan format pesan error konsisten.
+
