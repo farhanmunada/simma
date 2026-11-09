@@ -1,4 +1,5 @@
 export type StudentAttendanceStatus = "hadir" | "izin" | "sakit" | "alpa";
+export type AttendanceStudentStatus = StudentAttendanceStatus;
 
 export type TeacherAttendanceStatus =
   | "hadir"
@@ -6,6 +7,7 @@ export type TeacherAttendanceStatus =
   | "sakit"
   | "alpa"
   | "dinas_luar";
+export type AttendanceTeacherStatus = TeacherAttendanceStatus;
 
 export const STUDENT_ATTENDANCE_STATUSES: StudentAttendanceStatus[] = [
   "hadir",
@@ -32,6 +34,20 @@ export interface AttendanceStudent {
   teacherId?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  student?: {
+    id?: string;
+    fullName?: string;
+    nisn?: string;
+    nis?: string;
+  };
+  classroom?: {
+    id?: string;
+    name?: string;
+  };
+  teacher?: {
+    id?: string;
+    fullName?: string;
+  };
 }
 
 export interface AttendanceTeacher {
@@ -42,6 +58,12 @@ export interface AttendanceTeacher {
   note?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  teacher?: {
+    id?: string;
+    fullName?: string;
+    nip?: string;
+    nuptk?: string;
+  };
 }
 
 export interface AttendanceSummaryCounts {
@@ -51,6 +73,7 @@ export interface AttendanceSummaryCounts {
   alpa: number;
   total: number;
   attendancePercentage: number;
+  percentage?: number;
 }
 
 export interface StudentAttendanceSummary extends AttendanceSummaryCounts {
