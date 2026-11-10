@@ -151,6 +151,5 @@ export const API_ENDPOINTS = {
     EARLY_WARNINGS: "/mutabaah/early-warnings",
     REPORT_PDF: (studentId: string, month: number, year: number) =>
       `/mutabaah/report/${studentId}/pdf?month=${month}&year=${year}`,
-  }
   },
 } as const;
