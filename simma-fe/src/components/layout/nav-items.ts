@@ -9,6 +9,7 @@ import {
   FileSpreadsheet,
   LayoutDashboard,
   Layers,
+  ClipboardCheck,
 } from "lucide-react";
 
 export interface NavItem {
@@ -66,6 +67,23 @@ export const navItems: NavItem[] = [
     subItems: [
       { title: "Setoran Hafalan", href: "/tahfidz" },
       { title: "Ujian Tasmi'", href: "/tahfidz/tasmi" },
+    ],
+  },
+  {
+    title: "Mutaba'ah Yaumiyah",
+    icon: ClipboardCheck,
+    roles: [
+      "super_admin",
+      "admin_tu",
+      "kepala_madrasah",
+      "waka_kesiswaan",
+      "wali_kelas",
+      "guru",
+    ],
+    subItems: [
+      { title: "Checklist Harian", href: "/mutabaah/checklist" },
+      { title: "Monitoring & Rapor", href: "/mutabaah/compliance" },
+      { title: "Katalog Amalan", href: "/mutabaah/activities" },
     ],
   },
   {

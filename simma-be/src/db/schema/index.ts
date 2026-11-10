@@ -32,6 +32,11 @@ export {
   p5raAssessments,
   p5raStudentNotes,
 } from "./p5ra";
+export {
+  mutabaahActivities,
+  mutabaahDailyEntries,
+  mutabaahUzurRecords,
+} from "./mutabaah";
 export type {
   Institution,
   NewInstitution,
@@ -108,4 +113,12 @@ export type {
   P5raStudentNote,
   NewP5raStudentNote,
 } from "./p5ra";
+export type {
+  MutabaahActivity,
+  NewMutabaahActivity,
+  MutabaahDailyEntry,
+  NewMutabaahDailyEntry,
+  MutabaahUzurRecord,
+  NewMutabaahUzurRecord,
+} from "./mutabaah";
 

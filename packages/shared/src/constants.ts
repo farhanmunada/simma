@@ -213,6 +213,41 @@ export const P5RA_PREDICATE_LABELS: Record<P5raPredicate, string> = {
   SAB: "Sangat Berkembang",
 };
 
+// Mutaba'ah Yaumiyah (Modul 11 - Ibadah Harian Santri)
+export const MUTABAAH_ACTIVITY_CATEGORIES = [
+  "fardhu",
+  "sunnah",
+  "quran",
+  "dzikir",
+  "kajian",
+] as const;
+export type MutabaahActivityCategory =
+  (typeof MUTABAAH_ACTIVITY_CATEGORIES)[number];
+
+export const MUTABAAH_ENTRY_STATUSES = [
+  "terlaksana",
+  "masbuk",
+  "uzur",
+  "tidak_terlaksana",
+] as const;
+export type MutabaahEntryStatus = (typeof MUTABAAH_ENTRY_STATUSES)[number];
+
+export const MUTABAAH_UZUR_TYPES = [
+  "haidh",
+  "sakit",
+  "nifas",
+  "lainnya",
+] as const;
+export type MutabaahUzurType = (typeof MUTABAAH_UZUR_TYPES)[number];
+
+export const MUTABAAH_COMPLIANCE_STATUS = [
+  "istiqamah",
+  "perhatian",
+  "konseling",
+] as const;
+export type MutabaahComplianceStatus =
+  (typeof MUTABAAH_COMPLIANCE_STATUS)[number];
+
 
 
 

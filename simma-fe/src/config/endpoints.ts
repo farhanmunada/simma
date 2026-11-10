@@ -141,4 +141,16 @@ export const API_ENDPOINTS = {
     STUDENT_REPORT: (projectId: string, studentId: string) => `/p5ra/projects/${projectId}/students/${studentId}/report`,
     STUDENT_PDF: (projectId: string, studentId: string) => `/p5ra/projects/${projectId}/students/${studentId}/pdf`,
   },
+  MUTABAAH: {
+    ACTIVITIES: "/mutabaah/activities",
+    ACTIVITY_DETAIL: (id: string) => `/mutabaah/activities/${id}`,
+    CHECKLIST: "/mutabaah/checklist",
+    UZUR: "/mutabaah/uzur",
+    UZUR_DETAIL: (id: string) => `/mutabaah/uzur/${id}`,
+    COMPLIANCE: "/mutabaah/compliance",
+    EARLY_WARNINGS: "/mutabaah/early-warnings",
+    REPORT_PDF: (studentId: string, month: number, year: number) =>
+      `/mutabaah/report/${studentId}/pdf?month=${month}&year=${year}`,
+  }
+  },
 } as const;
