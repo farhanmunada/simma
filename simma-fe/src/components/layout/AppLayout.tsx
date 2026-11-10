@@ -14,9 +14,7 @@ export const AppLayout: React.FC = () => {
   const location = useLocation();
   const { user, logout, hasRole } = useAuthStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    "Master Data": true,
-  });
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
@@ -224,13 +222,11 @@ export const AppLayout: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
-          <div className="text-xs font-medium text-slate-500">
-            Tahun Ajaran <span className="font-semibold text-slate-800">2026/2027 Ganjil</span>
+          <div className="text-xs text-slate-500">
+            Tahun Ajaran <span className="font-medium text-slate-800">2026/2027 Ganjil</span>
           </div>
-          <div className="flex items-center space-x-3 text-xs">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Sistem Aktif
-            </span>
+          <div className="text-xs text-slate-400">
+            SIMMA Aliyah
           </div>
         </header>
 
