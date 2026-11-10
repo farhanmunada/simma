@@ -28,17 +28,17 @@ export const AppLayout: React.FC = () => {
           isCollapsed ? "w-16" : "w-60"
         } bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 transition-all duration-200 select-none`}
       >
-        <div className="h-14 px-3 flex items-center justify-between border-b border-slate-800">
+        <div className="h-14 px-3 flex items-center justify-between border-b border-slate-800 bg-slate-950/40">
           {!isCollapsed ? (
             <>
-              <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-md bg-emerald-600 flex items-center justify-center font-bold text-white text-sm">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-700 border border-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow-xs">
                   S
                 </div>
-                <span className="font-bold text-slate-100 tracking-tight text-sm">SIMMA</span>
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded-sm bg-slate-800 text-slate-400">
-                  MA
-                </span>
+                <div>
+                  <span className="font-bold text-slate-100 tracking-tight text-sm block leading-none">SIMMA</span>
+                  <span className="text-[10px] text-emerald-400 font-medium">Madrasah Aliyah</span>
+                </div>
               </div>
               <button
                 onClick={() => setIsCollapsed(true)}
@@ -85,7 +85,7 @@ export const AppLayout: React.FC = () => {
                     to={targetUrl}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
                       isActive
-                        ? "bg-emerald-600 text-white shadow-xs"
+                        ? "bg-emerald-700 text-white shadow-xs"
                         : "text-slate-400 hover:text-white hover:bg-slate-800"
                     }`}
                   >
@@ -129,7 +129,7 @@ export const AppLayout: React.FC = () => {
                 <div key={item.title} className="space-y-0.5">
                   <button
                     onClick={() => toggleMenu(item.title)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-md font-medium transition-colors ${
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg font-medium transition-colors ${
                       isChildActive
                         ? "text-emerald-400 bg-slate-800/80"
                         : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
@@ -174,9 +174,9 @@ export const AppLayout: React.FC = () => {
               <Link
                 key={item.title}
                 to={item.href!}
-                className={`flex items-center space-x-2.5 px-2.5 py-2 rounded-md font-medium transition-colors ${
+                className={`flex items-center space-x-2.5 px-2.5 py-2 rounded-lg font-medium transition-colors ${
                   isDirectActive
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-emerald-700 text-white font-semibold shadow-xs"
                     : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
                 }`}
               >
@@ -222,11 +222,15 @@ export const AppLayout: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
-          <div className="text-xs text-slate-500">
-            Tahun Ajaran <span className="font-medium text-slate-800">2026/2027 Ganjil</span>
+          <div className="flex items-center space-x-2 text-xs text-slate-500">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+            <span>Tahun Ajaran</span>
+            <span className="font-semibold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              2026/2027 Ganjil
+            </span>
           </div>
-          <div className="text-xs text-slate-400">
-            SIMMA Aliyah
+          <div className="text-xs text-slate-500 font-medium">
+            Sistem Terpadu Madrasah
           </div>
         </header>
 
