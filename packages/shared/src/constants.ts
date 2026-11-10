@@ -160,5 +160,59 @@ export const LETTER_STATUSES = [
 ] as const;
 export type LetterStatus = IncomingLetterStatus | OutgoingLetterStatus | DispositionStatus;
 
+// Modul 10 - P5RA (Profil Pelajar Pancasila & Rahmatan Lil 'Alamin)
+export const P5RA_THEMES = [
+  "Gaya Hidup Berkelanjutan",
+  "Kearifan Lokal",
+  "Bhinneka Tunggal Ika",
+  "Bangunlah Jiwa dan Raganya",
+  "Suara Demokrasi",
+  "Rekayasa & Teknologi",
+  "Kewirausahaan",
+  "Kebekerjaan",
+] as const;
+export type P5raTheme = (typeof P5RA_THEMES)[number];
+
+export const P5RA_FASES = ["E", "F"] as const;
+export type P5raFase = (typeof P5RA_FASES)[number];
+
+export const P5RA_STATUSES = ["draft", "active", "completed"] as const;
+export type P5raStatus = (typeof P5RA_STATUSES)[number];
+
+export const P5RA_DIMENSIONS = [
+  "Beriman, Bertakwa kepada Tuhan YME & Berakhlak Mulia",
+  "Berkebhinekaan Global",
+  "Bergotong Royong",
+  "Mandiri",
+  "Bernalar Kritis",
+  "Kreatif",
+] as const;
+export type P5raDimension = (typeof P5RA_DIMENSIONS)[number];
+
+export const P5RA_VALUES = [
+  "Berkeadaban (Ta'addub)",
+  "Keteladanan (Qudwah)",
+  "Kewarganegaraan dan Kebangsaan (Muwathanah)",
+  "Mengambil Jalan Tengah (Tawassuth)",
+  "Berimbang (Tawazun)",
+  "Lurus dan Tegas (I'tidal)",
+  "Kesetaraan (Musawah)",
+  "Musyawarah (Syura)",
+  "Toleransi (Tasamuh)",
+  "Dinamis dan Inovatif (Tathawwur wa Ibtikar)",
+] as const;
+export type P5raValue = (typeof P5RA_VALUES)[number];
+
+export const P5RA_PREDICATES = ["MB", "SB", "BSH", "SAB"] as const;
+export type P5raPredicate = (typeof P5RA_PREDICATES)[number];
+
+export const P5RA_PREDICATE_LABELS: Record<P5raPredicate, string> = {
+  MB: "Mulai Berkembang",
+  SB: "Sedang Berkembang",
+  BSH: "Berkembang Sesuai Harapan",
+  SAB: "Sangat Berkembang",
+};
+
+
 
 

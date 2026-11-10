@@ -8,4 +8,5 @@ export * from "./schemas/grades.schema.js";
 export * from "./schemas/reports.schema.js";
 export * from "./schemas/ppdb.schema.js";
 export * from "./schemas/letters.schema.js";
+export * from "./schemas/p5ra.schema.js";
 export * from "./types/common.types.js";

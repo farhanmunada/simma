@@ -127,4 +127,18 @@ export const API_ENDPOINTS = {
     EXPEDITION_DETAIL: (id: string) => `/letters/expeditions/${id}`,
     VERIFY: (hash: string) => `/letters/verify/${hash}`,
   },
+  P5RA: {
+    PROJECTS: "/p5ra/projects",
+    PROJECT_DETAIL: (projectId: string) => `/p5ra/projects/${projectId}`,
+    PROJECT_CLASSROOMS: (projectId: string) => `/p5ra/projects/${projectId}/classrooms`,
+    TARGETS: (projectId: string) => `/p5ra/projects/${projectId}/targets`,
+    TARGET_DETAIL: (projectId: string, targetId: string) => `/p5ra/projects/${projectId}/targets/${targetId}`,
+    ASSESSMENTS: (projectId: string) => `/p5ra/projects/${projectId}/assessments`,
+    ASSESSMENTS_BATCH: (projectId: string) => `/p5ra/projects/${projectId}/assessments/batch`,
+    NOTES: (projectId: string) => `/p5ra/projects/${projectId}/notes`,
+    NOTES_GENERATE: (projectId: string, studentId: string) => `/p5ra/projects/${projectId}/students/${studentId}/generate-notes`,
+    RECAP: (projectId: string) => `/p5ra/projects/${projectId}/recap`,
+    STUDENT_REPORT: (projectId: string, studentId: string) => `/p5ra/projects/${projectId}/students/${studentId}/report`,
+    STUDENT_PDF: (projectId: string, studentId: string) => `/p5ra/projects/${projectId}/students/${studentId}/pdf`,
+  },
 } as const;

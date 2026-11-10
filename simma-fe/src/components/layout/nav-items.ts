@@ -8,6 +8,7 @@ import {
   GraduationCap,
   FileSpreadsheet,
   LayoutDashboard,
+  Layers,
 } from "lucide-react";
 
 export interface NavItem {
@@ -82,6 +83,12 @@ export const navItems: NavItem[] = [
     href: "/grades",
     icon: GraduationCap,
     roles: ["super_admin", "guru", "wali_kelas"],
+  },
+  {
+    title: "Projek P5RA",
+    href: "/p5ra",
+    icon: Layers,
+    roles: ["super_admin", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
   },
   {
     title: "Rapor & Legger",

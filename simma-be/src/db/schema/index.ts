@@ -25,6 +25,13 @@ export {
   outgoingLetters,
   expeditionBooks,
 } from "./letters";
+export {
+  p5raProjects,
+  p5raProjectClassrooms,
+  p5raProjectTargets,
+  p5raAssessments,
+  p5raStudentNotes,
+} from "./p5ra";
 export type {
   Institution,
   NewInstitution,
@@ -89,3 +96,16 @@ export type {
   ExpeditionBook,
   NewExpeditionBook,
 } from "./letters";
+export type {
+  P5raProject,
+  NewP5raProject,
+  P5raProjectClassroom,
+  NewP5raProjectClassroom,
+  P5raProjectTarget,
+  NewP5raProjectTarget,
+  P5raAssessment,
+  NewP5raAssessment,
+  P5raStudentNote,
+  NewP5raStudentNote,
+} from "./p5ra";
+
