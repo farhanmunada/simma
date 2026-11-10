@@ -13,7 +13,8 @@ export const StudentsRoutes: React.FC = () => {
   const location = useLocation();
   const isDetailPage =
     location.pathname.startsWith("/students/") &&
-    !location.pathname.startsWith("/students/assign");
+    !location.pathname.startsWith("/students/assign") &&
+    !location.pathname.startsWith("/students/classes");
 
   return (
     <div className="space-y-4">
@@ -48,6 +49,7 @@ export const StudentsRoutes: React.FC = () => {
       <Routes>
         <Route index element={<StudentsListPage />} />
         <Route path="assign" element={<ClassAssignmentPage />} />
+        <Route path="classes" element={<Navigate to="/students/assign" replace />} />
         <Route path=":id" element={<StudentDetailPage />} />
         <Route path="*" element={<Navigate to="/students" replace />} />
       </Routes>

@@ -60,7 +60,7 @@ const navItems: NavItem[] = [
     subItems: [
       { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
       { title: "Buku Induk Siswa", href: "/students" },
-      { title: "Penempatan Rombel", href: "/students/classes" },
+      { title: "Penempatan Rombel", href: "/students/assign" },
     ],
   },
   {

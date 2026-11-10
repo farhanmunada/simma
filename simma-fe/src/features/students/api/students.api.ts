@@ -156,26 +156,28 @@ export function useStudents(params?: StudentQueryParams) {
 }
 
 export function useStudent(id?: string) {
+  const isUuid = Boolean(id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
   return useQuery({
-    queryKey: id ? studentsQueryKeys.detail(id) : ["students", "detail", "empty"],
+    queryKey: isUuid ? studentsQueryKeys.detail(id!) : ["students", "detail", "empty"],
     queryFn: () => {
       if (!id) throw new Error("ID Siswa diperlukan");
       return getStudentById(id);
     },
-    enabled: Boolean(id),
+    enabled: isUuid,
   });
 }
 
 export function useStudentParents(studentId?: string) {
+  const isUuid = Boolean(studentId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(studentId));
   return useQuery({
-    queryKey: studentId
-      ? studentsQueryKeys.parents(studentId)
+    queryKey: isUuid
+      ? studentsQueryKeys.parents(studentId!)
       : ["students", "parents", "empty"],
     queryFn: () => {
       if (!studentId) throw new Error("ID Siswa diperlukan");
       return getStudentParents(studentId);
     },
-    enabled: Boolean(studentId),
+    enabled: isUuid,
   });
 }
 
