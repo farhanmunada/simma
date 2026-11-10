@@ -44,6 +44,13 @@ export {
   teacherDocuments,
   teacherWorkloads,
 } from "./teachers";
+export {
+  feeItems,
+  studentInvoices,
+  paymentTransactions,
+  paymentTransactionItems,
+  dispensationRequests,
+} from "./finance";
 
 export type {
   Institution,
@@ -141,5 +148,17 @@ export type {
   TeacherWorkload,
   NewTeacherWorkload,
 } from "./teachers";
+export type {
+  FeeItemRow,
+  NewFeeItemRow,
+  StudentInvoiceRow,
+  NewStudentInvoiceRow,
+  PaymentTransactionRow,
+  NewPaymentTransactionRow,
+  PaymentTransactionItemRow,
+  NewPaymentTransactionItemRow,
+  DispensationRequestRow,
+  NewDispensationRequestRow,
+} from "./finance";
 
 

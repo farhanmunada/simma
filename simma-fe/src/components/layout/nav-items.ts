@@ -11,6 +11,7 @@ import {
   Layers,
   ClipboardCheck,
   UserCheck,
+  CreditCard,
 } from "lucide-react";
 
 export interface NavItem {
@@ -80,6 +81,18 @@ export const navGroups: NavGroup[] = [
           { title: "Direktori GTK", href: "/teachers" },
           { title: "Beban Kerja (24 JTM)", href: "/teachers/workloads" },
           { title: "Monitoring Mutu", href: "/teachers/monitoring" },
+        ],
+      },
+      {
+        title: "Keuangan & SPP",
+        icon: CreditCard,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "bendahara"],
+        subItems: [
+          { title: "Kasir Loket Cepat", href: "/finance/cashier" },
+          { title: "Tagihan Siswa", href: "/finance/invoices" },
+          { title: "Pos & Tarif Biaya", href: "/finance/fee-items" },
+          { title: "Dispensasi", href: "/finance/dispensations" },
+          { title: "Laporan Keuangan", href: "/finance/reports" },
         ],
       },
     ],
@@ -171,6 +184,7 @@ export const roleLabelMap: Record<string, string> = {
   kepala_madrasah: "Kepala Madrasah",
   waka_kurikulum: "Waka Kurikulum",
   waka_kesiswaan: "Waka Kesiswaan",
+  bendahara: "Bendahara",
   wali_kelas: "Wali Kelas",
   guru_mapel: "Guru Mapel",
   guru: "Guru",

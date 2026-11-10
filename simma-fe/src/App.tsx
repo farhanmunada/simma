@@ -14,6 +14,7 @@ import { LettersRoutes, VerifyLetterPublicPage } from "./features/letters";
 import { P5raRoutes } from "./features/p5ra";
 import { MutabaahRoutes } from "./features/mutabaah";
 import { TeachersRoutes } from "./features/teachers";
+import { FinanceRoutes } from "./features/finance";
 import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
@@ -61,6 +62,7 @@ export function App() {
             <Route path="letters/*" element={<LettersRoutes />} />
             <Route path="p5ra/*" element={<P5raRoutes />} />
             <Route path="teachers/*" element={<TeachersRoutes />} />
+            <Route path="finance/*" element={<FinanceRoutes />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
