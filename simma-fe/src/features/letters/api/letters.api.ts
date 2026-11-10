@@ -238,9 +238,30 @@ export const useUpdateOutgoingLetterStatus = () => {
   });
 };
 
-// 5. Generator Surat Resmi & PDF Hooks
+// 6. Unduh PDF Surat Keluar Resmi
+export async function downloadOutgoingLetterPdf(id: string, filename?: string): Promise<void> {
+  const blob = await apiClient<Blob>(API_ENDPOINTS.LETTERS.OUTGOING_PDF(id), {
+    responseType: "blob",
+  });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename || `Surat_Keluar_${id}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
+export function useDownloadOutgoingLetterPdf() {
+  return useMutation({
+    mutationFn: ({ id, filename }: { id: string; filename?: string }) =>
+      downloadOutgoingLetterPdf(id, filename),
+  });
+}
 export {
   useGenerateStudentLetter,
+  useGenerateStudentBehaviorLetter,
   useGenerateTeacherLetter,
   useGenerateInvitationLetter,
   useVerifyLetter,

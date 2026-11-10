@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./api/letters.api";
 export * from "./api/letters-generator.api";
+export { VerifyLetterPublicPage } from "./components/VerifyLetterPublicPage";
 export * from "./LettersRoutes";
 export { IncomingLettersPage } from "./components/IncomingLettersPage";
 export { DispositionsPage } from "./components/DispositionsPage";

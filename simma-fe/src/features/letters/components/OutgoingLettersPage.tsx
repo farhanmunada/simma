@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Plus, Search, FileText, Download, CheckCircle, Sparkles, QrCode } from "lucide-react";
 import { Badge } from "../../../components/ui/Badge";
-import { useOutgoingLetters, useClassifications } from "../api/letters.api";
+import {
+  useOutgoingLetters,
+  useClassifications,
+  useDownloadOutgoingLetterPdf,
+} from "../api/letters.api";
 import { CreateOutgoingLetterModal } from "./CreateOutgoingLetterModal";
 import { GenerateLetterModal } from "./GenerateLetterModal";
 import type { OutgoingLetter } from "../types";
@@ -20,6 +24,20 @@ export const OutgoingLettersPage: React.FC = () => {
   });
 
   const letters: OutgoingLetter[] = data?.data ?? [];
+
+  const downloadPdfMutation = useDownloadOutgoingLetterPdf();
+
+  const handleDownloadPdf = async (id: string, letterNumber: string) => {
+    try {
+      const safeFilename = letterNumber.replace(/[/\\?%*:|"<>]/g, "_");
+      await downloadPdfMutation.mutateAsync({
+        id,
+        filename: `Surat_${safeFilename}.pdf`,
+      });
+    } catch (err) {
+      console.error("Gagal mengunduh PDF surat keluar:", err);
+    }
+  };
 
   const handleCopyVerification = (hash: string) => {
     const url = `${window.location.origin}/verify-letter/${hash}`;
@@ -145,17 +163,18 @@ export const OutgoingLettersPage: React.FC = () => {
                     <td className="px-4 py-3">{getStatusBadge(row.status)}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={`/api/v1/letters/outgoing/${row.id}/pdf`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 text-emerald-600 hover:text-emerald-800 font-medium"
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadPdf(row.id, row.letterNumber)}
+                          disabled={downloadPdfMutation.isPending}
+                          className="flex items-center gap-1 text-emerald-600 hover:text-emerald-800 font-medium cursor-pointer disabled:opacity-50"
                           title="Unduh PDF Resmi"
                         >
                           <Download className="w-3.5 h-3.5" />
                           PDF
-                        </a>
+                        </button>
                         <button
+                          type="button"
                           onClick={() => handleCopyVerification(row.verificationHash)}
                           className="flex items-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer"
                           title="Salin Link QR Verifikasi"

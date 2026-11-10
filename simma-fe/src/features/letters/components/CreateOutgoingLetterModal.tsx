@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "../../../components/ui/Modal";
 import { useCreateOutgoingLetter, useClassifications } from "../api/letters.api";
+import { useTeachers } from "../../settings/api/settings.api";
 import type { LetterSecurityDegree, CreateOutgoingLetterInput } from "../types";
 
 export interface CreateOutgoingLetterModalProps {
@@ -13,6 +14,7 @@ export const CreateOutgoingLetterModal: React.FC<CreateOutgoingLetterModalProps>
   onClose,
 }) => {
   const { data: classifications } = useClassifications();
+  const { data: teachers = [] } = useTeachers();
   const createMutation = useCreateOutgoingLetter();
 
   const [form, setForm] = useState<CreateOutgoingLetterInput>({
@@ -22,12 +24,35 @@ export const CreateOutgoingLetterModal: React.FC<CreateOutgoingLetterModalProps>
     letterDate: new Date().toISOString().split("T")[0],
     recipient: "",
     subject: "",
-    signerName: "H. Ahmad Syarif, M.Pd.I",
-    signerNip: "197508152003121002",
+    signerName: "",
+    signerNip: "",
     signerRole: "Kepala Madrasah",
     templateType: "custom",
     status: "signed",
   });
+
+  const handleSelectSigner = (teacherId: string) => {
+    const selected = teachers.find((t) => t.id === teacherId);
+    if (selected) {
+      // Dapatkan NIP dari emisData atau NUPTK atau fallback "-"
+      const nip =
+        (selected.emisData?.nip as string) ||
+        selected.nuptk ||
+        (selected.employmentType === "PNS" ? selected.nik : "-");
+
+      setForm((prev) => ({
+        ...prev,
+        signerName: selected.fullName,
+        signerNip: nip,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        signerName: "",
+        signerNip: "",
+      }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,22 +164,55 @@ export const CreateOutgoingLetterModal: React.FC<CreateOutgoingLetterModalProps>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-slate-700 font-medium mb-1">Penandatangan</label>
+            <label className="block text-slate-700 font-medium mb-1">
+              Pilih Penandatangan (GTK/Guru)
+            </label>
+            <select
+              value={teachers.find((t) => t.fullName === form.signerName)?.id || ""}
+              onChange={(e) => handleSelectSigner(e.target.value)}
+              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white"
+            >
+              <option value="">-- Pilih Guru / Staff GTK --</option>
+              {teachers.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.fullName} ({t.employmentType})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-slate-700 font-medium mb-1">Jabatan Penandatangan</label>
+            <input
+              type="text"
+              required
+              value={form.signerRole}
+              onChange={(e) => setForm({ ...form, signerRole: e.target.value })}
+              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
+              placeholder="Kepala Madrasah / Plt. / Waka"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-slate-700 font-medium mb-1">Nama Penandatangan</label>
             <input
               type="text"
               required
               value={form.signerName}
               onChange={(e) => setForm({ ...form, signerName: e.target.value })}
-              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
+              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-slate-50"
+              placeholder="Pilih dari dropdown di atas"
             />
           </div>
           <div>
-            <label className="block text-slate-700 font-medium mb-1">NIP Penandatangan</label>
+            <label className="block text-slate-700 font-medium mb-1">NIP Penandatangan (Otomatis)</label>
             <input
               type="text"
               value={form.signerNip || ""}
               onChange={(e) => setForm({ ...form, signerNip: e.target.value })}
-              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
+              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-slate-50"
+              placeholder="Terisi otomatis setelah nama dipilih"
             />
           </div>
         </div>

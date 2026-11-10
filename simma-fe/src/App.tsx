@@ -10,7 +10,7 @@ import { AttendanceRoutes } from "./features/attendance";
 import { GradesRoutes } from "./features/grades";
 import { ReportsRoutes } from "./features/reports";
 import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
-import { LettersRoutes } from "./features/letters";
+import { LettersRoutes, VerifyLetterPublicPage } from "./features/letters";
 import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
@@ -37,6 +37,7 @@ export function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/ppdb" element={<PpdbPublicPortalPage />} />
+          <Route path="/verify-letter/:hash" element={<VerifyLetterPublicPage />} />
           <Route
             path="/"
             element={

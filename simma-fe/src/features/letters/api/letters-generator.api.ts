@@ -14,7 +14,21 @@ export const useGenerateStudentLetter = () => {
   return useMutation({
     mutationFn: (data: GenerateStudentActiveLetterInput) =>
       apiClient<{ success: boolean; data: OutgoingLetter }>(
-        API_ENDPOINTS.LETTERS.GENERATE_STUDENT,
+        API_ENDPOINTS.LETTERS.GENERATE_STUDENT_ACTIVE,
+        { method: "POST", body: JSON.stringify(data) }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: lettersQueryKeys.all });
+    },
+  });
+};
+
+export const useGenerateStudentBehaviorLetter = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: GenerateStudentActiveLetterInput) =>
+      apiClient<{ success: boolean; data: OutgoingLetter }>(
+        API_ENDPOINTS.LETTERS.GENERATE_STUDENT_BEHAVIOR,
         { method: "POST", body: JSON.stringify(data) }
       ),
     onSuccess: () => {
