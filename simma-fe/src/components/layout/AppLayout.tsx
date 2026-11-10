@@ -26,9 +26,9 @@ export const AppLayout: React.FC = () => {
       <aside
         className={`${
           isCollapsed ? "w-16" : "w-60"
-        } bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 transition-all duration-200 select-none`}
+        } bg-white text-slate-600 flex flex-col shrink-0 border-r border-slate-200 transition-all duration-200 select-none shadow-xs`}
       >
-        <div className="h-14 px-3 flex items-center justify-between border-b border-slate-800 bg-slate-950/40">
+        <div className="h-14 px-3 flex items-center justify-between border-b border-slate-100 bg-emerald-50/30">
           {!isCollapsed ? (
             <>
               <div className="flex items-center space-x-2.5">
@@ -36,14 +36,14 @@ export const AppLayout: React.FC = () => {
                   S
                 </div>
                 <div>
-                  <span className="font-bold text-slate-100 tracking-tight text-sm block leading-none">SIMMA</span>
-                  <span className="text-[10px] text-emerald-400 font-medium">Madrasah Aliyah</span>
+                  <span className="font-bold text-slate-900 tracking-tight text-sm block leading-none">SIMMA</span>
+                  <span className="text-[10px] text-emerald-700 font-medium">Madrasah Aliyah</span>
                 </div>
               </div>
               <button
                 onClick={() => setIsCollapsed(true)}
                 title="Tutup Sidebar"
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                className="p-1.5 text-slate-400 hover:text-emerald-800 hover:bg-emerald-50 rounded-md transition-colors"
               >
                 <PanelLeftClose className="w-4 h-4" />
               </button>
@@ -53,9 +53,9 @@ export const AppLayout: React.FC = () => {
               <button
                 onClick={() => setIsCollapsed(false)}
                 title="Buka Sidebar"
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition-colors"
+                className="p-1.5 text-slate-400 hover:text-emerald-800 hover:bg-emerald-50 rounded-md transition-colors"
               >
-                <PanelLeftOpen className="w-5 h-5 text-emerald-400" />
+                <PanelLeftOpen className="w-5 h-5 text-emerald-700" />
               </button>
             </div>
           )}
@@ -85,16 +85,16 @@ export const AppLayout: React.FC = () => {
                     to={targetUrl}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
                       isActive
-                        ? "bg-emerald-700 text-white shadow-xs"
-                        : "text-slate-400 hover:text-white hover:bg-slate-800"
+                        ? "bg-emerald-800 text-white shadow-xs"
+                        : "text-slate-500 hover:text-emerald-800 hover:bg-emerald-50"
                     }`}
                   >
                     <Icon className="w-5 h-5" />
                   </Link>
 
                   {/* Flyout Submenu / Label on Hover when Collapsed */}
-                  <div className="absolute left-full top-0 ml-2 hidden group-hover:flex flex-col bg-slate-900 border border-slate-800 shadow-xl rounded-lg py-1.5 px-2 z-50 min-w-44">
-                    <p className="text-[11px] font-bold text-slate-200 px-2 py-1 border-b border-slate-800/80 mb-1">
+                  <div className="absolute left-full top-0 ml-2 hidden group-hover:flex flex-col bg-white border border-slate-200 shadow-xl rounded-lg py-1.5 px-2 z-50 min-w-44">
+                    <p className="text-[11px] font-bold text-slate-800 px-2 py-1 border-b border-slate-100 mb-1">
                       {item.title}
                     </p>
                     {hasSub ? (
@@ -104,8 +104,8 @@ export const AppLayout: React.FC = () => {
                           to={sub.href}
                           className={`text-xs px-2 py-1.5 rounded-md transition-colors ${
                             location.pathname === sub.href
-                              ? "bg-emerald-600/20 text-emerald-400 font-medium"
-                              : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                              ? "bg-emerald-50 text-emerald-800 font-semibold"
+                              : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-800"
                           }`}
                         >
                           {sub.title}
@@ -114,7 +114,7 @@ export const AppLayout: React.FC = () => {
                     ) : (
                       <Link
                         to={item.href!}
-                        className="text-xs px-2 py-1 rounded-md text-emerald-400 hover:bg-slate-800"
+                        className="text-xs px-2 py-1 rounded-md text-emerald-800 hover:bg-emerald-50 font-medium"
                       >
                         Buka Halaman
                       </Link>
@@ -131,8 +131,8 @@ export const AppLayout: React.FC = () => {
                     onClick={() => toggleMenu(item.title)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg font-medium transition-colors ${
                       isChildActive
-                        ? "text-emerald-400 bg-slate-800/80"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                        ? "text-emerald-800 bg-emerald-50/80 font-semibold"
+                        : "text-slate-600 hover:text-emerald-800 hover:bg-emerald-50/60"
                     }`}
                   >
                     <div className="flex items-center space-x-2.5">
@@ -140,9 +140,9 @@ export const AppLayout: React.FC = () => {
                       <span>{item.title}</span>
                     </div>
                     {isOpen ? (
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     ) : (
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                     )}
                   </button>
 
@@ -156,8 +156,8 @@ export const AppLayout: React.FC = () => {
                             to={sub.href}
                             className={`block px-2.5 py-1.5 rounded-md transition-colors ${
                               isSubActive
-                                ? "bg-emerald-600/20 text-emerald-400 font-medium"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/30"
+                                ? "bg-emerald-100/70 text-emerald-900 font-semibold"
+                                : "text-slate-500 hover:text-emerald-800 hover:bg-emerald-50"
                             }`}
                           >
                             {sub.title}
@@ -176,8 +176,8 @@ export const AppLayout: React.FC = () => {
                 to={item.href!}
                 className={`flex items-center space-x-2.5 px-2.5 py-2 rounded-lg font-medium transition-colors ${
                   isDirectActive
-                    ? "bg-emerald-700 text-white font-semibold shadow-xs"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                    ? "bg-emerald-800 text-white font-semibold shadow-xs"
+                    : "text-slate-600 hover:text-emerald-800 hover:bg-emerald-50/60"
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -188,21 +188,21 @@ export const AppLayout: React.FC = () => {
         </nav>
 
         {/* User bar at bottom - clean and isolated */}
-        <div className="p-3 border-t border-slate-800 bg-slate-900/60 flex items-center justify-between">
+        <div className="p-3 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between">
           {!isCollapsed ? (
             <>
               <div className="min-w-0 pr-2">
-                <p className="text-xs font-medium text-slate-200 truncate">
+                <p className="text-xs font-semibold text-slate-800 truncate">
                   {user?.fullName || "Pengguna"}
                 </p>
-                <p className="text-[11px] text-slate-400 truncate">
+                <p className="text-[11px] text-emerald-700 font-medium truncate">
                   {roleLabelMap[user?.role || ""] || user?.role || "Staff"}
                 </p>
               </div>
               <button
                 onClick={() => logout()}
                 title="Keluar"
-                className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
+                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -211,7 +211,7 @@ export const AppLayout: React.FC = () => {
             <button
               onClick={() => logout()}
               title="Keluar"
-              className="w-full flex items-center justify-center p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-md transition-colors"
+              className="w-full flex items-center justify-center p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
