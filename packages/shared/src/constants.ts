@@ -248,6 +248,45 @@ export const MUTABAAH_COMPLIANCE_STATUS = [
 export type MutabaahComplianceStatus =
   (typeof MUTABAAH_COMPLIANCE_STATUS)[number];
 
+// Finance & SPP (Modul 12 - Keuangan Madrasah & Kasir)
+export const FEE_TYPES = ["rutin", "non_rutin"] as const;
+export type FeeType = (typeof FEE_TYPES)[number];
+
+export const FEE_CATEGORIES = [
+  "spp",
+  "asrama",
+  "komite",
+  "uang_pangkal",
+  "seragam",
+  "buku",
+  "ujian",
+  "kegiatan",
+  "lainnya",
+] as const;
+export type FeeCategory = (typeof FEE_CATEGORIES)[number];
+
+export const PAYMENT_METHODS = ["tunai", "transfer", "qris"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+export const INVOICE_STATUSES = [
+  "unpaid",
+  "partial",
+  "paid",
+  "cancelled",
+] as const;
+export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
+
+export const TRANSACTION_STATUSES = ["success", "void"] as const;
+export type TransactionStatus = (typeof TRANSACTION_STATUSES)[number];
+
+export const DISPENSATION_STATUSES = [
+  "pending",
+  "approved",
+  "rejected",
+] as const;
+export type DispensationStatus = (typeof DISPENSATION_STATUSES)[number];
+
+
 
 
 

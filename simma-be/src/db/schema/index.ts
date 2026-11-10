@@ -37,6 +37,14 @@ export {
   mutabaahDailyEntries,
   mutabaahUzurRecords,
 } from "./mutabaah";
+export {
+  feeItems,
+  studentInvoices,
+  paymentTransactions,
+  paymentTransactionItems,
+  dispensationRequests,
+} from "./finance";
+
 export type {
   Institution,
   NewInstitution,
@@ -121,4 +129,17 @@ export type {
   MutabaahUzurRecord,
   NewMutabaahUzurRecord,
 } from "./mutabaah";
+export type {
+  FeeItemRow,
+  NewFeeItemRow,
+  StudentInvoiceRow,
+  NewStudentInvoiceRow,
+  PaymentTransactionRow,
+  NewPaymentTransactionRow,
+  PaymentTransactionItemRow,
+  NewPaymentTransactionItemRow,
+  DispensationRequestRow,
+  NewDispensationRequestRow,
+} from "./finance";
+
 

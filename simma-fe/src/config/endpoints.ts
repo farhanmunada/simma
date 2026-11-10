@@ -152,4 +152,21 @@ export const API_ENDPOINTS = {
     REPORT_PDF: (studentId: string, month: number, year: number) =>
       `/mutabaah/report/${studentId}/pdf?month=${month}&year=${year}`,
   },
+  FINANCE: {
+    FEE_ITEMS: "/finance/fee-items",
+    FEE_ITEM_DETAIL: (id: string) => `/finance/fee-items/${id}`,
+    INVOICES: "/finance/invoices",
+    INVOICE_DETAIL: (id: string) => `/finance/invoices/${id}`,
+    GENERATE_INVOICES: "/finance/invoices/generate",
+    CASHIER_SEARCH: "/finance/cashier/search",
+    CASHIER_STUDENT_PROFILE: (studentId: string) => `/finance/cashier/student/${studentId}`,
+    CASHIER_PAY: "/finance/cashier/pay",
+    CASHIER_VOID: (id: string) => `/finance/cashier/transactions/${id}/void`,
+    CASHIER_TRANSACTION: (id: string) => `/finance/cashier/transactions/${id}`,
+    CASHIER_RECEIPT_PDF: (id: string) => `/finance/cashier/transactions/${id}/receipt-pdf`,
+    DISPENSATIONS: "/finance/dispensations",
+    DISPENSATION_STATUS: (id: string) => `/finance/dispensations/${id}/status`,
+    REPORTS_CASHFLOW: "/finance/reports/cashflow",
+    REPORTS_ARREARS: "/finance/reports/arrears",
+  },
 } as const;
