@@ -13,6 +13,7 @@ import { gradesRoutes } from "./modules/grades/grades.routes.js";
 import { reportsRoutes } from "./modules/reports/reports.routes.js";
 import { ppdbRoutes } from "./modules/ppdb/ppdb.routes.js";
 import { lettersRoutes } from "./modules/letters/letters.routes.js";
+import { mutabaahRoutes } from "./modules/mutabaah/mutabaah.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -60,6 +61,7 @@ export async function buildApp() {
   await app.register(reportsRoutes, { prefix: "/api/v1/reports" });
   await app.register(ppdbRoutes, { prefix: "/api/v1/ppdb" });
   await app.register(lettersRoutes, { prefix: "/api/v1/letters" });
+  await app.register(mutabaahRoutes, { prefix: "/api/v1/mutabaah" });
 
   return app;
 }

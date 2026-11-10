@@ -25,6 +25,11 @@ export {
   outgoingLetters,
   expeditionBooks,
 } from "./letters";
+export {
+  mutabaahActivities,
+  mutabaahDailyEntries,
+  mutabaahUzurRecords,
+} from "./mutabaah";
 export type {
   Institution,
   NewInstitution,
@@ -89,3 +94,12 @@ export type {
   ExpeditionBook,
   NewExpeditionBook,
 } from "./letters";
+export type {
+  MutabaahActivity,
+  NewMutabaahActivity,
+  MutabaahDailyEntry,
+  NewMutabaahDailyEntry,
+  MutabaahUzurRecord,
+  NewMutabaahUzurRecord,
+} from "./mutabaah";
+

@@ -11,6 +11,7 @@ import { GradesRoutes } from "./features/grades";
 import { ReportsRoutes } from "./features/reports";
 import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
 import { LettersRoutes, VerifyLetterPublicPage } from "./features/letters";
+import { MutabaahRoutes } from "./features/mutabaah";
 import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
@@ -52,6 +53,7 @@ export function App() {
             <Route path="students/*" element={<StudentsRoutes />} />
             <Route path="tahfidz/*" element={<TahfidzRoutes />} />
             <Route path="attendance/*" element={<AttendanceRoutes />} />
+            <Route path="mutabaah/*" element={<MutabaahRoutes />} />
             <Route path="grades/*" element={<GradesRoutes />} />
             <Route path="reports/*" element={<ReportsRoutes />} />
             <Route path="letters/*" element={<LettersRoutes />} />
