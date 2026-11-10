@@ -11,6 +11,7 @@ import { GradesRoutes } from "./features/grades";
 import { ReportsRoutes } from "./features/reports";
 import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
 import { LettersRoutes } from "./features/letters";
+import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,27 +30,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function DashboardPlaceholder() {
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-slate-200">
-          <p className="text-xs text-slate-500 font-medium">Status Akademik</p>
-          <p className="text-xl font-bold text-slate-800 mt-1">2026/2027 Ganjil</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200">
-          <p className="text-xs text-slate-500 font-medium">Sistem Madrasah</p>
-          <p className="text-xl font-bold text-emerald-600 mt-1">Online (Lokal/VPS)</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200">
-          <p className="text-xs text-slate-500 font-medium">Modul Aktif</p>
-          <p className="text-xl font-bold text-slate-800 mt-1">Phase 1 MVP</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -65,7 +45,7 @@ export function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<DashboardPlaceholder />} />
+            <Route index element={<DashboardOverview />} />
             <Route path="ppdb-admin/*" element={<PpdbRoutes />} />
             <Route path="settings/*" element={<SettingsRoutes />} />
             <Route path="students/*" element={<StudentsRoutes />} />
