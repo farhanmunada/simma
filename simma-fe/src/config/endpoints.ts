@@ -152,4 +152,21 @@ export const API_ENDPOINTS = {
     REPORT_PDF: (studentId: string, month: number, year: number) =>
       `/mutabaah/report/${studentId}/pdf?month=${month}&year=${year}`,
   },
+  TEACHERS: {
+    LIST: "/teachers",
+    CREATE: "/teachers",
+    STATS: "/teachers/stats",
+    EMIS_EXPORT: "/teachers/export/emis",
+    WORKLOADS: "/teachers/workloads",
+    WORKLOAD_UPSERT: "/teachers/workload",
+    DETAIL: (id: string) => `/teachers/${id}`,
+    UPDATE: (id: string) => `/teachers/${id}`,
+    DELETE: (id: string) => `/teachers/${id}`,
+    EDUCATIONS: (id: string) => `/teachers/${id}/educations`,
+    EDUCATION_DELETE: (id: string, eduId: string) => `/teachers/${id}/educations/${eduId}`,
+    RANKS: (id: string) => `/teachers/${id}/ranks`,
+    RANK_DELETE: (id: string, rankId: string) => `/teachers/${id}/ranks/${rankId}`,
+    DOCUMENTS: (id: string) => `/teachers/${id}/documents`,
+    DOCUMENT_DELETE: (id: string, docId: string) => `/teachers/${id}/documents/${docId}`,
+  },
 } as const;

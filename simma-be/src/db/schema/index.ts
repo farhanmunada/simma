@@ -37,6 +37,14 @@ export {
   mutabaahDailyEntries,
   mutabaahUzurRecords,
 } from "./mutabaah";
+export {
+  teacherProfiles,
+  teacherEducation,
+  teacherRanks,
+  teacherDocuments,
+  teacherWorkloads,
+} from "./teachers";
+
 export type {
   Institution,
   NewInstitution,
@@ -121,4 +129,17 @@ export type {
   MutabaahUzurRecord,
   NewMutabaahUzurRecord,
 } from "./mutabaah";
+export type {
+  TeacherProfile,
+  NewTeacherProfile,
+  TeacherEducation,
+  NewTeacherEducation,
+  TeacherRankRecord,
+  NewTeacherRankRecord,
+  TeacherDocument,
+  NewTeacherDocument,
+  TeacherWorkload,
+  NewTeacherWorkload,
+} from "./teachers";
+
 

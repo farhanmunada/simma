@@ -248,6 +248,113 @@ export const MUTABAAH_COMPLIANCE_STATUS = [
 export type MutabaahComplianceStatus =
   (typeof MUTABAAH_COMPLIANCE_STATUS)[number];
 
+// Modul 13 - Kepegawaian GTK (Guru & Tenaga Kependidikan)
+export const EMPLOYMENT_TYPES = ["PNS", "PPPK", "GTY", "GTT", "PTT"] as const;
+export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number];
+
+export const GTK_TYPES = ["pendidik", "tenaga_kependidikan"] as const;
+export type GtkType = (typeof GTK_TYPES)[number];
+
+export const DUTY_STATUSES = [
+  "aktif",
+  "cuti",
+  "tugas_belajar",
+  "mutasi",
+  "pensiun",
+  "keluar",
+] as const;
+export type DutyStatus = (typeof DUTY_STATUSES)[number];
+
+export const EDUCATION_LEVELS = ["D3", "S1", "S2", "S3"] as const;
+export type EducationLevel = (typeof EDUCATION_LEVELS)[number];
+
+export const GRADE_GROUPS = [
+  "II/a",
+  "II/b",
+  "II/c",
+  "II/d",
+  "III/a",
+  "III/b",
+  "III/c",
+  "III/d",
+  "IV/a",
+  "IV/b",
+  "IV/c",
+  "IV/d",
+  "IV/e",
+  "Non-PNS",
+] as const;
+export type GradeGroup = (typeof GRADE_GROUPS)[number];
+
+export const TEACHER_RANKS = [
+  "Pengatur Muda",
+  "Pengatur Muda Tk. I",
+  "Pengatur",
+  "Pengatur Tk. I",
+  "Penata Muda",
+  "Penata Muda Tk. I",
+  "Penata",
+  "Penata Tk. I",
+  "Pembina",
+  "Pembina Tk. I",
+  "Pembina Utama Muda",
+  "Pembina Utama Madya",
+  "Pembina Utama",
+  "Tenaga Honorer / Non-PNS",
+] as const;
+export type TeacherRank = (typeof TEACHER_RANKS)[number];
+
+export const TEACHER_DOCUMENT_TYPES = [
+  "sk_pengangkatan",
+  "sk_pembagian_tugas",
+  "ijazah",
+  "sertifikat_pendidik",
+  "pak",
+  "ktp",
+  "npwp",
+  "karpeg",
+  "sk_kgb",
+  "sk_pangkat",
+  "lainnya",
+] as const;
+export type TeacherDocumentType = (typeof TEACHER_DOCUMENT_TYPES)[number];
+
+export const ADDITIONAL_DUTY_TYPES = [
+  "kepala_madrasah",
+  "waka_kurikulum",
+  "waka_kesiswaan",
+  "waka_sarpras",
+  "waka_humas",
+  "wali_kelas",
+  "kepala_lab",
+  "kepala_perpustakaan",
+  "pembina_ekskul",
+  "pembina_asrama",
+  "guru_piket",
+  "tidak_ada",
+] as const;
+export type AdditionalDutyType = (typeof ADDITIONAL_DUTY_TYPES)[number];
+
+export const ADDITIONAL_DUTY_JTM_MAP: Record<AdditionalDutyType, number> = {
+  kepala_madrasah: 18,
+  waka_kurikulum: 12,
+  waka_kesiswaan: 12,
+  waka_sarpras: 12,
+  waka_humas: 12,
+  wali_kelas: 2,
+  kepala_lab: 12,
+  kepala_perpustakaan: 12,
+  pembina_ekskul: 2,
+  pembina_asrama: 12,
+  guru_piket: 1,
+  tidak_ada: 0,
+};
+
+export const MIN_JTM_TPG = 24;
+
+export const SIMPATIKA_STATUSES = ["layak", "tidak_layak", "dalam_proses"] as const;
+export type SimpatikaStatus = (typeof SIMPATIKA_STATUSES)[number];
+
 
 
 

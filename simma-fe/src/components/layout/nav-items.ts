@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Layers,
   ClipboardCheck,
+  UserCheck,
 } from "lucide-react";
 
 export interface NavItem {
@@ -61,6 +62,24 @@ export const navGroups: NavGroup[] = [
           { title: "Kelas & Rombel", href: "/settings/classrooms" },
           { title: "Mata Pelajaran", href: "/settings/subjects" },
           { title: "Guru & GTK", href: "/settings/teachers" },
+        ],
+      },
+      {
+        title: "Kepegawaian GTK",
+        icon: UserCheck,
+        roles: [
+          "super_admin",
+          "admin_tu",
+          "kepala_madrasah",
+          "waka_kurikulum",
+          "guru",
+          "guru_mapel",
+          "wali_kelas",
+        ],
+        subItems: [
+          { title: "Direktori GTK", href: "/teachers" },
+          { title: "Beban Kerja (24 JTM)", href: "/teachers/workloads" },
+          { title: "Monitoring Mutu", href: "/teachers/monitoring" },
         ],
       },
     ],

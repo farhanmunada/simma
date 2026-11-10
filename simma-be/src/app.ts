@@ -15,6 +15,7 @@ import { ppdbRoutes } from "./modules/ppdb/ppdb.routes.js";
 import { lettersRoutes } from "./modules/letters/letters.routes.js";
 import { p5raRoutes } from "./modules/p5ra/p5ra.routes.js";
 import { mutabaahRoutes } from "./modules/mutabaah/mutabaah.routes.js";
+import { teachersRoutes } from "./modules/teachers/teachers.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -64,6 +65,7 @@ export async function buildApp() {
   await app.register(lettersRoutes, { prefix: "/api/v1/letters" });
   await app.register(p5raRoutes, { prefix: "/api/v1/p5ra" });
   await app.register(mutabaahRoutes, { prefix: "/api/v1/mutabaah" });
+  await app.register(teachersRoutes, { prefix: "/api/v1/teachers" });
 
   return app;
 }
