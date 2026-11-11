@@ -35,6 +35,14 @@ const STORAGE_KEY = "simma_auth";
 
 function loadInitialState() {
   try {
+    if (typeof localStorage === "undefined") {
+      return {
+        user: null,
+        token: null,
+        refreshToken: null,
+        isAuthenticated: false,
+      };
+    }
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
@@ -48,7 +56,9 @@ function loadInitialState() {
       }
     }
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   }
   return {
     user: null,

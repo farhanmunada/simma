@@ -19,6 +19,7 @@ import { SchedulesRoutes } from "./features/schedules";
 import { DisciplineRoutes } from "./features/discipline";
 import { TransfersPage } from "./features/transfers";
 import { ExtracurricularPage } from "./features/extracurricular";
+import { EmisDashboardPage } from "./features/emis";
 import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
@@ -71,6 +72,7 @@ export function App() {
             <Route path="discipline/*" element={<DisciplineRoutes />} />
             <Route path="transfers" element={<TransfersPage />} />
             <Route path="extracurricular" element={<ExtracurricularPage />} />
+            <Route path="emis" element={<EmisDashboardPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

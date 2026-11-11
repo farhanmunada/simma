@@ -15,6 +15,7 @@ import {
   Calendar,
   ShieldAlert,
   Award,
+  Database,
 } from "lucide-react";
 
 export interface NavItem {
@@ -97,6 +98,12 @@ export const navGroups: NavGroup[] = [
           { title: "Dispensasi", href: "/finance/dispensations" },
           { title: "Laporan Keuangan", href: "/finance/reports" },
         ],
+      },
+      {
+        title: "Ekspor EMIS 4.0",
+        href: "/emis",
+        icon: Database,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "waka_kesiswaan"],
       },
     ],
   },

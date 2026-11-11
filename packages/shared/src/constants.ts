@@ -619,4 +619,57 @@ export const EXTRACURRICULAR_PREDICATE_LABELS: Record<ExtracurricularGradeScore,
   D: "Kurang",
 };
 
+// EMIS 4.0 Kemenag (Modul 18 - Standarisasi & Pelaporan Nasional Kemenag)
+export const EMIS_EXPORT_TYPES = [
+  "students",
+  "teachers",
+  "classrooms",
+  "institution",
+  "bundle",
+] as const;
+export type EmisExportType = (typeof EMIS_EXPORT_TYPES)[number];
+
+export const EMIS_EXPORT_FORMATS = ["csv", "json"] as const;
+export type EmisExportFormat = (typeof EMIS_EXPORT_FORMATS)[number];
+
+export const EMIS_ENTITY_TYPES = [
+  "all",
+  "student",
+  "teacher",
+  "classroom",
+  "institution",
+] as const;
+export type EmisEntityType = (typeof EMIS_ENTITY_TYPES)[number];
+
+export const EMIS_BAP_STATUSES = ["draft", "approved", "submitted"] as const;
+export type EmisBapStatus = (typeof EMIS_BAP_STATUSES)[number];
+
+export const EMIS_PERMISSIONS = {
+  read: [
+    "super_admin",
+    "admin_tu",
+    "kepala_madrasah",
+    "waka_kurikulum",
+    "waka_kesiswaan",
+  ],
+  audit: [
+    "super_admin",
+    "admin_tu",
+    "kepala_madrasah",
+  ],
+  export: [
+    "super_admin",
+    "admin_tu",
+    "kepala_madrasah",
+  ],
+  bap_create: [
+    "super_admin",
+    "admin_tu",
+  ],
+  bap_approve: [
+    "super_admin",
+    "kepala_madrasah",
+  ],
+} as const;
+
 
