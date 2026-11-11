@@ -225,4 +225,17 @@ export const API_ENDPOINTS = {
     GRADUATIONS: "/transfers/graduations/list",
     GRADUATION_BATCH: "/transfers/graduations/batch",
   },
+  EMIS: {
+    AUDIT: "/emis/audit",
+    EXPORT_STUDENTS: "/emis/export/students",
+    EXPORT_TEACHERS: "/emis/export/teachers",
+    EXPORT_CLASSROOMS: "/emis/export/classrooms",
+    EXPORT_INSTITUTION: "/emis/export/institution",
+    EXPORT_BUNDLE: "/emis/export/bundle",
+    BAP_LIST: "/emis/bap",
+    BAP_CREATE: "/emis/bap",
+    BAP_DETAIL: (id: string) => `/emis/bap/${id}`,
+    BAP_APPROVE: (id: string) => `/emis/bap/${id}/approve`,
+    BAP_PDF: (id: string) => `/emis/bap/${id}/pdf`,
+  },
 } as const;
