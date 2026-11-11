@@ -14,6 +14,7 @@ import {
   CreditCard,
   Calendar,
   ShieldAlert,
+  Award,
 } from "lucide-react";
 
 export interface NavItem {
@@ -137,6 +138,19 @@ export const navGroups: NavGroup[] = [
           { title: "Checklist Harian", href: "/mutabaah/checklist" },
           { title: "Monitoring & Rapor", href: "/mutabaah/compliance" },
           { title: "Katalog Amalan", href: "/mutabaah/activities" },
+        ],
+      },
+      {
+        title: "Ekstrakurikuler",
+        href: "/extracurricular",
+        icon: Award,
+        roles: [
+          "super_admin",
+          "admin_tu",
+          "kepala_madrasah",
+          "waka_kesiswaan",
+          "wali_kelas",
+          "guru",
         ],
       },
     ],

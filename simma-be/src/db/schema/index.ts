@@ -202,6 +202,20 @@ export type {
   StudentGraduationRow,
   NewStudentGraduationRow,
 } from "./transfers";
+export {
+  extracurriculars,
+  extracurricularMembers,
+  extracurricularGrades,
+} from "./extracurricular";
+export type {
+  ExtracurricularRow,
+  NewExtracurricularRow,
+  ExtracurricularMemberRow,
+  NewExtracurricularMemberRow,
+  ExtracurricularGradeRow,
+  NewExtracurricularGradeRow,
+} from "./extracurricular";
+
 
 
 

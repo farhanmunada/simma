@@ -581,3 +581,42 @@ export const TRANSFER_PERMISSIONS = {
   ],
 } as const;
 
+// --- Extracurricular Constants (Modul 17) ---
+export const EXTRACURRICULAR_CATEGORIES = [
+  "keagamaan",
+  "keilmuan",
+  "seni",
+  "olahraga",
+  "kepanduan",
+] as const;
+export type ExtracurricularCategory = (typeof EXTRACURRICULAR_CATEGORIES)[number];
+
+export const EXTRACURRICULAR_ROLES = [
+  "MEMBER",
+  "LEADER",
+  "SECRETARY",
+] as const;
+export type ExtracurricularRole = (typeof EXTRACURRICULAR_ROLES)[number];
+
+export const EXTRACURRICULAR_MEMBER_STATUSES = [
+  "ACTIVE",
+  "INACTIVE",
+] as const;
+export type ExtracurricularMemberStatus = (typeof EXTRACURRICULAR_MEMBER_STATUSES)[number];
+
+export const EXTRACURRICULAR_GRADES = [
+  "A",
+  "B",
+  "C",
+  "D",
+] as const;
+export type ExtracurricularGradeScore = (typeof EXTRACURRICULAR_GRADES)[number];
+
+export const EXTRACURRICULAR_PREDICATE_LABELS: Record<ExtracurricularGradeScore, string> = {
+  A: "Sangat Baik",
+  B: "Baik",
+  C: "Cukup",
+  D: "Kurang",
+};
+
+

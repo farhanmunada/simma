@@ -20,6 +20,7 @@ import { financeRoutes } from "./modules/finance/finance.routes.js";
 import { schedulesRoutes } from "./modules/schedules/schedules.routes.js";
 import { disciplineRoutes } from "./modules/discipline/discipline.routes.js";
 import { transfersRoutes } from "./modules/transfers/transfers.routes.js";
+import { extracurricularRoutes } from "./modules/extracurricular/extracurricular.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -74,6 +75,7 @@ export async function buildApp() {
   await app.register(schedulesRoutes, { prefix: "/api/v1/schedules" });
   await app.register(disciplineRoutes, { prefix: "/api/v1/discipline" });
   await app.register(transfersRoutes, { prefix: "/api/v1/transfers" });
+  await app.register(extracurricularRoutes, { prefix: "/api/v1/extracurricular" });
 
   return app;
 }

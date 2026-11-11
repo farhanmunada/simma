@@ -225,4 +225,14 @@ export const API_ENDPOINTS = {
     GRADUATIONS: "/transfers/graduations/list",
     GRADUATION_BATCH: "/transfers/graduations/batch",
   },
+  EXTRACURRICULAR: {
+    STATS: "/extracurricular/stats",
+    LIST: "/extracurricular",
+    DETAIL: (id: string) => `/extracurricular/${id}`,
+    MEMBERS: "/extracurricular/members",
+    MEMBER_DETAIL: (id: string) => `/extracurricular/members/${id}`,
+    GRADES: "/extracurricular/grades",
+    GRADES_BATCH: "/extracurricular/grades/batch",
+    STUDENT_GRADES: (studentId: string) => `/extracurricular/grades/student/${studentId}`,
+  },
 } as const;
