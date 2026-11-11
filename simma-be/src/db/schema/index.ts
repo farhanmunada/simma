@@ -56,6 +56,12 @@ export {
   scheduleTimeSlots,
   schedules,
 } from "./schedules";
+export {
+  disciplineRules,
+  studentInfractions,
+  counselingSessions,
+  parentSummons,
+} from "./discipline";
 
 export type {
   Institution,
@@ -173,6 +179,16 @@ export type {
   Schedule,
   NewSchedule,
 } from "./schedules";
+export type {
+  DisciplineRule,
+  NewDisciplineRule,
+  StudentInfractionRecord,
+  NewStudentInfractionRecord,
+  CounselingSessionRecord,
+  NewCounselingSessionRecord,
+  ParentSummonRecord,
+  NewParentSummonRecord,
+} from "./discipline";
 
 
 

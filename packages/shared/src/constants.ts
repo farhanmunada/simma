@@ -12,6 +12,7 @@ export const ROLES = [
   "pembina_ekskul",
   "admin_tu",
   "bendahara",
+  "guru_bk",
   "calon_siswa",
 ] as const;
 
@@ -429,6 +430,87 @@ export const ROOM_TYPES = [
   "lapangan",
 ] as const;
 export type RoomType = (typeof ROOM_TYPES)[number];
+
+// Discipline & BK (Modul 16 - Tata Tertib & Bimbingan Konseling)
+export const DISCIPLINE_RULE_TYPES = ["infraction", "reward"] as const;
+export type DisciplineRuleType = (typeof DISCIPLINE_RULE_TYPES)[number];
+
+export const DISCIPLINE_CATEGORIES = [
+  "ringan",
+  "sedang",
+  "berat",
+  "akademik",
+  "non_akademik",
+  "tahfidz",
+  "kedisiplinan",
+] as const;
+export type DisciplineCategory = (typeof DISCIPLINE_CATEGORIES)[number];
+
+export const SANCTION_LEVELS = [
+  "normal",
+  "teguran_lisan",
+  "sp_1",
+  "sp_2",
+  "sp_3",
+] as const;
+export type SanctionLevel = (typeof SANCTION_LEVELS)[number];
+
+export const ESCALATION_THRESHOLDS = {
+  TEGURAN_LISAN: 25,
+  SP_1: 50,
+  SP_2: 75,
+  SP_3: 100,
+} as const;
+
+export const REWARD_TYPES = [
+  "akademik",
+  "non_akademik",
+  "tahfidz",
+  "santri_teladan",
+  "kedisiplinan",
+] as const;
+export type RewardType = (typeof REWARD_TYPES)[number];
+
+export const INFRACTION_STATUSES = [
+  "pending_approval",
+  "approved",
+  "rejected",
+] as const;
+export type InfractionStatus = (typeof INFRACTION_STATUSES)[number];
+
+export const COUNSELING_SESSION_TYPES = [
+  "individual",
+  "kelompok",
+  "orang_tua",
+  "krisis",
+] as const;
+export type CounselingSessionType = (typeof COUNSELING_SESSION_TYPES)[number];
+
+export const COUNSELING_ISSUE_CATEGORIES = [
+  "akademik",
+  "kedisiplinan",
+  "sosial_emosional",
+  "karir_minat",
+  "keluarga",
+] as const;
+export type CounselingIssueCategory = (typeof COUNSELING_ISSUE_CATEGORIES)[number];
+
+export const COUNSELING_STATUSES = [
+  "dijadwalkan",
+  "berlangsung",
+  "selesai",
+  "tindak_lanjut",
+] as const;
+export type CounselingStatus = (typeof COUNSELING_STATUSES)[number];
+
+export const PARENT_SUMMON_STATUSES = [
+  "terbit",
+  "terkirim",
+  "hadir",
+  "selesai",
+] as const;
+export type ParentSummonStatus = (typeof PARENT_SUMMON_STATUSES)[number];
+
 
 
 

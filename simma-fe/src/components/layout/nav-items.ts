@@ -13,6 +13,7 @@ import {
   UserCheck,
   CreditCard,
   Calendar,
+  ShieldAlert,
 } from "lucide-react";
 
 export interface NavItem {
@@ -179,6 +180,27 @@ export const navGroups: NavGroup[] = [
           { title: "Legger Nilai", href: "/reports/legger" },
         ],
       },
+      {
+        title: "Tata Tertib & BK",
+        icon: ShieldAlert,
+        roles: [
+          "super_admin",
+          "kepala_madrasah",
+          "waka_kesiswaan",
+          "guru_bk",
+          "wali_kelas",
+          "guru",
+          "guru_mapel",
+          "admin_tu",
+        ],
+        subItems: [
+          { title: "Dashboard & Leaderboard", href: "/discipline" },
+          { title: "Pelanggaran & Apresiasi", href: "/discipline/infractions" },
+          { title: "Bimbingan Konseling (BK)", href: "/discipline/counseling" },
+          { title: "Panggilan Orang Tua", href: "/discipline/summons" },
+          { title: "Katalog Aturan Tatib", href: "/discipline/rules" },
+        ],
+      },
     ],
   },
 ];
@@ -191,6 +213,7 @@ export const roleLabelMap: Record<string, string> = {
   kepala_madrasah: "Kepala Madrasah",
   waka_kurikulum: "Waka Kurikulum",
   waka_kesiswaan: "Waka Kesiswaan",
+  guru_bk: "Guru BK",
   bendahara: "Bendahara",
   wali_kelas: "Wali Kelas",
   guru_mapel: "Guru Mapel",

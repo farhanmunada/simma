@@ -18,6 +18,7 @@ import { mutabaahRoutes } from "./modules/mutabaah/mutabaah.routes.js";
 import { teachersRoutes } from "./modules/teachers/teachers.routes.js";
 import { financeRoutes } from "./modules/finance/finance.routes.js";
 import { schedulesRoutes } from "./modules/schedules/schedules.routes.js";
+import { disciplineRoutes } from "./modules/discipline/discipline.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -70,6 +71,7 @@ export async function buildApp() {
   await app.register(teachersRoutes, { prefix: "/api/v1/teachers" });
   await app.register(financeRoutes, { prefix: "/api/v1/finance" });
   await app.register(schedulesRoutes, { prefix: "/api/v1/schedules" });
+  await app.register(disciplineRoutes, { prefix: "/api/v1/discipline" });
 
   return app;
 }

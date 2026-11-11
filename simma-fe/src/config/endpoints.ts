@@ -198,4 +198,18 @@ export const API_ENDPOINTS = {
     MATRIX: "/schedules/matrix",
     EXPORT_PDF: "/schedules/export/pdf",
   },
+  DISCIPLINE: {
+    RULES: "/discipline/rules",
+    RULE_DETAIL: (id: string) => `/discipline/rules/${id}`,
+    INFRACTIONS: "/discipline/infractions",
+    INFRACTION_DETAIL: (id: string) => `/discipline/infractions/${id}`,
+    INFRACTION_APPROVAL: (id: string) => `/discipline/infractions/${id}/approval`,
+    STUDENT_PROFILE: (studentId: string) => `/discipline/students/${studentId}`,
+    LEADERBOARD: "/discipline/leaderboard",
+    COUNSELING: "/discipline/counseling",
+    COUNSELING_DETAIL: (id: string) => `/discipline/counseling/${id}`,
+    SUMMONS: "/discipline/summons",
+    SUMMON_DETAIL: (id: string) => `/discipline/summons/${id}`,
+    SUMMON_PDF: (id: string) => `/discipline/summons/${id}/pdf`,
+  },
 } as const;
