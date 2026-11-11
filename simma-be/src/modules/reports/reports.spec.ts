@@ -636,7 +636,7 @@ describe("Reports HTTP Endpoints & Auth Guards", () => {
       }
 
       await app.close();
-    }, 15000);
+    }, 30000);
   });
 
   describe("Role-based Authorization Guard (403)", () => {

@@ -173,6 +173,19 @@ export type {
   Schedule,
   NewSchedule,
 } from "./schedules";
+export {
+  studentTransfers,
+  transferClearances,
+  studentGraduations,
+} from "./transfers";
+export type {
+  StudentTransferRow,
+  NewStudentTransferRow,
+  TransferClearanceRow,
+  NewTransferClearanceRow,
+  StudentGraduationRow,
+  NewStudentGraduationRow,
+} from "./transfers";
 
 
 

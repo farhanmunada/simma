@@ -198,4 +198,17 @@ export const API_ENDPOINTS = {
     MATRIX: "/schedules/matrix",
     EXPORT_PDF: "/schedules/export/pdf",
   },
+  TRANSFERS: {
+    STATS: "/transfers/stats",
+    LIST: "/transfers",
+    DETAIL: (id: string) => `/transfers/${id}`,
+    CREATE_IN: "/transfers/in",
+    CREATE_OUT: "/transfers/out",
+    UPDATE_CLEARANCE: (id: string, dimension: string) => `/transfers/${id}/clearance/${dimension}`,
+    APPROVE: (id: string) => `/transfers/${id}/approve`,
+    PDF: (id: string) => `/transfers/${id}/pdf`,
+    VERIFY: (code: string) => `/transfers/verify/${code}`,
+    GRADUATIONS: "/transfers/graduations/list",
+    GRADUATION_BATCH: "/transfers/graduations/batch",
+  },
 } as const;
