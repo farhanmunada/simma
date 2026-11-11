@@ -1,14 +1,23 @@
 import React, { useState } from "react";
-import { Plus, Search, Check, X } from "lucide-react";
+import { Plus, Search, Check, X, Trash2, Edit } from "lucide-react";
 import { Modal } from "../../../components/ui/Modal";
-import { useClassifications, useCreateClassification } from "../api/letters.api";
+import {
+  useClassifications,
+  useCreateClassification,
+  useUpdateClassification,
+  useDeleteClassification,
+} from "../api/letters.api";
 import type { LetterClassification, CreateClassificationInput } from "../types";
 
 export const ClassificationsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   const { data: classifications = [], isLoading } = useClassifications();
   const createMutation = useCreateClassification();
+  const updateMutation = useUpdateClassification();
+  const deleteMutation = useDeleteClassification();
 
   const [form, setForm] = useState<CreateClassificationInput>({
     code: "",
@@ -23,14 +32,54 @@ export const ClassificationsPage: React.FC = () => {
       c.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleOpenCreate = () => {
+    setEditingId(null);
+    setForm({ code: "", name: "", description: "", isActive: true });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (item: LetterClassification) => {
+    setEditingId(item.id);
+    setForm({
+      code: item.code,
+      name: item.name,
+      description: item.description || "",
+      isActive: item.isActive,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string, code: string) => {
+    if (window.confirm(`Hapus klasifikasi ${code}?`)) {
+      try {
+        await deleteMutation.mutateAsync(id);
+      } catch (err) {
+        console.error("Gagal menghapus klasifikasi:", err);
+      }
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(form, {
-      onSuccess: () => {
-        setIsModalOpen(false);
-        setForm({ code: "", name: "", description: "", isActive: true });
-      },
-    });
+    if (editingId) {
+      updateMutation.mutate(
+        { id: editingId, data: form },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            setEditingId(null);
+            setForm({ code: "", name: "", description: "", isActive: true });
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(form, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          setForm({ code: "", name: "", description: "", isActive: true });
+        },
+      });
+    }
   };
 
   return (
@@ -49,11 +98,11 @@ export const ClassificationsPage: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium cursor-pointer w-full sm:w-auto justify-center"
+          onClick={handleOpenCreate}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium cursor-pointer shadow-xs"
         >
           <Plus className="w-4 h-4" />
-          Tambah Klasifikasi
+          Tambah Kode Klasifikasi
         </button>
       </div>
 
@@ -66,19 +115,20 @@ export const ClassificationsPage: React.FC = () => {
                 <th className="px-4 py-3">Kode KMA 44/2010</th>
                 <th className="px-4 py-3">Uraian Klasifikasi</th>
                 <th className="px-4 py-3">Deskripsi / Ruang Lingkup</th>
-                <th className="px-4 py-3 text-right">Status</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-slate-400">
+                  <td colSpan={5} className="text-center py-8 text-slate-400">
                     Memuat kode klasifikasi Kemenag...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-10 text-slate-400">
+                  <td colSpan={5} className="text-center py-10 text-slate-400">
                     Tidak ditemukan kode klasifikasi yang sesuai
                   </td>
                 </tr>
@@ -94,7 +144,7 @@ export const ClassificationsPage: React.FC = () => {
                     <td className="px-4 py-3 text-slate-500 max-w-sm">
                       {item.description || "-"}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3">
                       {item.isActive ? (
                         <span className="inline-flex items-center gap-1 text-emerald-600 text-[11px]">
                           <Check className="w-3.5 h-3.5" /> Aktif
@@ -105,6 +155,26 @@ export const ClassificationsPage: React.FC = () => {
                         </span>
                       )}
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(item)}
+                          className="text-slate-500 hover:text-slate-800 cursor-pointer p-1"
+                          title="Edit Klasifikasi"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id, item.code)}
+                          className="text-rose-500 hover:text-rose-700 cursor-pointer p-1"
+                          title="Hapus Klasifikasi"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -113,11 +183,11 @@ export const ClassificationsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal Tambah Klasifikasi */}
+      {/* Modal Tambah / Edit Klasifikasi */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Tambah Klasifikasi Naskah Dinas (KMA 44/2010)"
+        title={editingId ? "Edit Klasifikasi Naskah Dinas" : "Tambah Klasifikasi Naskah Dinas (KMA 44/2010)"}
         description="Daftarkan kode klasifikasi persuratan resmi Kementerian Agama RI."
       >
         <form onSubmit={handleSubmit} className="space-y-3 mt-3 text-xs">
@@ -151,6 +221,17 @@ export const ClassificationsPage: React.FC = () => {
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
             />
+          </div>
+          <div>
+            <label className="block text-slate-700 font-medium mb-1">Status Keaktifan</label>
+            <select
+              value={form.isActive ? "true" : "false"}
+              onChange={(e) => setForm({ ...form, isActive: e.target.value === "true" })}
+              className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
+            >
+              <option value="true">Aktif (Dapat Digunakan)</option>
+              <option value="false">Non-Aktif (Diarsipkan)</option>
+            </select>
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button

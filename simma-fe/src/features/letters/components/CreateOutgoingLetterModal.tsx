@@ -162,6 +162,24 @@ export const CreateOutgoingLetterModal: React.FC<CreateOutgoingLetterModalProps>
           />
         </div>
 
+        <div>
+          <label className="block text-slate-700 font-medium mb-1">
+            Isi Narasi / Batang Tubuh Surat Dinas
+          </label>
+          <textarea
+            rows={4}
+            value={(form.contentData as Record<string, string>)?.body || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                contentData: { ...((form.contentData as Record<string, unknown>) || {}), body: e.target.value },
+              })
+            }
+            className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono text-[11px]"
+            placeholder="Tuliskan naskah surat lengkap di sini (paragraf pembuka, rincian permohonan/kegiatan, dan kalimat penutup)..."
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-slate-700 font-medium mb-1">

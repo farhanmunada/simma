@@ -5,6 +5,8 @@ import {
   useGenerateTeacherLetter,
   useGenerateInvitationLetter,
 } from "../api/letters-generator.api";
+import { useStudents } from "../../students/api/students.api";
+import { useTeachers } from "../../settings/api/settings.api";
 
 export interface GenerateLetterModalProps {
   isOpen: boolean;
@@ -19,8 +21,13 @@ export const GenerateLetterModal: React.FC<GenerateLetterModalProps> = ({
     "active_student" | "skkb" | "duty_teacher" | "parent_invitation"
   >("active_student");
 
-  const [studentId, setStudentId] = useState("018f3a2c-1234-7000-8000-000000000001");
-  const [teacherId, setTeacherId] = useState("018f3a2c-1234-7000-8000-000000000002");
+  const { data: studentsData } = useStudents({ page: 1, limit: 100 });
+  const { data: teachers = [] } = useTeachers();
+
+  const studentsList = studentsData?.data || [];
+
+  const [studentId, setStudentId] = useState("");
+  const [teacherId, setTeacherId] = useState("");
   const [purpose, setPurpose] = useState("Pengurusan Beasiswa PIP Kemenag RI");
   const [assignmentName, setAssignmentName] = useState("Pendampingan Kompetisi Sains Madrasah (KSM)");
   const [destination, setDestination] = useState("Kantor Kemenag Wilayah Provinsi");
@@ -50,11 +57,13 @@ export const GenerateLetterModal: React.FC<GenerateLetterModalProps> = ({
     };
 
     if (templateType === "active_student" || templateType === "skkb") {
+      if (!studentId) return;
       studentMutation.mutate(
         { studentId, purpose, classificationCode: "PP.00.6", ...defaultSigner },
         { onSuccess: onClose }
       );
     } else if (templateType === "duty_teacher") {
+      if (!teacherId) return;
       teacherMutation.mutate(
         {
           teacherId,
@@ -110,14 +119,20 @@ export const GenerateLetterModal: React.FC<GenerateLetterModalProps> = ({
         {(templateType === "active_student" || templateType === "skkb") && (
           <>
             <div>
-              <label className="block text-slate-700 font-medium mb-1">ID Siswa (UUID)</label>
-              <input
-                type="text"
+              <label className="block text-slate-700 font-medium mb-1">Pilih Siswa Terdaftar</label>
+              <select
                 required
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
-              />
+                className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white"
+              >
+                <option value="">-- Cari / Pilih Siswa --</option>
+                {studentsList.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.fullName} - NISN: {s.nisn || "-"} ({s.nis || "Aktif"})
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-slate-700 font-medium mb-1">Tujuan / Keperluan Surat</label>
@@ -135,14 +150,20 @@ export const GenerateLetterModal: React.FC<GenerateLetterModalProps> = ({
         {templateType === "duty_teacher" && (
           <>
             <div>
-              <label className="block text-slate-700 font-medium mb-1">ID Guru / GTK (UUID)</label>
-              <input
-                type="text"
+              <label className="block text-slate-700 font-medium mb-1">Pilih Guru / GTK Ditugaskan</label>
+              <select
                 required
                 value={teacherId}
                 onChange={(e) => setTeacherId(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg"
-              />
+                className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white"
+              >
+                <option value="">-- Cari / Pilih Guru / GTK --</option>
+                {teachers.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.fullName} - NUPTK: {t.nuptk || "-"} ({t.employmentType})
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-slate-700 font-medium mb-1">Nama Tugas Dinas</label>

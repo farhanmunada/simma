@@ -1,59 +1,28 @@
 import React from "react";
-import { Routes, Route, Navigate, Link, useLocation } from "react-router";
+import { Routes, Route, Navigate } from "react-router";
 import { SetupWizardPage } from "./components/SetupWizardPage";
-import { AcademicYearsPage } from "./components/AcademicYearsPage";
-import { SemestersPage } from "./components/SemestersPage";
-import { ClassroomsPage } from "./components/ClassroomsPage";
-import { SubjectsPage } from "./components/SubjectsPage";
-import { TeachersPage } from "./components/TeachersPage";
-
-const tabs = [
-  { name: "Wizard Inisialisasi", href: "/settings/wizard" },
-  { name: "Tahun Ajaran", href: "/settings/academic-years" },
-  { name: "Semester", href: "/settings/semesters" },
-  { name: "Kelas & Rombel", href: "/settings/classrooms" },
-  { name: "Mata Pelajaran", href: "/settings/subjects" },
-  { name: "Guru & GTK", href: "/settings/teachers" },
-];
 
 export const SettingsRoutes: React.FC = () => {
-  const location = useLocation();
-
   return (
     <div className="space-y-4">
-      {/* Sub navigation bar */}
-      <div className="border-b border-slate-200">
-        <nav className="flex space-x-6 -mb-px overflow-x-auto" aria-label="Master Data Tabs">
-          {tabs.map((tab) => {
-            const isActive = location.pathname.startsWith(tab.href);
-            return (
-              <Link
-                key={tab.name}
-                to={tab.href}
-                className={`whitespace-nowrap py-2.5 px-1 border-b-2 text-xs font-medium transition-colors ${
-                  isActive
-                    ? "border-emerald-600 text-emerald-700 font-semibold"
-                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-                }`}
-              >
-                {tab.name}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
       {/* Child Routes */}
       <Routes>
-        <Route index element={<Navigate to="academic-years" replace />} />
         <Route path="wizard" element={<SetupWizardPage />} />
-        <Route path="academic-years" element={<AcademicYearsPage />} />
-        <Route path="semesters" element={<SemestersPage />} />
-        <Route path="classrooms" element={<ClassroomsPage />} />
-        <Route path="subjects" element={<SubjectsPage />} />
-        <Route path="teachers" element={<TeachersPage />} />
-        <Route path="*" element={<Navigate to="academic-years" replace />} />
+
+        {/* Redirect master data lama ke Kesiswaan */}
+        <Route path="academic-years" element={<Navigate to="/students/academic-years" replace />} />
+        <Route path="semesters" element={<Navigate to="/students/semesters" replace />} />
+        <Route path="classrooms" element={<Navigate to="/students/classrooms" replace />} />
+        <Route path="subjects" element={<Navigate to="/students/subjects" replace />} />
+
+        {/* Redirect guru ke modul Kepegawaian */}
+        <Route path="teachers" element={<Navigate to="/teachers" replace />} />
+
+        <Route index element={<Navigate to="/settings/wizard" replace />} />
+        <Route path="*" element={<Navigate to="/settings/wizard" replace />} />
       </Routes>
     </div>
   );
 };
+
+export default SettingsRoutes;

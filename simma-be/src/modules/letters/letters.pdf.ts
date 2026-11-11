@@ -70,21 +70,34 @@ export function generateOfficialLetterPdf(
   curY -= 24;
 
   // 4. Isi Surat (Body Text)
-  const contentBody = (letter.contentData as Record<string, string>)?.body || letter.subject;
-  const rawParagraphs = contentBody.split("\n");
+  const contentBody = (letter.contentData as Record<string, string>)?.body || "";
+  const rawParagraphs = contentBody ? contentBody.split("\n") : [letter.subject];
 
   for (const para of rawParagraphs) {
     if (para.trim().length === 0) {
       curY -= 10;
       continue;
     }
-    // Simple line wrap at ~78 chars
+
+    // Check if line is key-value format (e.g. "Nama Lengkap : Fatimah")
+    const colonIdx = para.indexOf(":");
+    if (colonIdx > 0 && !para.startsWith("http") && !para.includes("menerangkan") && !para.includes("sebagaimana") && colonIdx < 30) {
+      const label = para.slice(0, colonIdx).trim();
+      const val = para.slice(colonIdx + 1).trim();
+      addText(label, "/F2", 9, 72, curY);
+      addText(":", "/F1", 9, 185, curY);
+      addText(val, "/F1", 9, 195, curY);
+      curY -= 14;
+      if (curY < 180) break;
+      continue;
+    }
+
+    // Simple line wrap at ~78 chars for standard text
     let remaining = para;
     while (remaining.length > 0) {
       const chunk = remaining.slice(0, 78);
       remaining = remaining.slice(78);
-      const isBold = chunk.includes(":") && (chunk.startsWith("Nama") || chunk.startsWith("NISN") || chunk.startsWith("Hari"));
-      addText(chunk, isBold ? "/F2" : "/F1", 9, 54, curY);
+      addText(chunk, "/F1", 9, 54, curY);
       curY -= 12;
       if (curY < 180) break;
     }
@@ -92,23 +105,23 @@ export function generateOfficialLetterPdf(
     if (curY < 180) break;
   }
 
-  // 5. Tanda Tangan & QR Code Verifikasi
-  const sigY = Math.max(curY - 15, 120);
+  // 5. Tanda Tangan Fisik & Cap Dinas Madrasah
+  const sigY = Math.max(curY - 20, 140);
 
-  // Box Verifikasi Dokumen Kemenag PMA 12/2024
-  addRect(54, sigY - 45, 230, 50, 0.75);
-  addText("VERIFIKASI KEASLIAN DOKUMEN DIGITAL", "/F2", 7, 60, sigY - 5);
-  addText("Sesuai PMA RI No. 12 Tahun 2024 (Tata Naskah Dinas)", "/F1", 6.5, 60, sigY - 15);
-  addText(`Hash: ${letter.verificationHash}`, "/F1", 6.5, 60, sigY - 26);
-  addText("Pindai QR / Cek Validasi di Portal SIMMA", "/F2", 6.5, 60, sigY - 37);
+  // Box Catatan Validasi Dokumen / Kode Arsip
+  addRect(54, sigY - 45, 220, 48, 0.5);
+  addText("SISTEM INFORMASI PERSURATAN MADRASAH", "/F2", 7, 60, sigY - 8);
+  addText("Sesuai PMA RI No. 12 Tahun 2024 (Tata Naskah Dinas)", "/F1", 6.5, 60, sigY - 18);
+  addText(`No. Registrasi Agenda: #${letter.sequenceNumber}/${letter.year}`, "/F1", 6.5, 60, sigY - 28);
+  addText("Dokumen sah ditandatangani dan dicap stempel madrasah", "/F1", 6, 60, sigY - 38);
 
-  // Area Tanda Tangan Pejabat
+  // Area Tanda Tangan Basah Pejabat Kamad / Pengesah
   addText(letter.signerRole, "/F1", 9.5, 360, sigY);
   addText("Madrasah Aliyah SIMMA,", "/F1", 9.5, 360, sigY - 13);
-  addText(`[ TTD Digital - ${letter.status.toUpperCase()} ]`, "/F2", 8, 360, sigY - 32);
-  addText(letter.signerName, "/F2", 9.5, 360, sigY - 50);
-  if (letter.signerNip) {
-    addText(`NIP. ${letter.signerNip}`, "/F1", 8.5, 360, sigY - 62);
+
+  addText(letter.signerName, "/F2", 9.5, 360, sigY - 65);
+  if (letter.signerNip && letter.signerNip !== "-") {
+    addText(`NIP. ${letter.signerNip}`, "/F1", 8.5, 360, sigY - 77);
   }
 
   const streamContent = lines.join("\n");

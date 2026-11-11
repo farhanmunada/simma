@@ -146,6 +146,26 @@ export class LettersRepository {
     return row || null;
   }
 
+  async updateOutgoingLetter(id: string, data: Partial<NewOutgoingLetter>): Promise<OutgoingLetter | null> {
+    const [row] = await getDb().update(outgoingLetters).set({ ...data, updatedAt: new Date() }).where(eq(outgoingLetters.id, id)).returning();
+    return row || null;
+  }
+
+  async deleteOutgoingLetter(id: string): Promise<boolean> {
+    const res = await getDb().delete(outgoingLetters).where(eq(outgoingLetters.id, id)).returning({ id: outgoingLetters.id });
+    return res.length > 0;
+  }
+
+  async updateClassification(id: string, data: Partial<NewLetterClassification>): Promise<LetterClassification | null> {
+    const [row] = await getDb().update(letterClassifications).set({ ...data, updatedAt: new Date() }).where(eq(letterClassifications.id, id)).returning();
+    return row || null;
+  }
+
+  async deleteClassification(id: string): Promise<boolean> {
+    const res = await getDb().delete(letterClassifications).where(eq(letterClassifications.id, id)).returning({ id: letterClassifications.id });
+    return res.length > 0;
+  }
+
   async findExpeditions(p: { page: number; limit: number; search?: string; outgoingLetterId?: string }) {
     const db = getDb();
     const conds = [];

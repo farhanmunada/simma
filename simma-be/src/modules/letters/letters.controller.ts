@@ -13,6 +13,7 @@ import {
   UpdateDispositionStatusSchema,
   CreateOutgoingLetterSchema,
   OutgoingLetterQuerySchema,
+  UpdateOutgoingLetterStatusSchema,
   CreateExpeditionBookSchema,
   UpdateExpeditionBookSchema,
   ExpeditionQuerySchema,
@@ -118,6 +119,39 @@ export class LettersController {
     const body = parseData(CreateOutgoingLetterSchema, req.body);
     const data = await this.service.createOutgoingLetter(body);
     return reply.status(201).send({ message: "Surat keluar berhasil dibuat dengan nomor resmi Kemenag otomatis", data });
+  };
+
+  updateOutgoingLetterStatus = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { id } = parseData(IdParamSchema, req.params);
+    const body = parseData(UpdateOutgoingLetterStatusSchema, req.body);
+    const data = await this.service.updateOutgoingLetterStatus(id, body.status);
+    return reply.status(200).send({ message: "Status surat keluar berhasil diperbarui", data });
+  };
+
+  updateOutgoingLetter = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { id } = parseData(IdParamSchema, req.params);
+    const body = req.body as Record<string, unknown>;
+    const data = await this.service.updateOutgoingLetter(id, body);
+    return reply.status(200).send({ message: "Data surat keluar berhasil diperbarui", data });
+  };
+
+  deleteOutgoingLetter = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { id } = parseData(IdParamSchema, req.params);
+    const result = await this.service.deleteOutgoingLetter(id);
+    return reply.status(200).send({ message: "Surat keluar berhasil dihapus", data: result });
+  };
+
+  updateClassification = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { id } = parseData(IdParamSchema, req.params);
+    const body = req.body as Record<string, unknown>;
+    const data = await this.service.updateClassification(id, body);
+    return reply.status(200).send({ message: "Klasifikasi surat berhasil diperbarui", data });
+  };
+
+  deleteClassification = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { id } = parseData(IdParamSchema, req.params);
+    const result = await this.service.deleteClassification(id);
+    return reply.status(200).send({ message: "Klasifikasi surat berhasil dihapus", data: result });
   };
 
   downloadOutgoingLetterPdf = async (req: FastifyRequest, reply: FastifyReply) => {

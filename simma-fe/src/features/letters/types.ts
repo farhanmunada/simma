@@ -51,17 +51,22 @@ export interface LetterClassification {
 
 export interface IncomingLetter {
   id: string;
-  agendaNumber: string;
-  senderLetterNumber: string;
-  senderName: string;
-  letterDate: string;
+  agendaNumber: number | string;
+  mailNumber?: string;
+  senderLetterNumber?: string;
+  sender: string;
+  senderName?: string;
+  mailDate?: string;
+  letterDate?: string;
   receivedDate: string;
   subject: string;
   summary?: string | null;
   classificationCode: string;
+  classificationId?: string;
   attachmentPath?: string | null;
+  fileUrl?: string | null;
   status: LetterStatus;
-  recordedBy: string;
+  recordedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -85,21 +90,28 @@ export interface Disposition {
 export interface OutgoingLetter {
   id: string;
   letterNumber: string;
+  securityDegree: LetterSecurityDegree;
   sequenceNumber: number;
-  degreeCode: string;
+  year: number;
+  month: number;
   satkerCode: string;
   classificationCode: string;
-  month: string;
-  year: number;
-  recipientName: string;
+  classificationId?: string | null;
+  letterDate: string;
+  recipient: string;
+  recipientName?: string;
   recipientAddress?: string | null;
   subject: string;
+  signerName: string;
+  signerNip?: string | null;
+  signerRole: string;
+  templateType: string;
+  studentId?: string | null;
+  teacherId?: string | null;
   contentData?: Record<string, unknown> | null;
-  status: LetterStatus;
   verificationHash: string;
-  signerName?: string | null;
-  signedAt?: string | null;
-  createdById: string;
+  attachmentPath?: string | null;
+  status: LetterStatus;
   createdAt: string;
   updatedAt: string;
 }

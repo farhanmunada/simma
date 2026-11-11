@@ -10,7 +10,7 @@ import { AttendanceRoutes } from "./features/attendance";
 import { GradesRoutes } from "./features/grades";
 import { ReportsRoutes } from "./features/reports";
 import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
-import { LettersRoutes, VerifyLetterPublicPage } from "./features/letters";
+import { LettersRoutes } from "./features/letters";
 import { P5raRoutes } from "./features/p5ra";
 import { MutabaahRoutes } from "./features/mutabaah";
 import { TeachersRoutes } from "./features/teachers";
@@ -47,7 +47,6 @@ export function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/ppdb" element={<PpdbPublicPortalPage />} />
-          <Route path="/verify-letter/:hash" element={<VerifyLetterPublicPage />} />
           <Route path="/facilities/scan/:token" element={<FacilityPublicScanPage />} />
           <Route
             path="/"

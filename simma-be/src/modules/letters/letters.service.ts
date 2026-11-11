@@ -140,6 +140,36 @@ export class LettersService {
     return item;
   }
 
+  async updateOutgoingLetterStatus(id: string, status: "draft" | "signed" | "sent" | "archived") {
+    const updated = await this.repo.updateOutgoingLetter(id, { status });
+    if (!updated) throw new NotFoundError("Surat keluar tidak ditemukan");
+    return updated;
+  }
+
+  async updateOutgoingLetter(id: string, data: Partial<NewOutgoingLetter>) {
+    const updated = await this.repo.updateOutgoingLetter(id, data);
+    if (!updated) throw new NotFoundError("Surat keluar tidak ditemukan");
+    return updated;
+  }
+
+  async deleteOutgoingLetter(id: string) {
+    const deleted = await this.repo.deleteOutgoingLetter(id);
+    if (!deleted) throw new NotFoundError("Surat keluar tidak ditemukan");
+    return { success: true };
+  }
+
+  async updateClassification(id: string, data: Partial<NewLetterClassification>) {
+    const updated = await this.repo.updateClassification(id, data);
+    if (!updated) throw new NotFoundError("Klasifikasi surat tidak ditemukan");
+    return updated;
+  }
+
+  async deleteClassification(id: string) {
+    const deleted = await this.repo.deleteClassification(id);
+    if (!deleted) throw new NotFoundError("Klasifikasi surat tidak ditemukan");
+    return { success: true };
+  }
+
   async verifyPublicLetter(hash: string): Promise<VerifyLetterResult> {
     const letter = await this.repo.findOutgoingLetterByHash(hash);
     if (!letter) {

@@ -59,18 +59,6 @@ export const navGroups: NavGroup[] = [
         ],
       },
       {
-        title: "Master Data",
-        icon: Settings,
-        roles: ["super_admin", "admin_tu", "waka_kurikulum"],
-        subItems: [
-          { title: "Tahun Ajaran", href: "/settings/academic-years" },
-          { title: "Semester", href: "/settings/semesters" },
-          { title: "Kelas & Rombel", href: "/settings/classrooms" },
-          { title: "Mata Pelajaran", href: "/settings/subjects" },
-          { title: "Guru & GTK", href: "/settings/teachers" },
-        ],
-      },
-      {
         title: "Sarana & Prasarana",
         href: "/facilities",
         icon: Package,
@@ -128,10 +116,14 @@ export const navGroups: NavGroup[] = [
       {
         title: "Kesiswaan",
         icon: Users,
-        roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas"],
+        roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas", "waka_kurikulum"],
         subItems: [
           { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
           { title: "Kesiswaan & Buku Induk", href: "/students" },
+          { title: "Tahun Ajaran", href: "/students/academic-years" },
+          { title: "Semester", href: "/students/semesters" },
+          { title: "Kelas & Rombel", href: "/students/classrooms" },
+          { title: "Mata Pelajaran", href: "/students/subjects" },
           { title: "Mutasi & Kelulusan", href: "/transfers" },
           { title: "Penempatan Rombel", href: "/students/assign" },
         ],

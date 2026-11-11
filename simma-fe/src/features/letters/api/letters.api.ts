@@ -238,6 +238,62 @@ export const useUpdateOutgoingLetterStatus = () => {
   });
 };
 
+export const useUpdateOutgoingLetter = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateOutgoingLetterInput> }) =>
+      apiClient<{ success: boolean; data: OutgoingLetter }>(
+        `${API_ENDPOINTS.LETTERS.OUTGOING}/${id}`,
+        { method: "PATCH", body: JSON.stringify(data) }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: lettersQueryKeys.all });
+    },
+  });
+};
+
+export const useDeleteOutgoingLetter = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiClient<{ success: boolean }>(
+        `${API_ENDPOINTS.LETTERS.OUTGOING}/${id}`,
+        { method: "DELETE" }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: lettersQueryKeys.all });
+    },
+  });
+};
+
+export const useUpdateClassification = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<LetterClassification> }) =>
+      apiClient<{ success: boolean; data: LetterClassification }>(
+        `${API_ENDPOINTS.LETTERS.CLASSIFICATIONS}/${id}`,
+        { method: "PATCH", body: JSON.stringify(data) }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: lettersQueryKeys.all });
+    },
+  });
+};
+
+export const useDeleteClassification = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiClient<{ success: boolean }>(
+        `${API_ENDPOINTS.LETTERS.CLASSIFICATIONS}/${id}`,
+        { method: "DELETE" }
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: lettersQueryKeys.all });
+    },
+  });
+};
+
 // 6. Unduh PDF Surat Keluar Resmi
 export async function downloadOutgoingLetterPdf(id: string, filename?: string): Promise<void> {
   const blob = await apiClient<Blob>(API_ENDPOINTS.LETTERS.OUTGOING_PDF(id), {

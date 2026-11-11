@@ -3,10 +3,18 @@ import { Routes, Route, Navigate, Link, useLocation } from "react-router";
 import { StudentsListPage } from "./components/StudentsListPage";
 import { StudentDetailPage } from "./components/StudentDetailPage";
 import { ClassAssignmentPage } from "./components/ClassAssignmentPage";
+import { AcademicYearsPage } from "../settings/components/AcademicYearsPage";
+import { SemestersPage } from "../settings/components/SemestersPage";
+import { ClassroomsPage } from "../settings/components/ClassroomsPage";
+import { SubjectsPage } from "../settings/components/SubjectsPage";
 
 const tabs = [
-  { name: "Daftar Siswa", href: "/students", exact: true },
-  { name: "Penempatan Kelas", href: "/students/assign" },
+  { name: "Buku Induk", href: "/students", exact: true },
+  { name: "Tahun Ajaran", href: "/students/academic-years" },
+  { name: "Semester", href: "/students/semesters" },
+  { name: "Kelas & Rombel", href: "/students/classrooms" },
+  { name: "Mata Pelajaran", href: "/students/subjects" },
+  { name: "Penempatan Rombel", href: "/students/assign" },
 ];
 
 export const StudentsRoutes: React.FC = () => {
@@ -14,7 +22,11 @@ export const StudentsRoutes: React.FC = () => {
   const isDetailPage =
     location.pathname.startsWith("/students/") &&
     !location.pathname.startsWith("/students/assign") &&
-    !location.pathname.startsWith("/students/classes");
+    !location.pathname.startsWith("/students/classes") &&
+    !location.pathname.startsWith("/students/academic-years") &&
+    !location.pathname.startsWith("/students/semesters") &&
+    !location.pathname.startsWith("/students/classrooms") &&
+    !location.pathname.startsWith("/students/subjects");
 
   return (
     <div className="space-y-4">
@@ -48,6 +60,10 @@ export const StudentsRoutes: React.FC = () => {
       {/* Child Routes */}
       <Routes>
         <Route index element={<StudentsListPage />} />
+        <Route path="academic-years" element={<AcademicYearsPage />} />
+        <Route path="semesters" element={<SemestersPage />} />
+        <Route path="classrooms" element={<ClassroomsPage />} />
+        <Route path="subjects" element={<SubjectsPage />} />
         <Route path="assign" element={<ClassAssignmentPage />} />
         <Route path="classes" element={<Navigate to="/students/assign" replace />} />
         <Route path=":id" element={<StudentDetailPage />} />

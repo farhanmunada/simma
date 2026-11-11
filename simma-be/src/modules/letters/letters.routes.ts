@@ -41,6 +41,8 @@ export const lettersRoutes: FastifyPluginAsync = async (app) => {
   app.get("/stats", readAuthGuard, controller.getStats);
   app.get("/classifications", readAuthGuard, controller.getClassifications);
   app.post("/classifications", tuOrKamadGuard, controller.createClassification);
+  app.patch("/classifications/:id", tuOrKamadGuard, controller.updateClassification);
+  app.delete("/classifications/:id", tuOrKamadGuard, controller.deleteClassification);
 
   // 4. Agenda Surat Masuk (F-TU-01)
   app.get("/incoming", readAuthGuard, controller.getIncomingLetters);
@@ -57,6 +59,9 @@ export const lettersRoutes: FastifyPluginAsync = async (app) => {
   app.get("/outgoing", readAuthGuard, controller.getOutgoingLetters);
   app.get("/outgoing/:id", readAuthGuard, controller.getOutgoingLetterById);
   app.post("/outgoing", tuOrKamadGuard, controller.createOutgoingLetter);
+  app.patch("/outgoing/:id/status", tuOrKamadGuard, controller.updateOutgoingLetterStatus);
+  app.patch("/outgoing/:id", tuOrKamadGuard, controller.updateOutgoingLetter);
+  app.delete("/outgoing/:id", tuOrKamadGuard, controller.deleteOutgoingLetter);
   app.get("/outgoing/:id/pdf", readAuthGuard, controller.downloadOutgoingLetterPdf);
 
   // 7. Otomatisasi Generator Naskah Dinas Resmi (F-TU-06 s/d F-TU-09)

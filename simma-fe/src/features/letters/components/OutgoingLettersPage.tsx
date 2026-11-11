@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { Plus, Search, FileText, Download, CheckCircle, Sparkles, QrCode } from "lucide-react";
+import { Plus, Search, FileText, Download, CheckCircle, Sparkles, Trash2, Edit2 } from "lucide-react";
 import { Badge } from "../../../components/ui/Badge";
 import {
   useOutgoingLetters,
   useClassifications,
   useDownloadOutgoingLetterPdf,
+  useUpdateOutgoingLetterStatus,
+  useDeleteOutgoingLetter,
 } from "../api/letters.api";
 import { CreateOutgoingLetterModal } from "./CreateOutgoingLetterModal";
+import { EditOutgoingLetterModal } from "./EditOutgoingLetterModal";
 import { GenerateLetterModal } from "./GenerateLetterModal";
 import type { OutgoingLetter } from "../types";
 
@@ -16,7 +19,8 @@ export const OutgoingLettersPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
-  const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [editLetter, setEditLetter] = useState<OutgoingLetter | null>(null);
+  const [previewLetter, setPreviewLetter] = useState<OutgoingLetter | null>(null);
 
   const { data, isLoading } = useOutgoingLetters({
     search: search || undefined,
@@ -26,6 +30,8 @@ export const OutgoingLettersPage: React.FC = () => {
   const letters: OutgoingLetter[] = data?.data ?? [];
 
   const downloadPdfMutation = useDownloadOutgoingLetterPdf();
+  const updateStatusMutation = useUpdateOutgoingLetterStatus();
+  const deleteMutation = useDeleteOutgoingLetter();
 
   const handleDownloadPdf = async (id: string, letterNumber: string) => {
     try {
@@ -39,11 +45,22 @@ export const OutgoingLettersPage: React.FC = () => {
     }
   };
 
-  const handleCopyVerification = (hash: string) => {
-    const url = `${window.location.origin}/verify-letter/${hash}`;
-    navigator.clipboard.writeText(url);
-    setCopiedHash(hash);
-    setTimeout(() => setCopiedHash(null), 2500);
+  const handleStatusChange = async (id: string, status: any) => {
+    try {
+      await updateStatusMutation.mutateAsync({ id, data: { status } });
+    } catch (err) {
+      console.error("Gagal memperbarui status surat:", err);
+    }
+  };
+
+  const handleDeleteLetter = async (id: string, letterNumber: string) => {
+    if (window.confirm(`Hapus surat ${letterNumber}?`)) {
+      try {
+        await deleteMutation.mutateAsync(id);
+      } catch (err) {
+        console.error("Gagal menghapus surat keluar:", err);
+      }
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -133,7 +150,11 @@ export const OutgoingLettersPage: React.FC = () => {
                 </tr>
               ) : (
                 letters.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50/70">
+                  <tr
+                    key={row.id}
+                    onClick={() => setPreviewLetter(row)}
+                    className="hover:bg-slate-50/80 cursor-pointer transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <p className="font-mono font-medium text-emerald-700">
                         {row.letterNumber}
@@ -143,7 +164,7 @@ export const OutgoingLettersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-800">{row.recipientName}</p>
+                      <p className="font-medium text-slate-800">{row.recipient || row.recipientName}</p>
                       {row.recipientAddress && (
                         <p className="text-[11px] text-slate-400">{row.recipientAddress}</p>
                       )}
@@ -160,9 +181,28 @@ export const OutgoingLettersPage: React.FC = () => {
                         Tgl: {row.month}/{row.year}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{getStatusBadge(row.status)}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <select
+                        value={row.status}
+                        onChange={(e) => handleStatusChange(row.id, e.target.value)}
+                        className="text-[11px] bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5"
+                      >
+                        <option value="draft">Draft / Konsep</option>
+                        <option value="signed">Ditandatangani</option>
+                        <option value="sent">Terkirim</option>
+                        <option value="archived">Diarsipkan</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditLetter(row)}
+                          className="flex items-center gap-1 text-slate-600 hover:text-slate-900 cursor-pointer"
+                          title="Edit Surat"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleDownloadPdf(row.id, row.letterNumber)}
@@ -175,12 +215,11 @@ export const OutgoingLettersPage: React.FC = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleCopyVerification(row.verificationHash)}
-                          className="flex items-center gap-1 text-slate-500 hover:text-slate-800 cursor-pointer"
-                          title="Salin Link QR Verifikasi"
+                          onClick={() => handleDeleteLetter(row.id, row.letterNumber)}
+                          className="flex items-center gap-1 text-rose-500 hover:text-rose-700 cursor-pointer"
+                          title="Hapus Surat"
                         >
-                          <QrCode className="w-3.5 h-3.5" />
-                          {copiedHash === row.verificationHash ? "Tersalin!" : "QR"}
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -201,6 +240,81 @@ export const OutgoingLettersPage: React.FC = () => {
         isOpen={isGenerateOpen}
         onClose={() => setIsGenerateOpen(false)}
       />
+
+      <EditOutgoingLetterModal
+        isOpen={Boolean(editLetter)}
+        onClose={() => setEditLetter(null)}
+        letter={editLetter}
+      />
+
+      {previewLetter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-5 space-y-3 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-800">Preview Naskah Dinas Keluar</h3>
+                <p className="text-xs text-emerald-700 font-mono">{previewLetter.letterNumber}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewLetter(null)}
+                className="text-slate-400 hover:text-slate-600 text-lg font-bold"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="space-y-2 text-xs text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <span className="text-slate-400">Penerima:</span>
+                  <p className="font-semibold">{previewLetter.recipient || previewLetter.recipientName}</p>
+                </div>
+                <div>
+                  <span className="text-slate-400">Penandatangan:</span>
+                  <p className="font-semibold">{previewLetter.signerName} ({previewLetter.signerRole})</p>
+                </div>
+              </div>
+              <div>
+                <span className="text-slate-400">Perihal:</span>
+                <p className="font-semibold">{previewLetter.subject}</p>
+              </div>
+              <div className="pt-2 border-t border-slate-200">
+                <span className="text-slate-400 block mb-1">Batang Tubuh / Isi Surat:</span>
+                <div className="bg-white p-3 rounded border border-slate-200 whitespace-pre-line font-mono text-[11px] leading-relaxed">
+                  {((previewLetter.contentData as Record<string, string>)?.body) || previewLetter.subject}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const letterToEdit = previewLetter;
+                  setPreviewLetter(null);
+                  setEditLetter(letterToEdit);
+                }}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium"
+              >
+                Edit Naskah
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDownloadPdf(previewLetter.id, previewLetter.letterNumber)}
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium"
+              >
+                Unduh PDF Fisik
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewLetter(null)}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

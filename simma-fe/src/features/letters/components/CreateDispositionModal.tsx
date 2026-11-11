@@ -81,7 +81,7 @@ export const CreateDispositionModal: React.FC<CreateDispositionModalProps> = ({
             <option value="">-- Pilih Agenda Surat Masuk --</option>
             {(incomingData?.data || []).map((l) => (
               <option key={l.id} value={l.id}>
-                [{l.agendaNumber}] {l.subject} ({l.senderName})
+                [{l.agendaNumber}] {l.subject} ({l.sender || l.senderName || "-"})
               </option>
             ))}
           </select>
