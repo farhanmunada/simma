@@ -22,6 +22,7 @@ import { disciplineRoutes } from "./modules/discipline/discipline.routes.js";
 import { transfersRoutes } from "./modules/transfers/transfers.routes.js";
 import { extracurricularRoutes } from "./modules/extracurricular/extracurricular.routes.js";
 import { emisRoutes } from "./modules/emis/emis.routes.js";
+import { facilitiesRoutes } from "./modules/facilities/facilities.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -78,6 +79,7 @@ export async function buildApp() {
   await app.register(transfersRoutes, { prefix: "/api/v1/transfers" });
   await app.register(extracurricularRoutes, { prefix: "/api/v1/extracurricular" });
   await app.register(emisRoutes, { prefix: "/api/v1/emis" });
+  await app.register(facilitiesRoutes, { prefix: "/api/v1/facilities" });
 
   return app;
 }

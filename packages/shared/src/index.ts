@@ -17,4 +17,5 @@ export * from "./schemas/discipline.schema.js";
 export * from "./schemas/transfer.schema.js";
 export * from "./schemas/extracurricular.schema.js";
 export * from "./schemas/emis.schema.js";
+export * from "./schemas/facilities.schema.js";
 export * from "./types/common.types.js";

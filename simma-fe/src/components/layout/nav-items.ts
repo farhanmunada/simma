@@ -16,6 +16,7 @@ import {
   ShieldAlert,
   Award,
   Database,
+  Package,
 } from "lucide-react";
 
 export interface NavItem {
@@ -67,6 +68,20 @@ export const navGroups: NavGroup[] = [
           { title: "Kelas & Rombel", href: "/settings/classrooms" },
           { title: "Mata Pelajaran", href: "/settings/subjects" },
           { title: "Guru & GTK", href: "/settings/teachers" },
+        ],
+      },
+      {
+        title: "Sarana & Prasarana",
+        href: "/facilities",
+        icon: Package,
+        roles: [
+          "super_admin",
+          "admin_tu",
+          "kepala_madrasah",
+          "waka_sarpras",
+          "guru",
+          "guru_mapel",
+          "wali_kelas",
         ],
       },
       {
@@ -233,6 +248,7 @@ export const roleLabelMap: Record<string, string> = {
   super_admin: "Super Admin",
   admin_tu: "Admin TU",
   kepala_madrasah: "Kepala Madrasah",
+  waka_sarpras: "Waka Sarpras",
   waka_kurikulum: "Waka Kurikulum",
   waka_kesiswaan: "Waka Kesiswaan",
   guru_bk: "Guru BK",

@@ -215,6 +215,19 @@ export type {
   ExtracurricularGradeRow,
   NewExtracurricularGradeRow,
 } from "./extracurricular";
+export {
+  facilityAssets,
+  facilityLoans,
+  facilityMaintenanceTickets,
+} from "./facilities";
+export type {
+  FacilityAssetRow,
+  NewFacilityAssetRow,
+  FacilityLoanRow,
+  NewFacilityLoanRow,
+  FacilityMaintenanceTicketRow,
+  NewFacilityMaintenanceTicketRow,
+} from "./facilities";
 
 
 
