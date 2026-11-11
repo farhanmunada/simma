@@ -17,6 +17,7 @@ import { TeachersRoutes } from "./features/teachers";
 import { FinanceRoutes } from "./features/finance";
 import { SchedulesRoutes } from "./features/schedules";
 import { DisciplineRoutes } from "./features/discipline";
+import { TransfersPage } from "./features/transfers";
 import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
@@ -67,6 +68,7 @@ export function App() {
             <Route path="finance/*" element={<FinanceRoutes />} />
             <Route path="schedules/*" element={<SchedulesRoutes />} />
             <Route path="discipline/*" element={<DisciplineRoutes />} />
+            <Route path="transfers" element={<TransfersPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

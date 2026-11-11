@@ -189,6 +189,19 @@ export type {
   ParentSummonRecord,
   NewParentSummonRecord,
 } from "./discipline";
+export {
+  studentTransfers,
+  transferClearances,
+  studentGraduations,
+} from "./transfers";
+export type {
+  StudentTransferRow,
+  NewStudentTransferRow,
+  TransferClearanceRow,
+  NewTransferClearanceRow,
+  StudentGraduationRow,
+  NewStudentGraduationRow,
+} from "./transfers";
 
 
 

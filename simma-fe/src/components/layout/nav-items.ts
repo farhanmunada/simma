@@ -108,7 +108,8 @@ export const navGroups: NavGroup[] = [
         roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas"],
         subItems: [
           { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
-          { title: "Buku Induk Siswa", href: "/students" },
+          { title: "Kesiswaan & Buku Induk", href: "/students" },
+          { title: "Mutasi & Kelulusan", href: "/transfers" },
           { title: "Penempatan Rombel", href: "/students/assign" },
         ],
       },

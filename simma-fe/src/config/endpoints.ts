@@ -212,4 +212,17 @@ export const API_ENDPOINTS = {
     SUMMON_DETAIL: (id: string) => `/discipline/summons/${id}`,
     SUMMON_PDF: (id: string) => `/discipline/summons/${id}/pdf`,
   },
+  TRANSFERS: {
+    STATS: "/transfers/stats",
+    LIST: "/transfers",
+    DETAIL: (id: string) => `/transfers/${id}`,
+    CREATE_IN: "/transfers/in",
+    CREATE_OUT: "/transfers/out",
+    UPDATE_CLEARANCE: (id: string, dimension: string) => `/transfers/${id}/clearance/${dimension}`,
+    APPROVE: (id: string) => `/transfers/${id}/approve`,
+    PDF: (id: string) => `/transfers/${id}/pdf`,
+    VERIFY: (code: string) => `/transfers/verify/${code}`,
+    GRADUATIONS: "/transfers/graduations/list",
+    GRADUATION_BATCH: "/transfers/graduations/batch",
+  },
 } as const;

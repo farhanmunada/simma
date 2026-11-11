@@ -511,8 +511,73 @@ export const PARENT_SUMMON_STATUSES = [
 ] as const;
 export type ParentSummonStatus = (typeof PARENT_SUMMON_STATUSES)[number];
 
+// Transfers & Graduation (Modul 15 - Mutasi & Kelulusan Siswa)
+export const TRANSFER_TYPES = ["masuk", "keluar"] as const;
+export type TransferType = (typeof TRANSFER_TYPES)[number];
 
+export const TRANSFER_STATUSES = [
+  "draft",
+  "pending_clearance",
+  "pending_approval",
+  "approved",
+  "rejected",
+  "completed",
+] as const;
+export type TransferStatus = (typeof TRANSFER_STATUSES)[number];
 
+export const CLEARANCE_STATUSES = [
+  "pending",
+  "in_progress",
+  "cleared",
+  "rejected",
+] as const;
+export type ClearanceStatus = (typeof CLEARANCE_STATUSES)[number];
 
+export const CLEARANCE_DIMENSIONS = [
+  "library",
+  "finance",
+  "discipline",
+] as const;
+export type ClearanceDimension = (typeof CLEARANCE_DIMENSIONS)[number];
 
+export const GRADUATION_STATUSES = [
+  "lulus",
+  "tidak_lulus",
+  "ditunda",
+] as const;
+export type GraduationStatus = (typeof GRADUATION_STATUSES)[number];
+
+export const TRANSFER_PERMISSIONS = {
+  read: [
+    "super_admin",
+    "kepala_madrasah",
+    "waka_kesiswaan",
+    "admin_tu",
+    "bendahara",
+    "wali_kelas",
+  ],
+  write: [
+    "super_admin",
+    "kepala_madrasah",
+    "waka_kesiswaan",
+    "admin_tu",
+  ],
+  clearance_library: [
+    "super_admin",
+    "admin_tu",
+    "waka_kesiswaan",
+  ],
+  clearance_finance: [
+    "super_admin",
+    "bendahara",
+  ],
+  clearance_discipline: [
+    "super_admin",
+    "waka_kesiswaan",
+  ],
+  approval: [
+    "super_admin",
+    "kepala_madrasah",
+  ],
+} as const;
 
