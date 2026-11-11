@@ -6,9 +6,9 @@ import {
   integer,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { academicYears, semesters, teachers, classrooms } from "./setup.js";
-import { students } from "./students.js";
-import { users } from "./users.js";
+import { academicYears, semesters, teachers, classrooms } from "./setup";
+import { students } from "./students";
+import { users } from "./users";
 import type {
   P5raTheme,
   P5raFase,

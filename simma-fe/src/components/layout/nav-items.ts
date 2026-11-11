@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   UserCheck,
   CreditCard,
+  Calendar,
 } from "lucide-react";
 
 export interface NavItem {
@@ -156,6 +157,12 @@ export const navGroups: NavGroup[] = [
         href: "/grades",
         icon: GraduationCap,
         roles: ["super_admin", "guru", "wali_kelas"],
+      },
+      {
+        title: "Jadwal Pelajaran",
+        href: "/schedules",
+        icon: Calendar,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
       },
       {
         title: "Projek P5RA",

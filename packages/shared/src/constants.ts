@@ -393,6 +393,44 @@ export const DISPENSATION_STATUSES = [
 ] as const;
 export type DispensationStatus = (typeof DISPENSATION_STATUSES)[number];
 
+// Schedules & Timetable (Modul 14)
+export const DAY_OF_WEEKS = [
+  "senin",
+  "selasa",
+  "rabu",
+  "kamis",
+  "jumat",
+  "sabtu",
+  "ahad",
+] as const;
+export type DayOfWeek = (typeof DAY_OF_WEEKS)[number];
+
+export const SESSION_TYPES = [
+  "formal",
+  "diniyah",
+  "istirahat",
+  "sholat",
+  "upacara",
+] as const;
+export type SessionType = (typeof SESSION_TYPES)[number];
+
+export const SCHEDULE_STATUSES = [
+  "draft",
+  "published",
+  "archived",
+] as const;
+export type ScheduleStatus = (typeof SCHEDULE_STATUSES)[number];
+
+export const ROOM_TYPES = [
+  "teori",
+  "laboratorium",
+  "masjid",
+  "aula",
+  "lapangan",
+] as const;
+export type RoomType = (typeof ROOM_TYPES)[number];
+
+
 
 
 

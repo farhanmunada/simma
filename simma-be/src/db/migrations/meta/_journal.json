@@ -43,6 +43,13 @@
       "when": 1794224021133,
       "tag": "0005_simple_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794362313403,
+      "tag": "0006_ancient_tomas",
+      "breakpoints": true
     }
   ]
 }

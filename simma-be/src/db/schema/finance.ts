@@ -7,9 +7,9 @@ import {
   integer,
   date,
 } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
-import { academicYears, classrooms } from "./setup.js";
-import { students } from "./students.js";
+import { users } from "./users";
+import { academicYears, classrooms } from "./setup";
+import { students } from "./students";
 
 export const feeItems = pgTable("fee_items", {
   id: uuid("id").defaultRandom().primaryKey(),

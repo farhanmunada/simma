@@ -7,7 +7,7 @@ import {
   date,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { teachers, academicYears, semesters } from "./setup.js";
+import { teachers, academicYears, semesters } from "./setup";
 
 export const teacherProfiles = pgTable("teacher_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),

@@ -12,4 +12,5 @@ export * from "./schemas/p5ra.schema.js";
 export * from "./schemas/mutabaah.schema.js";
 export * from "./teachers.schema.js";
 export * from "./schemas/finance.schema.js";
+export * from "./schemas/schedule.schema.js";
 export * from "./types/common.types.js";

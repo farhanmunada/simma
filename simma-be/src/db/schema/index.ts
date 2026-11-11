@@ -51,6 +51,11 @@ export {
   paymentTransactionItems,
   dispensationRequests,
 } from "./finance";
+export {
+  scheduleRooms,
+  scheduleTimeSlots,
+  schedules,
+} from "./schedules";
 
 export type {
   Institution,
@@ -160,5 +165,14 @@ export type {
   DispensationRequestRow,
   NewDispensationRequestRow,
 } from "./finance";
+export type {
+  ScheduleRoom,
+  NewScheduleRoom,
+  ScheduleTimeSlot,
+  NewScheduleTimeSlot,
+  Schedule,
+  NewSchedule,
+} from "./schedules";
+
 
 

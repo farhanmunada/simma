@@ -17,6 +17,7 @@ import { p5raRoutes } from "./modules/p5ra/p5ra.routes.js";
 import { mutabaahRoutes } from "./modules/mutabaah/mutabaah.routes.js";
 import { teachersRoutes } from "./modules/teachers/teachers.routes.js";
 import { financeRoutes } from "./modules/finance/finance.routes.js";
+import { schedulesRoutes } from "./modules/schedules/schedules.routes.js";
 
 export async function buildApp() {
   const env = getEnv();
@@ -68,6 +69,7 @@ export async function buildApp() {
   await app.register(mutabaahRoutes, { prefix: "/api/v1/mutabaah" });
   await app.register(teachersRoutes, { prefix: "/api/v1/teachers" });
   await app.register(financeRoutes, { prefix: "/api/v1/finance" });
+  await app.register(schedulesRoutes, { prefix: "/api/v1/schedules" });
 
   return app;
 }

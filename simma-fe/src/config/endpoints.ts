@@ -186,4 +186,16 @@ export const API_ENDPOINTS = {
     REPORTS_CASHFLOW: "/finance/reports/cashflow",
     REPORTS_ARREARS: "/finance/reports/arrears",
   },
+  SCHEDULES: {
+    ROOMS: "/schedules/rooms",
+    ROOM_DETAIL: (id: string) => `/schedules/rooms/${id}`,
+    TIME_SLOTS: "/schedules/time-slots",
+    TIME_SLOT_DETAIL: (id: string) => `/schedules/time-slots/${id}`,
+    LIST: "/schedules",
+    DETAIL: (id: string) => `/schedules/${id}`,
+    BATCH: "/schedules/batch",
+    CHECK_COLLISION: "/schedules/check-collision",
+    MATRIX: "/schedules/matrix",
+    EXPORT_PDF: "/schedules/export/pdf",
+  },
 } as const;
