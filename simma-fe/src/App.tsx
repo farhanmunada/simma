@@ -18,6 +18,7 @@ import { FinanceRoutes } from "./features/finance";
 import { SchedulesRoutes } from "./features/schedules";
 import { DisciplineRoutes } from "./features/discipline";
 import { TransfersPage } from "./features/transfers";
+import { FacilitiesPage, FacilityPublicScanPage } from "./features/facilities";
 import { DashboardOverview } from "./features/dashboard";
 
 const queryClient = new QueryClient({
@@ -45,6 +46,7 @@ export function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/ppdb" element={<PpdbPublicPortalPage />} />
           <Route path="/verify-letter/:hash" element={<VerifyLetterPublicPage />} />
+          <Route path="/facilities/scan/:token" element={<FacilityPublicScanPage />} />
           <Route
             path="/"
             element={
@@ -69,6 +71,7 @@ export function App() {
             <Route path="schedules/*" element={<SchedulesRoutes />} />
             <Route path="discipline/*" element={<DisciplineRoutes />} />
             <Route path="transfers" element={<TransfersPage />} />
+            <Route path="facilities" element={<FacilitiesPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

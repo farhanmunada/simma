@@ -202,6 +202,20 @@ export type {
   StudentGraduationRow,
   NewStudentGraduationRow,
 } from "./transfers";
+export {
+  facilityAssets,
+  facilityLoans,
+  facilityMaintenanceTickets,
+} from "./facilities";
+export type {
+  FacilityAssetRow,
+  NewFacilityAssetRow,
+  FacilityLoanRow,
+  NewFacilityLoanRow,
+  FacilityMaintenanceTicketRow,
+  NewFacilityMaintenanceTicketRow,
+} from "./facilities";
+
 
 
 

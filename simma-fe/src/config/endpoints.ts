@@ -225,4 +225,15 @@ export const API_ENDPOINTS = {
     GRADUATIONS: "/transfers/graduations/list",
     GRADUATION_BATCH: "/transfers/graduations/batch",
   },
+  FACILITIES: {
+    STATS: "/facilities/stats",
+    ASSETS: "/facilities/assets",
+    ASSET_DETAIL: (id: string) => `/facilities/assets/${id}`,
+    SCAN: (token: string) => `/facilities/scan/${token}`,
+    LOANS: "/facilities/loans",
+    LOAN_DETAIL: (id: string) => `/facilities/loans/${id}`,
+    LOAN_RETURN: (id: string) => `/facilities/loans/${id}/return`,
+    MAINTENANCE: "/facilities/maintenance",
+    MAINTENANCE_DETAIL: (id: string) => `/facilities/maintenance/${id}`,
+  },
 } as const;
