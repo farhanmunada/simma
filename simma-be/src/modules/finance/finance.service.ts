@@ -255,11 +255,95 @@ export class FinanceService {
   }
 
   async getCashflowReport(query: CashflowReportQuery) {
-    return this.repo.getCashflowSummary(query.startDate, query.endDate, query.paymentMethod);
+    const raw = await this.repo.getCashflowSummary(query.startDate, query.endDate, query.paymentMethod);
+    const byMethod: Record<string, number> = {};
+    let totalRevenue = 0;
+    let transactionCount = 0;
+
+    for (const r of raw.summary) {
+      if (r.method) {
+        byMethod[r.method] = Number(r.total) || 0;
+      }
+      totalRevenue += Number(r.total) || 0;
+      transactionCount += Number(r.count) || 0;
+    }
+
+    const transactions = raw.recentList.map((item) => ({
+      id: item.transaction.id,
+      receiptNumber: item.transaction.receiptNumber,
+      paymentDate: item.transaction.paymentDate ? item.transaction.paymentDate.toISOString() : new Date().toISOString(),
+      studentName: item.studentName || "Santri",
+      totalAmount: item.transaction.totalAmount,
+      paymentMethod: item.transaction.paymentMethod,
+      status: item.transaction.status,
+      cashierName: undefined,
+    }));
+
+    return {
+      summary: {
+        totalRevenue,
+        transactionCount,
+        byMethod,
+      },
+      transactions,
+    };
   }
 
   async getArrearsReport(query: ArrearsReportQuery) {
-    return this.repo.getArrearsSummary(query.classroomId);
+    const rows = await this.repo.getArrearsSummary(query.classroomId);
+    let totalArrears = 0;
+    let totalUnpaidInvoices = 0;
+    const studentSet = new Set<string>();
+
+    const classroomMap = new Map<string, {
+      classroomId: string | null;
+      classroomName: string;
+      totalArrears: number;
+      unpaidCount: number;
+      students: Set<string>;
+    }>();
+
+    for (const r of rows) {
+      const remaining = Number(r.totalRemaining) || 0;
+      const count = Number(r.unpaidCount) || 0;
+      totalArrears += remaining;
+      totalUnpaidInvoices += count;
+      if (r.studentId) studentSet.add(r.studentId);
+
+      const clsName = r.classroomName || "Tanpa Kelas";
+      const key = clsName;
+      if (!classroomMap.has(key)) {
+        classroomMap.set(key, {
+          classroomId: null,
+          classroomName: clsName,
+          totalArrears: 0,
+          unpaidCount: 0,
+          students: new Set<string>(),
+        });
+      }
+      const entry = classroomMap.get(key)!;
+      entry.totalArrears += remaining;
+      entry.unpaidCount += count;
+      if (r.studentId) entry.students.add(r.studentId);
+    }
+
+    const byClassroom = Array.from(classroomMap.values()).map((c) => ({
+      classroomId: c.classroomId,
+      classroomName: c.classroomName,
+      totalArrears: c.totalArrears,
+      unpaidCount: c.unpaidCount,
+      studentCount: c.students.size,
+    }));
+
+    return {
+      summary: {
+        totalArrears,
+        totalUnpaidInvoices,
+        affectedStudentsCount: studentSet.size,
+      },
+      byClassroom,
+      studentDetails: rows,
+    };
   }
 }
 

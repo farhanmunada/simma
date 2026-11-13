@@ -73,24 +73,24 @@ export const FinanceReportsPage: React.FC = () => {
           </div>
 
           {/* Metric cards */}
-          {cashflow && (
+          {cashflow?.summary && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
                 <span className="text-xs font-semibold text-emerald-800">Total Penerimaan</span>
                 <p className="mt-1 text-2xl font-bold text-emerald-950">
-                  Rp {cashflow.summary.totalRevenue.toLocaleString()}
+                  Rp {(cashflow.summary.totalRevenue || 0).toLocaleString()}
                 </p>
               </div>
               <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
                 <span className="text-xs font-semibold text-blue-800">Jumlah Transaksi</span>
                 <p className="mt-1 text-2xl font-bold text-blue-950">
-                  {cashflow.summary.transactionCount} Transaksi
+                  {cashflow.summary.transactionCount || 0} Transaksi
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <span className="text-xs font-semibold text-slate-600">Penerimaan Tunai</span>
                 <p className="mt-1 text-2xl font-bold text-slate-900">
-                  Rp {(cashflow.summary.byMethod["tunai"] || 0).toLocaleString()}
+                  Rp {((cashflow.summary.byMethod && cashflow.summary.byMethod["tunai"]) || 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -117,7 +117,7 @@ export const FinanceReportsPage: React.FC = () => {
                         Memuat data arus kas...
                       </td>
                     </tr>
-                  ) : !cashflow || cashflow.transactions.length === 0 ? (
+                  ) : !cashflow || !Array.isArray(cashflow.transactions) || cashflow.transactions.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-slate-400">
                         Tidak ada transaksi pada periode ini.
@@ -134,7 +134,7 @@ export const FinanceReportsPage: React.FC = () => {
                         <td className="px-4 py-3 text-slate-600">{t.cashierName || "-"}</td>
                         <td className="px-4 py-3 uppercase text-slate-600">{t.paymentMethod}</td>
                         <td className="px-4 py-3 text-right font-bold text-emerald-600">
-                          Rp {t.totalAmount.toLocaleString()}
+                          Rp {(t.totalAmount || 0).toLocaleString()}
                         </td>
                       </tr>
                     ))
@@ -147,24 +147,24 @@ export const FinanceReportsPage: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {/* Summary Arrears */}
-          {arrears && (
+          {arrears?.summary && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="rounded-xl border border-red-100 bg-red-50/50 p-4">
                 <span className="text-xs font-semibold text-red-800">Total Tunggakan Madrasah</span>
                 <p className="mt-1 text-2xl font-bold text-red-950">
-                  Rp {arrears.summary.totalArrears.toLocaleString()}
+                  Rp {(arrears.summary.totalArrears || 0).toLocaleString()}
                 </p>
               </div>
               <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4">
                 <span className="text-xs font-semibold text-amber-800">Jumlah Tagihan Tertunggak</span>
                 <p className="mt-1 text-2xl font-bold text-amber-950">
-                  {arrears.summary.totalUnpaidInvoices} Tagihan
+                  {arrears.summary.totalUnpaidInvoices || 0} Tagihan
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <span className="text-xs font-semibold text-slate-600">Siswa Tertunggak</span>
                 <p className="mt-1 text-2xl font-bold text-slate-900">
-                  {arrears.summary.affectedStudentsCount} Santri/Siswa
+                  {arrears.summary.affectedStudentsCount || 0} Santri/Siswa
                 </p>
               </div>
             </div>
@@ -186,23 +186,23 @@ export const FinanceReportsPage: React.FC = () => {
                   {isLoadingArrears ? (
                     <tr>
                       <td colSpan={4} className="py-8 text-center text-slate-400">
-                        Memuat data rekapitulasi tunggakan...
+                        Memuat data tunggakan per rombel...
                       </td>
                     </tr>
-                  ) : !arrears || arrears.byClassroom.length === 0 ? (
+                  ) : !arrears || !Array.isArray(arrears.byClassroom) || arrears.byClassroom.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="py-8 text-center text-slate-400">
-                        Alhamdulillah, tidak ada data tunggakan aktif.
+                        Tidak ada data tunggakan pada kelas yang dipilih.
                       </td>
                     </tr>
                   ) : (
                     arrears.byClassroom.map((row) => (
-                      <tr key={row.classroomId || "unknown"} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 font-semibold text-slate-900">{row.classroomName}</td>
-                        <td className="px-4 py-3 text-center text-slate-700">{row.studentCount} Siswa</td>
-                        <td className="px-4 py-3 text-center text-slate-700">{row.unpaidCount} Tagihan</td>
+                      <tr key={row.classroomId || row.classroomName} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 font-semibold text-slate-800">{row.classroomName}</td>
+                        <td className="px-4 py-3 text-slate-600">{row.studentCount || 0} Santri</td>
+                        <td className="px-4 py-3 text-slate-600">{row.unpaidCount || 0} Invoice</td>
                         <td className="px-4 py-3 text-right font-bold text-red-600">
-                          Rp {row.totalArrears.toLocaleString()}
+                          Rp {(row.totalArrears || 0).toLocaleString()}
                         </td>
                       </tr>
                     ))

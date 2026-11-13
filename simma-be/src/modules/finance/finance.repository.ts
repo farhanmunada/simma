@@ -275,14 +275,14 @@ export class FinanceRepository {
         studentNis: students.nis,
         classroomName: classrooms.name,
         unpaidCount: sql<number>`count(*)::int`,
-        totalRemaining: sql<number>`COALESCE(SUM(${studentInvoices.remainingAmount}), 0)::int`,
+        totalRemaining: sql<number>`COALESCE(SUM(${studentInvoices.remainingAmount}), 0)::int`.as("total_remaining"),
       })
       .from(studentInvoices)
       .innerJoin(students, eq(studentInvoices.studentId, students.id))
       .leftJoin(classrooms, eq(studentInvoices.classroomId, classrooms.id))
       .where(and(...conds))
       .groupBy(studentInvoices.studentId, students.fullName, students.nis, classrooms.name)
-      .orderBy(desc(sql`totalRemaining`));
+      .orderBy(desc(sql`COALESCE(SUM(${studentInvoices.remainingAmount}), 0)`));
   }
 
   async findInstitution() {
