@@ -34,105 +34,23 @@ export interface NavGroup {
 }
 
 export const navGroups: NavGroup[] = [
+  // 1. HARIAN & OPERASIONAL UTAMA (Paling Sering Diakses Tiap Hari)
   {
-    group: "Utama",
+    group: "Utama & Harian",
     items: [
       {
         title: "Dashboard",
         href: "/",
         icon: LayoutDashboard,
       },
-    ],
-  },
-  {
-    group: "Administrasi & TU",
-    items: [
       {
-        title: "Profil Madrasah",
-        href: "/settings/profile",
-        icon: Building2,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
-      },
-      {
-        title: "Tata Usaha & Surat",
-        icon: Mail,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
+        title: "Presensi",
+        icon: CalendarCheck,
+        roles: ["super_admin", "admin_tu", "guru", "wali_kelas"],
         subItems: [
-          { title: "Surat Masuk", href: "/letters/incoming" },
-          { title: "Disposisi Kamad", href: "/letters/dispositions" },
-          { title: "Surat Keluar", href: "/letters/outgoing" },
-          { title: "Buku Ekspedisi", href: "/letters/expeditions" },
-          { title: "Klasifikasi KMA 44", href: "/letters/classifications" },
-        ],
-      },
-      {
-        title: "Sarana & Prasarana",
-        href: "/facilities",
-        icon: Package,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_sarpras",
-          "guru",
-          "guru_mapel",
-          "wali_kelas",
-        ],
-      },
-      {
-        title: "Kepegawaian GTK",
-        icon: UserCheck,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_kurikulum",
-          "guru",
-          "guru_mapel",
-          "wali_kelas",
-        ],
-        subItems: [
-          { title: "Direktori GTK", href: "/teachers" },
-          { title: "Beban Kerja (24 JTM)", href: "/teachers/workloads" },
-          { title: "Monitoring Mutu", href: "/teachers/monitoring" },
-        ],
-      },
-      {
-        title: "Keuangan & SPP",
-        icon: CreditCard,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "bendahara"],
-        subItems: [
-          { title: "Kasir Loket Cepat", href: "/finance/cashier" },
-          { title: "Tagihan Siswa", href: "/finance/invoices" },
-          { title: "Pos & Tarif Biaya", href: "/finance/fee-items" },
-          { title: "Dispensasi", href: "/finance/dispensations" },
-          { title: "Laporan Keuangan", href: "/finance/reports" },
-        ],
-      },
-      {
-        title: "Ekspor EMIS 4.0",
-        href: "/emis",
-        icon: Database,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "waka_kesiswaan"],
-      },
-    ],
-  },
-  {
-    group: "Kesiswaan & Karakter",
-    items: [
-      {
-        title: "Kesiswaan",
-        icon: Users,
-        roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas", "waka_kurikulum"],
-        subItems: [
-          { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
-          { title: "Kesiswaan & Buku Induk", href: "/students" },
-          { title: "Tahun Ajaran", href: "/students/academic-years" },
-          { title: "Semester", href: "/students/semesters" },
-          { title: "Kelas & Rombel", href: "/students/classrooms" },
-          { title: "Mata Pelajaran", href: "/students/subjects" },
-          { title: "Mutasi & Kelulusan", href: "/transfers" },
-          { title: "Penempatan Rombel", href: "/students/assign" },
+          { title: "Presensi Siswa", href: "/attendance/students" },
+          { title: "Presensi Guru", href: "/attendance/teachers" },
+          { title: "Rekapitulasi", href: "/attendance/recap" },
         ],
       },
       {
@@ -162,61 +80,6 @@ export const navGroups: NavGroup[] = [
         ],
       },
       {
-        title: "Ekstrakurikuler",
-        href: "/extracurricular",
-        icon: Award,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_kesiswaan",
-          "wali_kelas",
-          "guru",
-        ],
-      },
-    ],
-  },
-  {
-    group: "Akademik & Pembelajaran",
-    items: [
-      {
-        title: "Presensi",
-        icon: CalendarCheck,
-        roles: ["super_admin", "admin_tu", "guru", "wali_kelas"],
-        subItems: [
-          { title: "Presensi Siswa", href: "/attendance/students" },
-          { title: "Presensi Guru", href: "/attendance/teachers" },
-          { title: "Rekapitulasi", href: "/attendance/recap" },
-        ],
-      },
-      {
-        title: "Penilaian",
-        href: "/grades",
-        icon: GraduationCap,
-        roles: ["super_admin", "guru", "wali_kelas"],
-      },
-      {
-        title: "Jadwal Pelajaran",
-        href: "/schedules",
-        icon: Calendar,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
-      },
-      {
-        title: "Projek P5RA",
-        href: "/p5ra",
-        icon: Layers,
-        roles: ["super_admin", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
-      },
-      {
-        title: "Rapor & Legger",
-        icon: FileSpreadsheet,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "wali_kelas", "guru"],
-        subItems: [
-          { title: "Rapor Siswa", href: "/reports" },
-          { title: "Legger Nilai", href: "/reports/legger" },
-        ],
-      },
-      {
         title: "Tata Tertib & BK",
         icon: ShieldAlert,
         roles: [
@@ -236,6 +99,157 @@ export const navGroups: NavGroup[] = [
           { title: "Panggilan Orang Tua", href: "/discipline/summons" },
           { title: "Katalog Aturan Tatib", href: "/discipline/rules" },
         ],
+      },
+      {
+        title: "Keuangan & SPP",
+        icon: CreditCard,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "bendahara"],
+        subItems: [
+          { title: "Kasir Loket Cepat", href: "/finance/cashier" },
+          { title: "Tagihan Siswa", href: "/finance/invoices" },
+          { title: "Pos & Tarif Biaya", href: "/finance/fee-items" },
+          { title: "Dispensasi", href: "/finance/dispensations" },
+          { title: "Laporan Keuangan", href: "/finance/reports" },
+        ],
+      },
+    ],
+  },
+
+  // 2. AKADEMIK & PEMBELAJARAN (Rutin Mingguan, Bulanan, & Semesteran)
+  {
+    group: "Akademik & Pembelajaran",
+    items: [
+      {
+        title: "Penilaian",
+        href: "/grades",
+        icon: GraduationCap,
+        roles: ["super_admin", "guru", "wali_kelas"],
+      },
+      {
+        title: "Jadwal Pelajaran",
+        href: "/schedules",
+        icon: Calendar,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
+      },
+      {
+        title: "Tata Usaha & Surat",
+        icon: Mail,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
+        subItems: [
+          { title: "Surat Masuk", href: "/letters/incoming" },
+          { title: "Disposisi Kamad", href: "/letters/dispositions" },
+          { title: "Surat Keluar", href: "/letters/outgoing" },
+          { title: "Buku Ekspedisi", href: "/letters/expeditions" },
+          { title: "Klasifikasi KMA 44", href: "/letters/classifications" },
+        ],
+      },
+      {
+        title: "Projek P5RA",
+        href: "/p5ra",
+        icon: Layers,
+        roles: ["super_admin", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
+      },
+      {
+        title: "Ekstrakurikuler",
+        href: "/extracurricular",
+        icon: Award,
+        roles: [
+          "super_admin",
+          "admin_tu",
+          "kepala_madrasah",
+          "waka_kesiswaan",
+          "wali_kelas",
+          "guru",
+        ],
+      },
+      {
+        title: "Rapor & Legger",
+        icon: FileSpreadsheet,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "wali_kelas", "guru"],
+        subItems: [
+          { title: "Rapor Siswa", href: "/reports" },
+          { title: "Legger Nilai", href: "/reports/legger" },
+        ],
+      },
+    ],
+  },
+
+  // 3. KEPEGAWAIAN & ASET (Bulanan / Semesteran)
+  {
+    group: "Kepegawaian & Fasilitas",
+    items: [
+      {
+        title: "Kepegawaian GTK",
+        icon: UserCheck,
+        roles: [
+          "super_admin",
+          "admin_tu",
+          "kepala_madrasah",
+          "waka_kurikulum",
+          "guru",
+          "guru_mapel",
+          "wali_kelas",
+        ],
+        subItems: [
+          { title: "Direktori GTK", href: "/teachers" },
+          { title: "Beban Kerja (24 JTM)", href: "/teachers/workloads" },
+          { title: "Monitoring Mutu", href: "/teachers/monitoring" },
+        ],
+      },
+      {
+        title: "Sarana & Prasarana",
+        href: "/facilities",
+        icon: Package,
+        roles: [
+          "super_admin",
+          "admin_tu",
+          "kepala_madrasah",
+          "waka_sarpras",
+          "guru",
+          "guru_mapel",
+          "wali_kelas",
+        ],
+      },
+    ],
+  },
+
+  // 4. KESISWAAN, PPDB & EMIS (Semesteran & Tahunan saat Tahun Ajaran Baru)
+  {
+    group: "Kesiswaan & Registrasi Tahunan",
+    items: [
+      {
+        title: "Kesiswaan",
+        icon: Users,
+        roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas", "waka_kurikulum"],
+        subItems: [
+          { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
+          { title: "Kesiswaan & Buku Induk", href: "/students" },
+          { title: "Kelas & Rombel", href: "/students/classrooms" },
+          { title: "Penempatan Rombel", href: "/students/assign" },
+          { title: "Mutasi & Kelulusan", href: "/transfers" },
+          { title: "Tahun Ajaran", href: "/students/academic-years" },
+          { title: "Semester", href: "/students/semesters" },
+          { title: "Mata Pelajaran", href: "/students/subjects" },
+        ],
+      },
+      {
+        title: "Ekspor EMIS 4.0",
+        href: "/emis",
+        icon: Database,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "waka_kesiswaan"],
+      },
+    ],
+  },
+
+  // 5. PENGATURAN SISTEM & PROFIL (1x Saat Inisiasi / Sangat Jarang Diakses)
+  {
+    group: "Pengaturan & Lembaga",
+    items: [
+      {
+        title: "Profil Madrasah",
+        href: "/settings/profile",
+        icon: Building2,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
       },
     ],
   },
