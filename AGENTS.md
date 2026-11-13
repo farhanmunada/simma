@@ -56,17 +56,23 @@ D:\Coding\simma\              <- Root monorepo (Leader: main branch)
 | Worker (coding) | `worker-gemini` | — |
 | Worker (review & security) | `worker-gemini` | — |
 
-### 4.2 Wave-Based Development
+### 4.2 Wave-Based Development (Prioritas Administratif Sekolah)
 
-Worker TIDAK serentak 7 modul dari nol. Urutan wave:
+Pengembangan mengutamakan penyelesaian **Fondasi Administratif Sekolah** (Tata Usaha, Persuratan, PPDB, Buku Induk Siswa) sebelum modul akademik harian. Urutan wave:
 
-| Wave | Worker | Modul | Dependency |
+| Wave | Worker | Modul | Boundary & Ketergantungan |
 |---|---|---|---|
 | 0 | Leader saja | Monorepo init, DB, shared types, auth core, migration setup | — |
-| 1 | Worker A + B | (A) Auth & RBAC, (B) Setup (TA, Semester, Kelas, Mapel, GTK) | Wave 0 |
-| 2 | Worker C + D | (C) Data Siswa, (D) Tahfidz & Tasmi' | Wave 1 |
-| 3 | Worker E + F | (E) Presensi, (F) Input Nilai | Wave 2 |
-| 4 | Worker G | Rapor (generate PDF) | Wave 3 |
+| 1 | Worker A + B | (A) `01-auth-rbac`, (B) `02-master-setup` (TA, Semester, Kelas, Mapel, GTK) | Wave 0 |
+| 2 | Worker C + D | (C) `03-tata-usaha-persuratan` (Surat Masuk/Keluar, Disposisi, Naskah Dinas), (D) `04-ppdb-madrasah` (Portal Calon Siswa & Seleksi) | Wave 1 |
+| 3 | Worker E | `05-kesiswaan-buku-induk` (Buku Induk EMIS 4.0, Rombel, Mutasi dari PPDB) | Wave 2 |
+| 4 | Worker F + G | (F) `06-presensi-siswa`, (G) `07-tahfidz-tasmi` | Wave 3 |
+| 5 | Worker H + I | (H) `08-penilaian-akademik`, (I) `09-rapor-rdm` (PDF RDM Kemenag) | Wave 4 |
+| 6 | Worker J + K | (J) `10-p5ra` (Kokurikuler & Rapor P5RA), (K) `11-mutabaah-yaumiyah` (Amalan Harian Santri) | Wave 5 |
+| 7 | Worker L + M | (L) `12-keuangan-spp` (Billing Kasir & SPP), (M) `13-kepegawaian-gtk` (Simpatika/24 JTM) | Wave 1 & 5 |
+| 8 | Worker N | `14-jadwal-pelajaran` (Jadwal Dual-Kurikulum & Anti-Bentrok) | Wave 1 & 7 |
+| 9 | Worker O + P | (O) `15-mutasi-siswa` (Mutasi & Kelulusan), (P) `16-tatib-kedisiplinan` (Poin & BK) | Wave 3 & 7 |
+| 10 | Worker Q + R | (Q) `17-ekstrakurikuler` (Ekskul & Nilai Rapor), (R) `18-emis-export` (Sinkronisasi EMIS 4.0), (S) `19-sarana-prasarana` (Aset QR & Tiket) | Wave 3, 5 & 9 |
 
 Setiap selesai wave → Worker Review & Security → Leader merge → wave berikutnya.
 
@@ -108,17 +114,29 @@ Berjalan sebagai gatekeeper setelah setiap wave selesai. Tugas:
 
 ---
 
-## 5. File Boundary per Modul (BE)
+## 5. File Boundary per Modul
 
 | Modul | Folder BE | Folder FE | DB Schema |
 |---|---|---|---|
-| Auth & RBAC | `src/modules/auth/` | `src/features/auth/` | `src/db/schema/users.ts` |
-| Setup | `src/modules/settings/` | `src/features/settings/` | `src/db/schema/{academic-years,semesters,classrooms,subjects,teachers}.ts` |
-| Data Siswa | `src/modules/students/` | `src/features/students/` | `src/db/schema/{students,parents,class-students}.ts` |
-| Tahfidz | `src/modules/tahfidz/` | `src/features/tahfidz/` | `src/db/schema/tahfidz.ts` |
-| Presensi | `src/modules/attendance/` | `src/features/attendance/` | `src/db/schema/attendance.ts` |
-| Input Nilai | `src/modules/grades/` | `src/features/grades/` | `src/db/schema/{assessments,grades,semester-grades}.ts` |
-| Rapor | `src/modules/reports/` | `src/features/reports/` | Konsumsi data grades & students |
+| 01. Auth & RBAC | `src/modules/auth/` | `src/features/auth/` | `src/db/schema/users.ts` |
+| 02. Setup | `src/modules/setup/` | `src/features/settings/` | `src/db/schema/setup.ts` |
+| 03. Tata Usaha & Surat | `src/modules/letters/` | `src/features/letters/` | `src/db/schema/letters.ts` |
+| 04. PPDB Madrasah | `src/modules/ppdb/` | `src/features/ppdb/` | `src/db/schema/ppdb.ts` |
+| 05. Kesiswaan (Buku Induk) | `src/modules/students/` | `src/features/students/` | `src/db/schema/students.ts` |
+| 06. Presensi | `src/modules/attendance/` | `src/features/attendance/` | `src/db/schema/attendance.ts` |
+| 07. Tahfidz | `src/modules/tahfidz/` | `src/features/tahfidz/` | `src/db/schema/tahfidz.ts` |
+| 08. Input Nilai | `src/modules/grades/` | `src/features/grades/` | `src/db/schema/grades.ts` |
+| 09. Rapor RDM | `src/modules/reports/` | `src/features/reports/` | Konsumsi data grades & students |
+| 10. P5RA | `src/modules/p5ra/` | `src/features/p5ra/` | `src/db/schema/p5ra.ts` |
+| 11. Mutaba'ah Yaumiyah | `src/modules/mutabaah/` | `src/features/mutabaah/` | `src/db/schema/mutabaah.ts` |
+| 12. Keuangan & SPP | `src/modules/finance/` | `src/features/finance/` | `src/db/schema/finance.ts` |
+| 13. Kepegawaian GTK | `src/modules/teachers/` | `src/features/teachers/` | `src/db/schema/teachers.ts` |
+| 14. Jadwal Pelajaran | `src/modules/schedules/` | `src/features/schedules/` | `src/db/schema/schedules.ts` |
+| 15. Mutasi Siswa | `src/modules/transfers/` | `src/features/transfers/` | `src/db/schema/transfers.ts` |
+| 16. Tatib & Disiplin | `src/modules/discipline/` | `src/features/discipline/` | `src/db/schema/discipline.ts` |
+| 17. Ekstrakurikuler | `src/modules/extracurricular/` | `src/features/extracurricular/` | `src/db/schema/extracurricular.ts` |
+| 18. Ekspor EMIS 4.0 | `src/modules/emis/` | `src/features/emis/` | Konsumsi data agregat students/gtk |
+| 19. Sarana Prasarana | `src/modules/facilities/` | `src/features/facilities/` | `src/db/schema/facilities.ts` |
 
 ---
 
@@ -164,14 +182,16 @@ src/features/<feature>/
 | Testing | `agentVault/04-Quality-and-Repeated-Testing/01-multi-stage-testing.md` |
 | Security | `agentVault/04-Security/risk-tiers-and-sandboxing.md` |
 
-**Spesifikasi project (sudah ada di `docs/`):**
+**Spesifikasi project (tersedia di `docs/`):**
 
 | Doc | Isi |
 |---|---|
-| `docs/PRD.md` | Modul fungsional, RBAC, acceptance criteria |
-| `docs/ARCHITECTURE.md` | Tech stack, ERD, API endpoints, file structure |
-| `docs/UX-DESIGN.md` | UI/UX patterns, component specs |
-| `docs/RESEARCH.md` | Riset EMIS, RDM, regulasi Kemenag |
+| `docs/modules/<nomor>-<modul>/PRD.md` | PRD granular per modul, aturan validasi, kriteria penerimaan |
+| `docs/modules/README.md` | Peta ketergantungan dan alur integrasi antar-modul |
+| `docs/PRD.md` | Overview sistem, domain model makro, modul fungsional |
+| `docs/ARCHITECTURE.md` | Tech stack, mitigasi konkurensi, file structure monorepo |
+| `docs/UX-DESIGN.md` | UI/UX patterns, component specs, Tailwind CSS v4 |
+| `docs/RESEARCH.md` & `RESEARCH_PPDB.md` | Regulasi Kemenag (KMA 347/450, PMA 12/2024, EMIS, RDM, SNPDB) |
 
 ---
 
@@ -254,3 +274,42 @@ pnpm --filter simma-be run db:migrate    # Run migration
 9. Catat evaluasi di agent-eval.md
 10. Mulai wave N+1
 ```
+
+---
+
+## 13. Aturan Wajib Clean Code (Enforced Post-Audit)
+
+Seluruh agent pengembang (Worker maupun Leader) **WAJIB** mematuhi 6 aturan dasar clean code berikut (merujuk audit `docs/CODE_REVIEW.md`):
+
+### 13.1 Batas Maksimal 300 Baris (LOC) per File (Anti God-Component)
+- File komponen UI, service, atau repository **DILARANG melebihi 300 baris kode**.
+- Jika suatu fitur memiliki formulir multi-langkah (*wizard*), tabel data, kartu metrik, atau modal interaktif, **WAJIB dipecah** menjadi sub-komponen terisolasi dalam folder `components/`.
+- Pisahkan state kompleks atau mutasi query panjang ke dalam custom hooks tersendiri (`hooks/use<Feature>.ts`).
+- Dilarang keras menaruh CSS cetak (@media print) atau tata letak cetak dokumen fisik ratusan baris langsung di dalam komponen halaman utama; buat berkas layout cetak terpisah (contoh: `<Feature>PrintLayout.tsx`).
+
+### 13.2 Berkas `types.ts` Wajib 100% Deklaratif
+- Berkas `types.ts` hanya boleh berisi definisi tipe TypeScript murni: `type`, `interface`, dan `enum` Zod infer.
+- **DILARANG KERAS** menyisipkan fungsi manipulasi DOM (`document.createElement`, manipulasi blob browser), fungsi pembantu kalkulasi, atau pemanggilan API di dalam `types.ts`.
+- Tempatkan fungsi penolong/utilitas di `src/lib/` atau direktori `utils/` modul terkait.
+
+### 13.3 Wajib Menggunakan Centralized API Endpoints Registry
+- Dilarang keras *hardcoded* string URL endpoint di dalam API client atau komponen (contoh: `apiClient("/ppdb/applicants")` ❌).
+- Seluruh endpoint wajib didaftarkan dan dikonsumsi melalui konstanta terpusat `API_ENDPOINTS` di `simma-fe/src/config/endpoints.ts` (contoh: `apiClient(API_ENDPOINTS.PPDB.APPLICANTS)` ✔️).
+
+### 13.4 Integritas Transaksi Database Atomik (Multi-Table)
+- Setiap operasi mutasi data di backend yang melibatkan 2 tabel atau lebih (misal: mutasi kelulusan pendaftar PPDB ke tabel `students`, `parents`, `studentParents`, dan update status `ppdbApplicants`) **WAJIB dibungkus transaksi atomik**:
+  ```ts
+  await db.transaction(async (tx) => {
+    // operasi mutasi aman menggunakan tx
+  });
+  ```
+- Dilarang menjalankan serangkaian `insert` tanpa transaksi yang dapat menyebabkan *partial write* saat terjadi kegagalan.
+
+### 13.5 Prinsip DRY & Single Source of Truth
+- Skema validasi DTO, enum domain, konstanta status, dan formula skor/bobot madrasah dilarang diduplikasi secara terpisah di FE dan BE.
+- Wajib didefinisikan satu kali di `packages/shared` (`@simma/shared`) lalu dikonsumsi bersama oleh `simma-be` dan `simma-fe`.
+
+### 13.6 Standardisasi Konsumsi API & Penanganan Error
+- FE dilarang memanipulasi struktur response secara ad-hoc per-fitur jika sudah ditangani oleh wrapper `apiClient`.
+- Backend wajib melempar error menggunakan hierarki `AppError` terstruktur (`NotFoundError`, `BadRequestError`, `ForbiddenError`, `ConflictError`) agar HTTP status code dan format pesan error konsisten.
+

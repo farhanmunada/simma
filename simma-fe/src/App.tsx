@@ -1,10 +1,84 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AppLayout } from "./components/layout/AppLayout";
+import { LoginPage } from "./features/auth";
+import { useAuthStore } from "./stores/auth.store";
+import { SettingsRoutes } from "./features/settings";
+import { StudentsRoutes } from "./features/students";
+import { TahfidzRoutes } from "./features/tahfidz";
+import { AttendanceRoutes } from "./features/attendance";
+import { GradesRoutes } from "./features/grades";
+import { ReportsRoutes } from "./features/reports";
+import { PpdbPublicPortalPage, PpdbRoutes } from "./features/ppdb";
+import { LettersRoutes } from "./features/letters";
+import { P5raRoutes } from "./features/p5ra";
+import { MutabaahRoutes } from "./features/mutabaah";
+import { TeachersRoutes } from "./features/teachers";
+import { FinanceRoutes } from "./features/finance";
+import { SchedulesRoutes } from "./features/schedules";
+import { DisciplineRoutes } from "./features/discipline";
+import { TransfersPage } from "./features/transfers";
+import { ExtracurricularPage } from "./features/extracurricular";
+import { EmisDashboardPage } from "./features/emis";
+import { FacilitiesPage, FacilityPublicScanPage } from "./features/facilities";
+import { DashboardOverview } from "./features/dashboard";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 menit data referensi
+      retry: 1,
+    },
+  },
+});
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+}
+
 export function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900">SIMMA</h1>
-        <p className="mt-2 text-gray-600">Sistem Informasi Madrasah Aliyah</p>
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/ppdb" element={<PpdbPublicPortalPage />} />
+          <Route path="/facilities/scan/:token" element={<FacilityPublicScanPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardOverview />} />
+            <Route path="ppdb-admin/*" element={<PpdbRoutes />} />
+            <Route path="settings/*" element={<SettingsRoutes />} />
+            <Route path="students/*" element={<StudentsRoutes />} />
+            <Route path="tahfidz/*" element={<TahfidzRoutes />} />
+            <Route path="attendance/*" element={<AttendanceRoutes />} />
+            <Route path="mutabaah/*" element={<MutabaahRoutes />} />
+            <Route path="grades/*" element={<GradesRoutes />} />
+            <Route path="reports/*" element={<ReportsRoutes />} />
+            <Route path="letters/*" element={<LettersRoutes />} />
+            <Route path="p5ra/*" element={<P5raRoutes />} />
+            <Route path="teachers/*" element={<TeachersRoutes />} />
+            <Route path="finance/*" element={<FinanceRoutes />} />
+            <Route path="schedules/*" element={<SchedulesRoutes />} />
+            <Route path="discipline/*" element={<DisciplineRoutes />} />
+            <Route path="transfers" element={<TransfersPage />} />
+            <Route path="extracurricular" element={<ExtracurricularPage />} />
+            <Route path="emis" element={<EmisDashboardPage />} />
+            <Route path="facilities" element={<FacilitiesPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

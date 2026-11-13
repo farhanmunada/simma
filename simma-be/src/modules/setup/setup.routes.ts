@@ -8,9 +8,12 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
   };
 
   // Institutions
+  app.get("/institution", authGuard, setupController.getInstitution);
   app.get("/institutions", authGuard, setupController.getInstitution);
   app.get("/institutions/:id", authGuard, setupController.getInstitutionById);
+  app.post("/institution", authGuard, setupController.createInstitution);
   app.post("/institutions", authGuard, setupController.createInstitution);
+  app.patch("/institution", authGuard, setupController.updateInstitution);
   app.patch("/institutions/:id", authGuard, setupController.updateInstitution);
 
   // Academic Years
@@ -24,6 +27,11 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
     authGuard,
     setupController.setActiveAcademicYear,
   );
+  app.patch(
+    "/academic-years/:id/status",
+    authGuard,
+    setupController.setActiveAcademicYear,
+  );
 
   // Semesters
   app.get("/semesters", authGuard, setupController.getSemesters);
@@ -32,6 +40,7 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
   app.patch("/semesters/:id", authGuard, setupController.updateSemester);
   app.delete("/semesters/:id", authGuard, setupController.deleteSemester);
   app.patch("/semesters/:id/set-active", authGuard, setupController.setActiveSemester);
+  app.patch("/semesters/:id/status", authGuard, setupController.setActiveSemester);
 
   // Classrooms
   app.get("/classrooms", authGuard, setupController.getClassrooms);

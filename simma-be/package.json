@@ -9,13 +9,15 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
-    "test": "vitest run",
+    "test": "vitest run --fileParallelism=false",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.0",
+    "@fastify/multipart": "^10.1.8",
     "@fastify/rate-limit": "^10.0.0",
     "@simma/shared": "workspace:*",
     "bcrypt": "^6.0.0",
