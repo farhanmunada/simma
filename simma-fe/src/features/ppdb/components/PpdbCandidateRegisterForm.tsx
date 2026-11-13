@@ -125,8 +125,8 @@ export const PpdbCandidateRegisterForm: React.FC<PpdbCandidateRegisterFormProps>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-        {/* Jalur & Jurusan */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 bg-slate-900/60 rounded-lg border border-slate-700/60">
+        {/* Jalur Pendaftaran */}
+        <div className="p-3.5 bg-slate-900/60 rounded-lg border border-slate-700/60">
           <div>
             <label className="block text-slate-300 font-medium mb-1">
               Jalur Pendaftaran PPDB <span className="text-rose-400">*</span>
@@ -140,23 +140,6 @@ export const PpdbCandidateRegisterForm: React.FC<PpdbCandidateRegisterFormProps>
               <option value="prestasi">Jalur Prestasi / Tahfidz Al-Qur'an</option>
               <option value="afirmasi">Jalur Afirmasi (KIP / PKH / DTKS)</option>
               <option value="perpindahan_ortu">Jalur Perpindahan Tugas Orang Tua / GTK</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Peminatan Jurusan <span className="text-rose-400">*</span>
-            </label>
-            <select
-              value={chosenMajor}
-              onChange={(e) => setChosenMajor(e.target.value as PpdbMajor)}
-              className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded text-emerald-400 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="MIPA">MIPA (Matematika & IPA)</option>
-              <option value="IPS">IPS (Ilmu Pengetahuan Sosial)</option>
-              <option value="Keagamaan">Keagamaan / IIK</option>
-              <option value="Bahasa">Bahasa & Budaya</option>
-              <option value="Vokasi">Keterampilan / Vokasi</option>
             </select>
           </div>
         </div>

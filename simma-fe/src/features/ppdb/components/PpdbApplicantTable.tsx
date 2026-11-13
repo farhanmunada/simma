@@ -38,7 +38,7 @@ export const PpdbApplicantTable: React.FC<PpdbApplicantTableProps> = ({
             <th className="py-2.5 px-3 font-semibold">No. Registrasi</th>
             <th className="py-2.5 px-3 font-semibold">Nama Lengkap & NIK</th>
             <th className="py-2.5 px-3 font-semibold">Asal Sekolah</th>
-            <th className="py-2.5 px-3 font-semibold">Jurusan</th>
+            <th className="py-2.5 px-3 font-semibold">Jalur</th>
             <th className="py-2.5 px-3 font-semibold">Status Seleksi</th>
             <th className="py-2.5 px-3 font-semibold">Tgl Daftar</th>
             <th className="py-2.5 px-3 font-semibold text-right">Aksi</th>
@@ -81,8 +81,8 @@ export const PpdbApplicantTable: React.FC<PpdbApplicantTableProps> = ({
                     </span>
                   </td>
                   <td className="py-2.5 px-3">
-                    <span className="font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-[11px]">
-                      {app.chosenMajor}
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 capitalize">
+                      {app.track}
                     </span>
                   </td>
                   <td className="py-2.5 px-3">

@@ -65,11 +65,11 @@ export function generatePpdbCardPdf(
   addText("NOMOR REGISTRASI PPDB:", "/F1", 8, 65, curY - 5);
   addText(applicant.registrationNumber, "/F2", 16, 65, curY - 24);
 
-  addText("JALUR PENDAFTARAN:", "/F1", 8, 250, curY - 5);
+  addText("JALUR SELEKSI:", "/F1", 8, 250, curY - 5);
   addText((applicant.track || "REGULER").toUpperCase(), "/F2", 11, 250, curY - 20);
 
-  addText("PEMINATAN / JURUSAN:", "/F1", 8, 390, curY - 5);
-  addText(applicant.chosenMajor || "MIPA", "/F2", 11, 390, curY - 20);
+  addText("JENJANG PENDIDIKAN:", "/F1", 8, 390, curY - 5);
+  addText("MADRASAH ALIYAH", "/F2", 11, 390, curY - 20);
 
   curY -= 50;
 

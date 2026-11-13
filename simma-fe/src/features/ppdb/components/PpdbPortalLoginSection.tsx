@@ -56,21 +56,21 @@ export const PpdbPortalLoginSection: React.FC<PpdbPortalLoginSectionProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto bg-slate-800/90 border border-slate-700/80 rounded-xl p-6 sm:p-8 space-y-6 shadow-xl">
-      <div className="text-center space-y-1.5 border-b border-slate-700/80 pb-4">
-        <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2">
+    <div className="max-w-md mx-auto bg-white border border-slate-200 rounded-xl p-6 sm:p-8 space-y-6 shadow-sm">
+      <div className="text-center space-y-1.5 border-b border-slate-100 pb-4">
+        <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
           <LogIn className="w-6 h-6" />
         </div>
-        <h2 className="text-lg sm:text-xl font-bold text-white">
+        <h2 className="text-lg sm:text-xl font-bold text-slate-900">
           Masuk ke Portal Calon Siswa
         </h2>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           Gunakan NIK (16 digit), NISN, atau No. Pendaftaran dan kata sandi Anda
         </p>
       </div>
 
       {errorMsg && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-start space-x-2">
+        <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs flex items-start space-x-2">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMsg}</span>
         </div>
@@ -78,8 +78,8 @@ export const PpdbPortalLoginSection: React.FC<PpdbPortalLoginSectionProps> = ({
 
       <form onSubmit={handleLogin} className="space-y-4 text-xs">
         <div>
-          <label className="block text-slate-300 font-medium mb-1">
-            NIK, NISN, atau No. Pendaftaran <span className="text-rose-400">*</span>
+          <label className="block text-slate-700 font-medium mb-1">
+            NIK, NISN, atau No. Pendaftaran <span className="text-rose-500">*</span>
           </label>
           <input
             type="text"
@@ -87,13 +87,13 @@ export const PpdbPortalLoginSection: React.FC<PpdbPortalLoginSectionProps> = ({
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             placeholder="Contoh: 3515... atau REG-2025-..."
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
           />
         </div>
 
         <div>
-          <label className="block text-slate-300 font-medium mb-1">
-            Kata Sandi <span className="text-rose-400">*</span>
+          <label className="block text-slate-700 font-medium mb-1">
+            Kata Sandi <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
             <input
@@ -102,30 +102,30 @@ export const PpdbPortalLoginSection: React.FC<PpdbPortalLoginSectionProps> = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimal 6 karakter"
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
-            <KeyRound className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
+            <KeyRound className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
           </div>
         </div>
 
         <button
           type="submit"
           disabled={loginMutation.isPending}
-          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white font-semibold rounded-md text-xs transition-colors shadow-md flex items-center justify-center space-x-2"
+          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-semibold rounded-md text-xs transition-colors shadow-sm flex items-center justify-center space-x-2"
         >
           <span>{loginMutation.isPending ? "Memverifikasi..." : "Masuk ke Akun Pendaftar"}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </form>
 
-      <div className="text-center pt-2 border-t border-slate-700/80 text-xs text-slate-400">
+      <div className="text-center pt-2 border-t border-slate-100 text-xs text-slate-500">
         Belum memiliki akun pendaftaran?{" "}
         <button
           type="button"
           onClick={onGoToRegister}
-          className="text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-2"
+          className="text-emerald-700 font-semibold hover:underline"
         >
-          Daftar Akun Baru Sekarang
+          Daftar Sekarang
         </button>
       </div>
     </div>

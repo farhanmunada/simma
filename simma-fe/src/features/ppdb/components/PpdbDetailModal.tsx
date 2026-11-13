@@ -47,9 +47,9 @@ export const PpdbDetailModal: React.FC<PpdbDetailModalProps> = ({
             </span>
           </div>
           <div>
-            <span className="text-[11px] text-slate-500 block">Pilihan Peminatan</span>
-            <span className="font-semibold text-slate-800 text-sm">
-              {applicant.chosenMajor}
+            <span className="text-[11px] text-slate-500 block">Jalur Seleksi</span>
+            <span className="font-semibold text-emerald-800 text-sm capitalize">
+              {applicant.track}
             </span>
           </div>
           <div>

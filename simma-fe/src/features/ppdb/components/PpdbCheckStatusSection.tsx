@@ -83,10 +83,10 @@ export const PpdbCheckStatusSection: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 sm:p-6 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-sm">
         <div>
-          <h3 className="text-base font-bold text-white">Cek Pengumuman Hasil Seleksi</h3>
-          <p className="text-xs text-slate-400">
+          <h3 className="text-base font-bold text-slate-900">Cek Pengumuman Hasil Seleksi</h3>
+          <p className="text-xs text-slate-500">
             Masukkan Nomor Pendaftaran (misal: REG-2025-00001) dan NIK atau NISN calon siswa
           </p>
         </div>
@@ -99,7 +99,7 @@ export const PpdbCheckStatusSection: React.FC = () => {
               placeholder="Nomor Pendaftaran (REG-...)"
               value={checkRegNumber}
               onChange={(e) => setCheckRegNumber(e.target.value.toUpperCase())}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-white text-xs font-mono placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 text-xs font-mono placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
           </div>
           <div>
@@ -109,14 +109,14 @@ export const PpdbCheckStatusSection: React.FC = () => {
               placeholder="NIK atau NISN"
               value={checkNikOrNisn}
               onChange={(e) => setCheckNikOrNisn(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-white text-xs font-mono placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 text-xs font-mono placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
           </div>
           <div>
             <button
               type="submit"
               disabled={checkStatusMutation.isPending}
-              className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white font-semibold rounded-md text-xs transition-colors flex items-center justify-center space-x-1.5"
+              className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-semibold rounded-md text-xs transition-colors flex items-center justify-center space-x-1.5 shadow-sm"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Cari Status</span>
@@ -125,7 +125,7 @@ export const PpdbCheckStatusSection: React.FC = () => {
         </form>
 
         {statusError && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-center space-x-2">
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{statusError}</span>
           </div>
@@ -133,52 +133,52 @@ export const PpdbCheckStatusSection: React.FC = () => {
       </div>
 
       {statusResult && (
-        <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-6 space-y-5 shadow-xl">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5 shadow-sm">
           {(() => {
             const conf = STATUS_CONFIG[statusResult.status] || STATUS_CONFIG.submitted;
             const Icon = conf.icon;
             return (
               <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/80 pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                   <div>
                     <span className="text-[11px] text-slate-500 block">Nomor Pendaftaran</span>
-                    <span className="font-mono font-bold text-lg text-emerald-400">
+                    <span className="font-mono font-bold text-lg text-emerald-700">
                       {statusResult.registrationNumber}
                     </span>
                   </div>
-                  <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs font-semibold">
-                    <Icon className="w-4 h-4 text-emerald-400" />
-                    <span className="text-white">{conf.label}</span>
+                  <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold">
+                    <Icon className="w-4 h-4 text-emerald-700" />
+                    <span className="text-emerald-900">{conf.label}</span>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg bg-slate-900/80 border border-slate-700/60">
-                  <p className="text-xs text-slate-300 leading-relaxed">{conf.desc}</p>
+                <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                  <p className="text-xs text-slate-700 leading-relaxed">{conf.desc}</p>
                   {statusResult.notes && (
-                    <div className="mt-2.5 pt-2 border-t border-slate-800 text-xs text-amber-300">
+                    <div className="mt-2.5 pt-2 border-t border-slate-200 text-xs text-amber-700">
                       <strong>Catatan Panitia:</strong> {statusResult.notes}
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
-                  <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <span className="text-slate-500 text-[11px] block">Nama Calon Siswa</span>
-                    <span className="font-semibold text-white">{statusResult.fullName}</span>
+                    <span className="font-semibold text-slate-900">{statusResult.fullName}</span>
                   </div>
-                  <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800">
-                    <span className="text-slate-500 text-[11px] block">Peminatan Jurusan</span>
-                    <span className="font-semibold text-emerald-400">{statusResult.chosenMajor}</span>
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <span className="text-slate-500 text-[11px] block">Jalur Seleksi</span>
+                    <span className="font-semibold text-emerald-700 capitalize">{statusResult.track}</span>
                   </div>
-                  <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <span className="text-slate-500 text-[11px] block">Asal Madrasah/Sekolah</span>
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-slate-900">
                       {statusResult.previousSchoolType} — {statusResult.previousSchoolName}
                     </span>
                   </div>
-                  <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <span className="text-slate-500 text-[11px] block">Tanggal Pendaftaran</span>
-                    <span className="font-semibold text-white">
+                    <span className="font-semibold text-slate-900">
                       {new Date(statusResult.createdAt).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "long",

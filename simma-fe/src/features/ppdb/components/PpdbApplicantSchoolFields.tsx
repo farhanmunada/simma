@@ -30,7 +30,7 @@ export const PpdbApplicantSchoolFields: React.FC<PpdbApplicantSchoolFieldsProps>
           <School className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-white">2. Asal Sekolah & Pilihan Jurusan</h3>
+          <h3 className="text-sm font-bold text-white">2. Asal Sekolah & Data Madrasah</h3>
           <p className="text-[11px] text-slate-400">Pendidikan jenjang sebelumnya dan minat konsentrasi</p>
         </div>
       </div>
@@ -78,20 +78,13 @@ export const PpdbApplicantSchoolFields: React.FC<PpdbApplicantSchoolFieldsProps>
         </div>
 
         <div>
-          <label className="block text-slate-300 font-medium mb-1">
-            Pilihan Peminatan Kurikulum Merdeka <span className="text-rose-400">*</span>
-          </label>
-          <select
-            value={chosenMajor}
-            onChange={(e) => setChosenMajor(e.target.value as PpdbMajor)}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-emerald-400 font-semibold focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          >
-            <option value="MIPA">Matematika & IPA (MIPA)</option>
-            <option value="IPS">Ilmu Pengetahuan Sosial (IPS)</option>
-            <option value="Keagamaan">Ilmu-ilmu Keagamaan (IIK)</option>
-            <option value="Bahasa">Bahasa & Budaya</option>
-            <option value="Vokasi">Keterampilan / Vokasi</option>
-          </select>
+          <label className="block text-slate-300 font-medium mb-1">Jenjang Madrasah</label>
+          <input
+            type="text"
+            readOnly
+            value="Madrasah Aliyah (Reguler / Tanpa Penjurusan)"
+            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-md text-emerald-400 font-medium focus:outline-none"
+          />
         </div>
       </div>
     </div>

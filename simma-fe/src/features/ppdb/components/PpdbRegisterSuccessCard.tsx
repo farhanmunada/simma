@@ -41,8 +41,8 @@ export const PpdbRegisterSuccessCard: React.FC<PpdbRegisterSuccessCardProps> = (
           </span>
         </div>
         <div className="bg-slate-900/60 p-3.5 rounded-lg border border-slate-700/60 space-y-1">
-          <span className="text-slate-500 text-[11px] block">Peminatan / Jurusan</span>
-          <span className="font-semibold text-emerald-400 text-sm">{applicant.chosenMajor}</span>
+          <span className="text-slate-500 text-[11px] block">Jalur Seleksi</span>
+          <span className="font-semibold text-emerald-400 text-sm capitalize">{applicant.track}</span>
         </div>
         <div className="bg-slate-900/60 p-3.5 rounded-lg border border-slate-700/60 space-y-1">
           <span className="text-slate-500 text-[11px] block">Asal Sekolah</span>

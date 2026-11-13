@@ -101,7 +101,7 @@ export const PpdbCandidateDashboard: React.FC<PpdbCandidateDashboardProps> = ({
             {applicant.fullName}
           </h2>
           <p className="text-xs text-slate-400">
-            NIK: {applicant.nik} {applicant.nisn ? `| NISN: ${applicant.nisn}` : ""} | Jurusan: {applicant.chosenMajor}
+            NIK: {applicant.nik} {applicant.nisn ? `| NISN: ${applicant.nisn}` : ""} | Jalur: {applicant.track.toUpperCase()}
           </p>
         </div>
 
