@@ -63,6 +63,8 @@ export class FacilitiesService {
       purchaseDate: input.purchaseDate ?? null,
       sourceOfFund: input.sourceOfFund ?? null,
       notes: input.notes ?? null,
+      frontImageUrl: input.frontImageUrl ?? null,
+      detailImageUrl: input.detailImageUrl ?? null,
       status: input.status || "TERSEDIA",
       qrCodeToken,
     });

@@ -57,6 +57,7 @@ export class TeachersService {
 
     const teacherData = {
       userId: input.userId ?? null,
+      positionId: input.positionId ?? null,
       nik: input.nik,
       nuptk: input.nuptk ?? null,
       fullName: input.fullName,
@@ -90,6 +91,7 @@ export class TeachersService {
 
     const teacherData = {
       userId: input.userId !== undefined ? input.userId : undefined,
+      positionId: input.positionId !== undefined ? input.positionId : undefined,
       nik: input.nik,
       nuptk: input.nuptk,
       fullName: input.fullName,
@@ -281,6 +283,9 @@ export class TeachersService {
       totalJtm: t.currentWorkload?.totalJtm ?? 0,
       isEligibleTpg: Boolean(t.currentWorkload?.isEligibleTpg),
     }));
+  }
+  async getPositions() {
+    return await this.repo.getAllPositions();
   }
 }
 

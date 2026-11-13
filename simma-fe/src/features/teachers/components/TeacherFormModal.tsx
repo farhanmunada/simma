@@ -9,6 +9,7 @@ import {
   type DutyStatus,
 } from "@simma/shared";
 import type { TeacherListItem, TeacherProfileDto } from "../types";
+import { usePositions } from "../api/teachers.api";
 
 interface TeacherFormModalProps {
   isOpen: boolean;
@@ -23,7 +24,9 @@ export const TeacherFormModal: React.FC<TeacherFormModalProps> = ({
   onSubmit,
   initialData,
 }) => {
+  const { data: positions = [] } = usePositions();
   const [fullName, setFullName] = useState("");
+  const [positionId, setPositionId] = useState<string>("");
   const [nik, setNik] = useState("");
   const [nuptk, setNuptk] = useState("");
   const [employmentType, setEmploymentType] = useState<EmploymentType>("GTY");
@@ -42,6 +45,7 @@ export const TeacherFormModal: React.FC<TeacherFormModalProps> = ({
   useEffect(() => {
     if (initialData) {
       setFullName(initialData.fullName || "");
+      setPositionId(initialData.positionId || "");
       setNik(initialData.nik || "");
       setNuptk(initialData.nuptk || "");
       setEmploymentType(initialData.employmentType || "GTY");
@@ -57,6 +61,7 @@ export const TeacherFormModal: React.FC<TeacherFormModalProps> = ({
       setEmail(p?.email || "");
     } else {
       setFullName("");
+      setPositionId("");
       setNik("");
       setNuptk("");
       setEmploymentType("GTY");
@@ -85,6 +90,7 @@ export const TeacherFormModal: React.FC<TeacherFormModalProps> = ({
     try {
       const payload = {
         fullName: fullName.trim(),
+        positionId: positionId || null,
         nik: nik.trim(),
         nuptk: nuptk.trim() || null,
         employmentType,
@@ -139,6 +145,22 @@ export const TeacherFormModal: React.FC<TeacherFormModalProps> = ({
                 placeholder="Contoh: Dra. Hj. Siti Zubaidah, M.Ag."
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
               />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Jabatan Resmi Madrasah</label>
+              <select
+                value={positionId}
+                onChange={(e) => setPositionId(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
+              >
+                <option value="">-- Pilih Jabatan Resmi --</option>
+                {positions.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.category})
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

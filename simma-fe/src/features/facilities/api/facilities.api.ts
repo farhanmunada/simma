@@ -129,6 +129,23 @@ export function useDeleteFacilityAsset() {
   });
 }
 
+export function useUploadFacilityImage() {
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await apiClient<{ data: { url: string; fileName: string } }>(
+        API_ENDPOINTS.FACILITIES.UPLOAD_IMAGE,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+      return res.data;
+    },
+  });
+}
+
 // --- Loans ---
 export function useFacilityLoans(
   filters?: Record<string, string | number | boolean>,

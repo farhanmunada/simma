@@ -4,6 +4,7 @@ export {
   academicYears,
   semesters,
   teachers,
+  positions,
   classrooms,
   subjects,
 } from "./setup";
@@ -72,6 +73,8 @@ export type {
   NewSemester,
   Teacher,
   NewTeacher,
+  Position,
+  NewPosition,
   Classroom,
   NewClassroom,
   Subject,

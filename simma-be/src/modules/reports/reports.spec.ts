@@ -97,6 +97,7 @@ const mockClassroom: Classroom = {
 const mockTeacher: Teacher = {
   id: teacherId,
   userId: "66666666-6666-6666-6666-666666666666",
+  positionId: null,
   nik: "3201010202020002",
   nuptk: "1234567890123456",
   fullName: "Ust. Abdullah, M.Pd",

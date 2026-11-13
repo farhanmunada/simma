@@ -1,6 +1,10 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
+import fs from "node:fs/promises";
+import fsSync from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
 import type { z } from "zod";
-import { ValidationError } from "../../core/errors/index.js";
+import { ValidationError, NotFoundError } from "../../core/errors/index.js";
 import { FacilitiesService } from "./facilities.service.js";
 import {
   CreateFacilityAssetSchema,
@@ -137,6 +141,66 @@ export class FacilitiesController {
   getStats = async (_request: FastifyRequest, reply: FastifyReply) => {
     const data = await this.service.getStats();
     return reply.status(200).send({ data });
+  };
+
+  // --- Upload & Serve Image ---
+  uploadImage = async (request: FastifyRequest, reply: FastifyReply) => {
+    const part = await request.file();
+    if (!part) {
+      throw new ValidationError("Berkas gambar tidak ditemukan");
+    }
+
+    const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!allowedMimes.includes(part.mimetype)) {
+      throw new ValidationError(
+        `Format gambar '${part.mimetype}' tidak didukung. Harap unggah format JPG, PNG, atau WEBP.`
+      );
+    }
+
+    const uploadDir = path.resolve(process.cwd(), "storage", "uploads", "facilities");
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    const ext = path.extname(part.filename).toLowerCase() || ".jpg";
+    const fileUUID = crypto.randomUUID();
+    const storedFileName = `asset_${fileUUID}${ext}`;
+    const absolutePath = path.join(uploadDir, storedFileName);
+
+    const buffer = await part.toBuffer();
+    await fs.writeFile(absolutePath, buffer);
+
+    const imageUrl = `/api/v1/facilities/images/${storedFileName}`;
+    return reply.status(201).send({
+      message: "Gambar berhasil diunggah",
+      data: {
+        url: imageUrl,
+        fileName: storedFileName,
+      },
+    });
+  };
+
+  serveImage = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { filename } = request.params as { filename: string };
+    const safeFilename = path.basename(filename);
+    const uploadDir = path.resolve(process.cwd(), "storage", "uploads", "facilities");
+    const filePath = path.join(uploadDir, safeFilename);
+
+    try {
+      await fs.access(filePath);
+    } catch {
+      throw new NotFoundError("Berkas foto tidak ditemukan di server");
+    }
+
+    const ext = path.extname(safeFilename).toLowerCase();
+    const mimeMap: Record<string, string> = {
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png": "image/png",
+      ".webp": "image/webp",
+    };
+    reply.header("Content-Type", mimeMap[ext] || "application/octet-stream");
+    reply.header("Cache-Control", "public, max-age=86400");
+    const stream = fsSync.createReadStream(filePath);
+    return reply.send(stream);
   };
 }
 

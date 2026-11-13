@@ -5,6 +5,7 @@ import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
 import { FacilityStatsCards } from "../components/FacilityStatsCards";
 import { FacilityAssetTable } from "../components/FacilityAssetTable";
 import { FacilityAssetModal } from "../components/FacilityAssetModal";
+import { FacilityAssetDetailModal } from "../components/FacilityAssetDetailModal";
 import { FacilityLoanTable } from "../components/FacilityLoanTable";
 import { FacilityLoanModal } from "../components/FacilityLoanModal";
 import { FacilityMaintenanceTable } from "../components/FacilityMaintenanceTable";
@@ -35,6 +36,8 @@ export const FacilitiesPage: React.FC = () => {
   // Modals state
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false);
   const [assetToEdit, setAssetToEdit] = useState<FacilityAsset | null>(null);
+  const [selectedAssetDetail, setSelectedAssetDetail] =
+    useState<FacilityAsset | null>(null);
 
   const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
   const [selectedAssetForLoan, setSelectedAssetForLoan] =
@@ -221,8 +224,7 @@ export const FacilitiesPage: React.FC = () => {
           onCategoryFilterChange={setCategoryFilter}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
-          onEdit={handleEditAsset}
-          onDelete={setAssetToDelete}
+          onSelectAsset={setSelectedAssetDetail}
           onViewQr={handleViewQr}
           onBorrow={handleBorrowAsset}
           onReportIssue={handleReportIssue}
@@ -248,6 +250,17 @@ export const FacilitiesPage: React.FC = () => {
       )}
 
       {/* Modals */}
+      <FacilityAssetDetailModal
+        isOpen={Boolean(selectedAssetDetail)}
+        onClose={() => setSelectedAssetDetail(null)}
+        asset={selectedAssetDetail}
+        onEdit={handleEditAsset}
+        onDelete={setAssetToDelete}
+        onViewQr={handleViewQr}
+        onBorrow={handleBorrowAsset}
+        onReportIssue={handleReportIssue}
+      />
+
       <FacilityAssetModal
         isOpen={isAssetModalOpen}
         onClose={() => setIsAssetModalOpen(false)}

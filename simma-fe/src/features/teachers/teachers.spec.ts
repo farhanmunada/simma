@@ -77,6 +77,10 @@ describe("Teachers & Staff (GTK) Feature Module (Frontend)", () => {
     expect(mod.TeacherStatsCards).toBeDefined();
     expect(mod.TeacherFormModal).toBeDefined();
     expect(mod.TeacherDetailModal).toBeDefined();
+    expect(mod.TeacherBioTab).toBeDefined();
+    expect(mod.TeacherEducationTab).toBeDefined();
+    expect(mod.TeacherRankTab).toBeDefined();
+    expect(mod.TeacherDocumentTab).toBeDefined();
     expect(mod.WorkloadRecapTable).toBeDefined();
     expect(mod.WorkloadModal).toBeDefined();
   });

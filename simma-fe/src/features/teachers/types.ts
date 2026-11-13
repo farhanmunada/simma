@@ -95,9 +95,23 @@ export interface TeacherWorkloadDto {
   updatedAt?: string;
 }
 
+export interface PositionDto {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  isLeadership: boolean;
+  allowance: number;
+  description?: string | null;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface TeacherListItem {
   id: string;
   userId: string | null;
+  positionId?: string | null;
   nik: string;
   nuptk: string | null;
   fullName: string;
@@ -107,12 +121,14 @@ export interface TeacherListItem {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  position?: PositionDto | null;
   profile?: TeacherProfileDto | null;
   currentRank?: TeacherRankDto | null;
   currentWorkload?: TeacherWorkloadDto | null;
 }
 
 export interface TeacherFullDetailDto extends TeacherListItem {
+  position?: PositionDto | null;
   profile: TeacherProfileDto | null;
   educations: TeacherEducationDto[];
   ranks: TeacherRankDto[];

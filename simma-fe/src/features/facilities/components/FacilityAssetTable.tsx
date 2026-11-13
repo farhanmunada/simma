@@ -1,12 +1,11 @@
 import React from "react";
 import {
   QrCode,
-  Edit2,
-  Trash2,
   HandHelping,
   Wrench,
   Search,
   Filter,
+  ImageIcon,
 } from "lucide-react";
 import { Badge } from "../../../components/ui/Badge";
 import { Button } from "../../../components/ui/Button";
@@ -21,8 +20,7 @@ interface FacilityAssetTableProps {
   onCategoryFilterChange: (val: string) => void;
   statusFilter: string;
   onStatusFilterChange: (val: string) => void;
-  onEdit: (asset: FacilityAsset) => void;
-  onDelete: (asset: FacilityAsset) => void;
+  onSelectAsset: (asset: FacilityAsset) => void;
   onViewQr: (asset: FacilityAsset) => void;
   onBorrow: (asset: FacilityAsset) => void;
   onReportIssue: (asset: FacilityAsset) => void;
@@ -37,8 +35,7 @@ export const FacilityAssetTable: React.FC<FacilityAssetTableProps> = ({
   onCategoryFilterChange,
   statusFilter,
   onStatusFilterChange,
-  onEdit,
-  onDelete,
+  onSelectAsset,
   onViewQr,
   onBorrow,
   onReportIssue,
@@ -121,32 +118,56 @@ export const FacilityAssetTable: React.FC<FacilityAssetTableProps> = ({
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase tracking-wider">
             <tr>
+              <th className="px-4 py-3">Foto</th>
               <th className="px-4 py-3">Kode & Nama Aset</th>
               <th className="px-4 py-3">Kategori</th>
               <th className="px-4 py-3">Lokasi</th>
               <th className="px-4 py-3">Kondisi</th>
               <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Aksi</th>
+              <th className="px-4 py-3 text-right">Opsi Cepat</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
                   Memuat data aset...
                 </td>
               </tr>
             ) : assets.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
                   Tidak ada aset sarana prasarana yang sesuai.
                 </td>
               </tr>
             ) : (
               assets.map((asset) => (
-                <tr key={asset.id} className="hover:bg-slate-50/70 transition-colors">
+                <tr
+                  key={asset.id}
+                  onClick={() => onSelectAsset(asset)}
+                  className="hover:bg-emerald-50/40 cursor-pointer transition-colors group"
+                >
+                  {/* Foto Miniatur */}
                   <td className="px-4 py-3">
-                    <div className="font-medium text-slate-900">{asset.name}</div>
+                    <div className="w-12 h-12 rounded-lg border border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+                      {asset.frontImageUrl ? (
+                        <img
+                          src={asset.frontImageUrl}
+                          alt={asset.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <ImageIcon className="w-5 h-5 text-slate-400 opacity-60" />
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-slate-900 group-hover:text-emerald-700 transition-colors">
+                      {asset.name}
+                    </div>
                     <div className="text-xs text-slate-500 font-mono mt-0.5">
                       {asset.code}
                     </div>
@@ -159,7 +180,10 @@ export const FacilityAssetTable: React.FC<FacilityAssetTableProps> = ({
                   </td>
                   <td className="px-4 py-3">{getConditionBadge(asset.condition)}</td>
                   <td className="px-4 py-3">{getStatusBadge(asset.status)}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td
+                    className="px-4 py-3 text-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="flex items-center justify-end gap-1">
                       <Button
                         size="sm"
@@ -190,28 +214,6 @@ export const FacilityAssetTable: React.FC<FacilityAssetTableProps> = ({
                         className="p-1.5 text-slate-500 hover:text-amber-600"
                       >
                         <Wrench className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onEdit(asset)}
-                        title="Edit Data"
-                        className="p-1.5 text-slate-500 hover:text-indigo-600"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onDelete(asset)}
-                        title="Hapus"
-                        disabled={
-                          asset.status === "DIPINJAM" ||
-                          asset.status === "DALAM_PERBAIKAN"
-                        }
-                        className="p-1.5 text-slate-500 hover:text-rose-600 disabled:opacity-30"
-                      >
-                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </td>

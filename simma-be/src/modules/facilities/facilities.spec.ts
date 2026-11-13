@@ -41,6 +41,8 @@ describe("Modul 19 Sarana & Prasarana - Unit Tests", () => {
       status: "TERSEDIA",
       qrCodeToken: "AST-QR-12345",
       notes: "Kondisi mulus",
+      frontImageUrl: null,
+      detailImageUrl: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

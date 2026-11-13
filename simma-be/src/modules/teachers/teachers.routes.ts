@@ -40,6 +40,9 @@ export const teachersRoutes: FastifyPluginAsync = async (app) => {
   // Global auth
   app.addHook("preHandler", authenticate);
 
+  // Positions master
+  app.get("/positions", { preHandler: [requireRoles(...readRoles)] }, teachersController.getPositions);
+
   // GTK Directory & Search (F-GTK-01)
   app.get("/", { preHandler: [requireRoles(...readRoles)] }, teachersController.getTeachers);
   app.post("/", { preHandler: [requireRoles(...writeRoles)] }, teachersController.createTeacher);

@@ -336,6 +336,22 @@ export const ADDITIONAL_DUTY_TYPES = [
 ] as const;
 export type AdditionalDutyType = (typeof ADDITIONAL_DUTY_TYPES)[number];
 
+export const DEFAULT_POSITIONS = [
+  { code: "KAMAD", name: "Kepala Madrasah", category: "Pendidik", isLeadership: true, allowance: 1500000 },
+  { code: "WAKA_KUR", name: "Waka Kurikulum", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+  { code: "WAKA_SIS", name: "Waka Kesiswaan", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+  { code: "WAKA_SAR", name: "Waka Sarana Prasarana", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+  { code: "WAKA_HUM", name: "Waka Humas", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+  { code: "GURU_MAPEL", name: "Guru Mata Pelajaran", category: "Pendidik", isLeadership: false, allowance: 0 },
+  { code: "GURU_BK", name: "Guru Bimbingan Konseling (BK)", category: "Pendidik", isLeadership: false, allowance: 0 },
+  { code: "KEPALA_TU", name: "Kepala Tata Usaha", category: "Tenaga Kependidikan", isLeadership: true, allowance: 750000 },
+  { code: "STAF_TU", name: "Staf Tata Usaha", category: "Tenaga Kependidikan", isLeadership: false, allowance: 0 },
+  { code: "LABORAN", name: "Kepala Laboratorium", category: "Pendidik", isLeadership: false, allowance: 500000 },
+  { code: "PUSTAKAWAN", name: "Kepala Perpustakaan", category: "Tenaga Kependidikan", isLeadership: false, allowance: 500000 },
+  { code: "BENDAHARA", name: "Bendahara Madrasah", category: "Tenaga Kependidikan", isLeadership: false, allowance: 500000 },
+] as const;
+export type DefaultPosition = (typeof DEFAULT_POSITIONS)[number];
+
 export const ADDITIONAL_DUTY_JTM_MAP: Record<AdditionalDutyType, number> = {
   kepala_madrasah: 18,
   waka_kurikulum: 12,

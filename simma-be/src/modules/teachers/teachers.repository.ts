@@ -2,6 +2,7 @@ import { eq, and, or, ilike, count, desc, isNull, inArray, sql } from "drizzle-o
 import { getDb } from "../../core/database/client.js";
 import {
   teachers,
+  positions,
   teacherProfiles,
   teacherEducation,
   teacherRanks,
@@ -9,6 +10,8 @@ import {
   teacherWorkloads,
   type Teacher,
   type NewTeacher,
+  type Position,
+  type NewPosition,
   type TeacherProfile,
   type TeacherEducation,
   type TeacherRankRecord,
@@ -46,19 +49,27 @@ export class TeachersRepository {
     }
 
     const teacherIds = teacherRows.map((t) => t.id);
+    const positionIds = teacherRows
+      .map((t) => t.positionId)
+      .filter((id): id is string => Boolean(id));
 
-    const [profiles, ranks, workloads] = await Promise.all([
+    const [profiles, ranks, workloads, posRows] = await Promise.all([
       db.select().from(teacherProfiles).where(inArray(teacherProfiles.teacherId, teacherIds)),
       db.select().from(teacherRanks).where(and(inArray(teacherRanks.teacherId, teacherIds), eq(teacherRanks.isCurrent, true))),
       db.select().from(teacherWorkloads).where(inArray(teacherWorkloads.teacherId, teacherIds)),
+      positionIds.length > 0
+        ? db.select().from(positions).where(inArray(positions.id, positionIds))
+        : Promise.resolve([]),
     ]);
 
     const profileMap = new Map(profiles.map((p) => [p.teacherId, p]));
     const rankMap = new Map(ranks.map((r) => [r.teacherId, r]));
     const workloadMap = new Map(workloads.map((w) => [w.teacherId, w]));
+    const positionMap = new Map(posRows.map((p) => [p.id, p]));
 
     const data: TeacherWithDetails[] = teacherRows.map((t) => ({
       ...t,
+      position: t.positionId ? positionMap.get(t.positionId) ?? null : null,
       profile: profileMap.get(t.id) ?? null,
       currentRank: rankMap.get(t.id) ?? null,
       currentWorkload: workloadMap.get(t.id) ?? null,
@@ -76,16 +87,20 @@ export class TeachersRepository {
 
     if (!teacher) return null;
 
-    const [profiles, educations, ranks, documents, workloads] = await Promise.all([
+    const [profiles, educations, ranks, documents, workloads, posRows] = await Promise.all([
       db.select().from(teacherProfiles).where(eq(teacherProfiles.teacherId, id)),
       db.select().from(teacherEducation).where(eq(teacherEducation.teacherId, id)).orderBy(desc(teacherEducation.graduationYear)),
       db.select().from(teacherRanks).where(eq(teacherRanks.teacherId, id)).orderBy(desc(teacherRanks.tmtRank)),
       db.select().from(teacherDocuments).where(eq(teacherDocuments.teacherId, id)).orderBy(desc(teacherDocuments.createdAt)),
       db.select().from(teacherWorkloads).where(eq(teacherWorkloads.teacherId, id)).orderBy(desc(teacherWorkloads.createdAt)),
+      teacher.positionId
+        ? db.select().from(positions).where(eq(positions.id, teacher.positionId))
+        : Promise.resolve([]),
     ]);
 
     return {
       ...teacher,
+      position: posRows[0] ?? null,
       profile: profiles[0] ?? null,
       educations,
       ranks,
@@ -122,6 +137,7 @@ export class TeachersRepository {
 
       return {
         ...newTeacher,
+        position: null,
         profile: createdProfile,
         educations: [],
         ranks: [],
@@ -288,6 +304,14 @@ export class TeachersRepository {
     if (academicYearId) conditions.push(eq(teacherWorkloads.academicYearId, academicYearId));
     if (semesterId) conditions.push(eq(teacherWorkloads.semesterId, semesterId));
     return await db.select().from(teacherWorkloads).where(conditions.length ? and(...conditions) : undefined);
+  }
+  async getAllPositions(): Promise<Position[]> {
+    const db = getDb();
+    return db
+      .select()
+      .from(positions)
+      .where(eq(positions.isActive, true))
+      .orderBy(desc(positions.isLeadership), positions.name);
   }
 }
 

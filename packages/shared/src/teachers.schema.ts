@@ -33,6 +33,7 @@ export const TeacherProfileSchema = z.object({
 
 export const CreateTeacherFullSchema = z.object({
   userId: z.string().uuid().nullable().optional(),
+  positionId: z.string().uuid().nullable().optional(),
   nik: z.string().length(16, "NIK harus 16 digit"),
   nuptk: z.string().max(20).nullable().optional(),
   fullName: z.string().min(1, "Nama lengkap GTK wajib diisi").max(255),

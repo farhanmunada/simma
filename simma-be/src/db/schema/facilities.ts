@@ -37,6 +37,8 @@ export const facilityAssets = pgTable(
       .notNull()
       .default("TERSEDIA"),
     notes: text("notes"),
+    frontImageUrl: text("front_image_url"),
+    detailImageUrl: text("detail_image_url"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

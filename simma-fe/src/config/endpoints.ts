@@ -159,6 +159,7 @@ export const API_ENDPOINTS = {
     EMIS_EXPORT: "/teachers/export/emis",
     WORKLOADS: "/teachers/workloads",
     WORKLOAD_UPSERT: "/teachers/workload",
+    POSITIONS: "/teachers/positions",
     DETAIL: (id: string) => `/teachers/${id}`,
     UPDATE: (id: string) => `/teachers/${id}`,
     DELETE: (id: string) => `/teachers/${id}`,
@@ -258,5 +259,7 @@ export const API_ENDPOINTS = {
     LOAN_RETURN: (id: string) => `/facilities/loans/${id}/return`,
     MAINTENANCE: "/facilities/maintenance",
     MAINTENANCE_DETAIL: (id: string) => `/facilities/maintenance/${id}`,
+    UPLOAD_IMAGE: "/facilities/upload-image",
+    SERVE_IMAGE: (filename: string) => `/facilities/images/${filename}`,
   },
 } as const;

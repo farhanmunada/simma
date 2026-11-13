@@ -107,9 +107,7 @@ export const TeacherListPage: React.FC = () => {
       <TeacherTable
         teachers={listData?.data || []}
         isLoading={listLoading}
-        onViewDetail={setDetailId}
-        onEdit={handleOpenEdit}
-        onDelete={handleDelete}
+        onSelectTeacher={(t) => setDetailId(t.id)}
       />
 
       <TeacherFormModal
@@ -119,7 +117,12 @@ export const TeacherListPage: React.FC = () => {
         initialData={selectedTeacher}
       />
 
-      <TeacherDetailModal teacherId={detailId} onClose={() => setDetailId(null)} />
+      <TeacherDetailModal
+        teacherId={detailId}
+        onClose={() => setDetailId(null)}
+        onEdit={handleOpenEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };

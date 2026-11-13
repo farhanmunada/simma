@@ -3,6 +3,7 @@ import { Modal } from "../../../components/ui/Modal";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { Select } from "../../../components/ui/Select";
+import { FacilityImageUpload } from "./FacilityImageUpload";
 import type { FacilityAsset } from "../types";
 import {
   useCreateFacilityAsset,
@@ -27,6 +28,8 @@ export const FacilityAssetModal: React.FC<FacilityAssetModalProps> = ({
   const [location, setLocation] = useState("");
   const [sourceOfFund, setSourceOfFund] = useState("BOS");
   const [purchaseDate, setPurchaseDate] = useState("");
+  const [frontImageUrl, setFrontImageUrl] = useState("");
+  const [detailImageUrl, setDetailImageUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +45,8 @@ export const FacilityAssetModal: React.FC<FacilityAssetModalProps> = ({
       setLocation(assetToEdit.location || "");
       setSourceOfFund(assetToEdit.sourceOfFund || "BOS");
       setPurchaseDate(assetToEdit.purchaseDate || "");
+      setFrontImageUrl(assetToEdit.frontImageUrl || "");
+      setDetailImageUrl(assetToEdit.detailImageUrl || "");
       setNotes(assetToEdit.notes || "");
     } else {
       setCode(`AST-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`);
@@ -51,6 +56,8 @@ export const FacilityAssetModal: React.FC<FacilityAssetModalProps> = ({
       setLocation("");
       setSourceOfFund("BOS");
       setPurchaseDate(new Date().toISOString().split("T")[0]);
+      setFrontImageUrl("");
+      setDetailImageUrl("");
       setNotes("");
     }
     setError(null);
@@ -70,26 +77,30 @@ export const FacilityAssetModal: React.FC<FacilityAssetModalProps> = ({
         await updateMutation.mutateAsync({
           id: assetToEdit.id,
           data: {
-            code,
-            name,
+            code: code.trim(),
+            name: name.trim(),
             category: category as any,
             condition: condition as any,
-            location: location || null,
-            sourceOfFund: sourceOfFund || null,
-            purchaseDate: purchaseDate || null,
-            notes: notes || null,
+            location: location.trim() ? location.trim() : null,
+            sourceOfFund: sourceOfFund.trim() ? sourceOfFund.trim() : null,
+            purchaseDate: purchaseDate.trim() ? purchaseDate.trim() : null,
+            frontImageUrl: frontImageUrl.trim() ? frontImageUrl.trim() : null,
+            detailImageUrl: detailImageUrl.trim() ? detailImageUrl.trim() : null,
+            notes: notes.trim() ? notes.trim() : null,
           },
         });
       } else {
         await createMutation.mutateAsync({
-          code,
-          name,
+          code: code.trim(),
+          name: name.trim(),
           category: category as any,
           condition: condition as any,
-          location: location || undefined,
-          sourceOfFund: sourceOfFund || undefined,
-          purchaseDate: purchaseDate || undefined,
-          notes: notes || undefined,
+          location: location.trim() ? location.trim() : undefined,
+          sourceOfFund: sourceOfFund.trim() ? sourceOfFund.trim() : undefined,
+          purchaseDate: purchaseDate.trim() ? purchaseDate.trim() : undefined,
+          frontImageUrl: frontImageUrl.trim() ? frontImageUrl.trim() : undefined,
+          detailImageUrl: detailImageUrl.trim() ? detailImageUrl.trim() : undefined,
+          notes: notes.trim() ? notes.trim() : undefined,
         });
       }
       onClose();
@@ -173,6 +184,22 @@ export const FacilityAssetModal: React.FC<FacilityAssetModalProps> = ({
           value={purchaseDate}
           onChange={(e) => setPurchaseDate(e.target.value)}
         />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <FacilityImageUpload
+            label="Foto 1: Tampak Depan"
+            sublabel="Wajib/Dokumentasi"
+            value={frontImageUrl}
+            onChange={setFrontImageUrl}
+            disabled={isSaving}
+          />
+          <FacilityImageUpload
+            label="Foto 2: Label Resmi Pabrikan"
+            sublabel="Serial / Spesifikasi"
+            value={detailImageUrl}
+            onChange={setDetailImageUrl}
+            disabled={isSaving}
+          />
+        </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-slate-700">Catatan / Spesifikasi Singkat</label>
           <textarea

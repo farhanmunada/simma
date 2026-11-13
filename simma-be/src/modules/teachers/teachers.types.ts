@@ -1,5 +1,6 @@
 import type {
   Teacher,
+  Position,
   TeacherProfile,
   TeacherEducation,
   TeacherRankRecord,
@@ -16,6 +17,7 @@ import type {
 } from "@simma/shared";
 
 export interface TeacherWithDetails extends Teacher {
+  position?: Position | null;
   profile?: TeacherProfile | null;
   currentRank?: TeacherRankRecord | null;
   currentWorkload?: TeacherWorkload | null;
@@ -24,6 +26,7 @@ export interface TeacherWithDetails extends Teacher {
 }
 
 export interface TeacherFullDetail extends Teacher {
+  position?: Position | null;
   profile: TeacherProfile | null;
   educations: TeacherEducation[];
   ranks: TeacherRankRecord[];

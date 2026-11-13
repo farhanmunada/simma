@@ -1,21 +1,17 @@
 import React from "react";
-import { Eye, Edit3, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 import type { TeacherListItem } from "../types";
 
 interface TeacherTableProps {
   teachers: TeacherListItem[];
   isLoading: boolean;
-  onViewDetail: (id: string) => void;
-  onEdit: (teacher: TeacherListItem) => void;
-  onDelete: (id: string, name: string) => void;
+  onSelectTeacher: (teacher: TeacherListItem) => void;
 }
 
 export const TeacherTable: React.FC<TeacherTableProps> = ({
   teachers,
   isLoading,
-  onViewDetail,
-  onEdit,
-  onDelete,
+  onSelectTeacher,
 }) => {
   if (isLoading) {
     return (
@@ -44,10 +40,9 @@ export const TeacherTable: React.FC<TeacherTableProps> = ({
             <tr>
               <th className="px-5 py-3.5">Nama & Identitas</th>
               <th className="px-4 py-3.5">Status & Jenis</th>
-              <th className="px-4 py-3.5">Gol. / Pangkat</th>
+              <th className="px-4 py-3.5">Jabatan</th>
               <th className="px-4 py-3.5">Beban JTM</th>
-              <th className="px-4 py-3.5">Sertifikasi & TPG</th>
-              <th className="px-4 py-3.5 text-right">Aksi</th>
+              <th className="px-4 py-3.5 text-right">Sertifikasi & TPG</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -57,9 +52,15 @@ export const TeacherTable: React.FC<TeacherTableProps> = ({
               const isEligible = t.currentWorkload?.isEligibleTpg ?? totalJtm >= 24;
 
               return (
-                <tr key={t.id} className="hover:bg-gray-50/80 transition-colors">
+                <tr
+                  key={t.id}
+                  onClick={() => onSelectTeacher(t)}
+                  className="hover:bg-emerald-50/50 cursor-pointer transition-colors group"
+                >
                   <td className="px-5 py-4">
-                    <div className="font-semibold text-gray-900">{t.fullName}</div>
+                    <div className="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">
+                      {t.fullName}
+                    </div>
                     <div className="text-xs text-gray-500 flex flex-wrap gap-x-2 mt-0.5">
                       <span>NIK: {t.nik}</span>
                       {t.profile?.nip && <span>• NIP: {t.profile.nip}</span>}
@@ -75,13 +76,20 @@ export const TeacherTable: React.FC<TeacherTableProps> = ({
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    {t.currentRank ? (
+                    {t.position ? (
+                      <div>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          {t.position.name}
+                        </span>
+                        <div className="text-xs text-gray-500 mt-0.5">{t.position.category}</div>
+                      </div>
+                    ) : t.currentRank ? (
                       <div>
                         <span className="font-medium text-gray-800">{t.currentRank.gradeGroup}</span>
                         <div className="text-xs text-gray-500">{t.currentRank.rank}</div>
                       </div>
                     ) : (
-                      <span className="text-xs text-gray-400 italic">Belum diinput</span>
+                      <span className="text-xs text-gray-400 italic">Belum diatur</span>
                     )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
@@ -90,7 +98,7 @@ export const TeacherTable: React.FC<TeacherTableProps> = ({
                       {t.currentWorkload?.teachingJtm ?? 0} Tatap Muka + {t.currentWorkload?.additionalDutyJtm ?? 0} Tugas
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap text-right">
                     {isPendidik ? (
                       isEligible ? (
                         <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
@@ -106,34 +114,6 @@ export const TeacherTable: React.FC<TeacherTableProps> = ({
                     ) : (
                       <span className="text-xs text-gray-400">Tendik</span>
                     )}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-right">
-                    <div className="inline-flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => onViewDetail(t.id)}
-                        className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                        title="Lihat Detail Profil & Dokumen"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onEdit(t)}
-                        className="p-1.5 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
-                        title="Edit Biodata"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDelete(t.id, t.fullName)}
-                        className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                        title="Hapus GTK"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
                   </td>
                 </tr>
               );

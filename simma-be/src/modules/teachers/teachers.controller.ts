@@ -116,6 +116,11 @@ export class TeachersController {
     const data = await this.service.upsertWorkload(input);
     return reply.status(200).send({ data });
   };
+
+  getPositions = async (_req: FastifyRequest, reply: FastifyReply) => {
+    const data = await this.service.getPositions();
+    return reply.status(200).send({ data });
+  };
 }
 
 export const teachersController = new TeachersController();

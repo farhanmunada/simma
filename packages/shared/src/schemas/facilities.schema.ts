@@ -69,6 +69,8 @@ export const FacilityAssetSchema = z.object({
   qrCodeToken: z.string(),
   status: z.enum(FACILITY_ASSET_STATUSES).default("TERSEDIA"),
   notes: z.string().nullable().optional(),
+  frontImageUrl: z.string().nullable().optional(),
+  detailImageUrl: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -83,6 +85,8 @@ export const CreateFacilityAssetSchema = z.object({
   purchaseDate: z.string().optional().nullable(),
   sourceOfFund: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+  frontImageUrl: z.string().optional().nullable(),
+  detailImageUrl: z.string().optional().nullable(),
   status: z.enum(FACILITY_ASSET_STATUSES).default("TERSEDIA").optional(),
 });
 export type CreateFacilityAssetInput = z.infer<typeof CreateFacilityAssetSchema>;

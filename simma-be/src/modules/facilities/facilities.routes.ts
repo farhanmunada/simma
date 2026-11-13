@@ -25,9 +25,19 @@ export const facilitiesRoutes: FastifyPluginAsync = async (app) => {
   // Public QR scan endpoint (PRD F-SAR-03: audit cepat via kamera tanpa login admin)
   app.get("/scan/:token", facilitiesController.getAssetByQrToken);
 
+  // Public/Streamed asset photos (akses foto aset sarpras)
+  app.get("/images/:filename", facilitiesController.serveImage);
+
   // Authenticated routes group
   app.register(async (authGroup) => {
     authGroup.addHook("preHandler", authenticate);
+
+    // --- Upload Asset Image ---
+    authGroup.post(
+      "/upload-image",
+      { preHandler: [requireRoles(...manageRoles)] },
+      facilitiesController.uploadImage,
+    );
 
     // --- Statistics ---
     authGroup.get(

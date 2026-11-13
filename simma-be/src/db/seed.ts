@@ -8,6 +8,7 @@ import {
   academicYears,
   semesters,
   teachers,
+  positions,
   teacherProfiles,
   teacherEducation,
   teacherRanks,
@@ -154,8 +155,34 @@ async function seed() {
     semesterId = existingSem[0].id;
   }
 
-  // 4. SEED TEACHERS
-  console.log("4. Seeding Guru & GTK...");
+  // 4. SEED POSITIONS & TEACHERS
+  console.log("4. Seeding Master Jabatan & GTK...");
+  const defaultPositionsData = [
+    { code: "KAMAD", name: "Kepala Madrasah", category: "Pendidik", isLeadership: true, allowance: 1500000 },
+    { code: "WAKA_KUR", name: "Waka Kurikulum", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+    { code: "WAKA_SIS", name: "Waka Kesiswaan", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+    { code: "WAKA_SAR", name: "Waka Sarana Prasarana", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+    { code: "WAKA_HUM", name: "Waka Humas", category: "Pendidik", isLeadership: true, allowance: 1000000 },
+    { code: "GURU_MAPEL", name: "Guru Mata Pelajaran", category: "Pendidik", isLeadership: false, allowance: 0 },
+    { code: "GURU_BK", name: "Guru Bimbingan Konseling (BK)", category: "Pendidik", isLeadership: false, allowance: 0 },
+    { code: "KEPALA_TU", name: "Kepala Tata Usaha", category: "Tenaga Kependidikan", isLeadership: true, allowance: 750000 },
+    { code: "STAF_TU", name: "Staf Tata Usaha", category: "Tenaga Kependidikan", isLeadership: false, allowance: 0 },
+    { code: "LABORAN", name: "Kepala Laboratorium", category: "Pendidik", isLeadership: false, allowance: 500000 },
+    { code: "PUSTAKAWAN", name: "Kepala Perpustakaan", category: "Tenaga Kependidikan", isLeadership: false, allowance: 500000 },
+    { code: "BENDAHARA", name: "Bendahara Madrasah", category: "Tenaga Kependidikan", isLeadership: false, allowance: 500000 },
+  ];
+
+  const posMap: Record<string, string> = {};
+  for (const p of defaultPositionsData) {
+    const existing = await db.select({ id: positions.id }).from(positions).where(eq(positions.code, p.code)).limit(1);
+    if (existing.length > 0) {
+      posMap[p.code] = existing[0].id;
+    } else {
+      const [inserted] = await db.insert(positions).values(p).returning({ id: positions.id });
+      posMap[p.code] = inserted.id;
+    }
+  }
+
   const teacherData = [
     {
       nik: "3201011508800001",
@@ -164,6 +191,7 @@ async function seed() {
       employmentType: "PNS",
       certification: "Sertifikasi Guru Qur'an Hadis",
       userId: userMap["guru"],
+      positionId: posMap["KAMAD"],
       gtkType: "pendidik",
       gender: "L",
       birthPlace: "Jakarta",
@@ -368,6 +396,7 @@ async function seed() {
           employmentType: t.employmentType,
           certification: t.certification,
           userId: t.userId,
+          positionId: t.positionId ?? null,
         })
         .where(eq(teachers.id, tId));
     } else {
@@ -380,6 +409,7 @@ async function seed() {
           employmentType: t.employmentType,
           certification: t.certification,
           userId: t.userId,
+          positionId: t.positionId ?? null,
         })
         .returning({ id: teachers.id });
       tId = inserted.id;

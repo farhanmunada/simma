@@ -8,8 +8,8 @@ import {
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { teachers, academicYears } from "./setup.js";
-import { students } from "./students.js";
+import { teachers, academicYears } from "./setup";
+import { students } from "./students";
 import type {
   ExtracurricularCategory,
   ExtracurricularRole,

@@ -6,6 +6,7 @@ import type {
   TeacherFullDetailDto,
   WorkloadSummaryDto,
   GtkStatsDto,
+  PositionDto,
 } from "../types";
 import type {
   CreateTeacherFullInput,
@@ -35,6 +36,14 @@ export const useTeachersList = (params: TeacherQueryParams = {}) =>
       apiClient<{ data: TeacherListItem[]; total: number }>(API_ENDPOINTS.TEACHERS.LIST, {
         params: params as Record<string, string | number | boolean>,
       }),
+  });
+
+export const usePositions = () =>
+  useQuery({
+    queryKey: ["teachers", "positions"],
+    queryFn: () =>
+      apiClient<{ data: PositionDto[] }>(API_ENDPOINTS.TEACHERS.POSITIONS).then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
   });
 
 export const useTeacherStats = () =>

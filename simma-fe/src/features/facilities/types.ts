@@ -44,6 +44,8 @@ export interface FacilityAsset {
   status: FacilityAssetStatus;
   qrCodeToken: string;
   notes: string | null;
+  frontImageUrl: string | null;
+  detailImageUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
