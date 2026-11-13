@@ -71,6 +71,13 @@
       "when": 1794398149720,
       "tag": "0009_polite_ender_wiggin",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794529356805,
+      "tag": "0010_opposite_epoch",
+      "breakpoints": true
     }
   ]
 }
