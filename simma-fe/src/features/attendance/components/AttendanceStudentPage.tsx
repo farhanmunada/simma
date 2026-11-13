@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Users, Check, RotateCcw, Save } from "lucide-react";
+import { Check, RotateCcw, Save } from "lucide-react";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { Select } from "../../../components/ui/Select";
+import { useClassrooms } from "../../settings";
+import { useStudents } from "../../students/api/students.api";
 import {
   useClassroomAttendance,
   useBulkRecordStudents,
@@ -10,46 +12,13 @@ import {
 import { AttendanceStudentTable, type StudentAttendanceRow } from "./AttendanceStudentTable";
 import type { StudentAttendanceStatus } from "../types";
 
-export interface StudentItem {
-  id: string;
-  fullName: string;
-  nisn?: string;
-  nis?: string;
-  gender?: string;
-}
-
-export interface ClassroomItem {
-  id: string;
-  name: string;
-  gradeLevel: number;
-}
-
 export const AttendanceStudentPage: React.FC = () => {
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>(() => new Date().toISOString().split("T")[0]);
   const [attendanceRows, setAttendanceRows] = useState<StudentAttendanceRow[]>([]);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const [classrooms] = useState<ClassroomItem[]>([
-    { id: "cls-10-ipa-1", name: "X IPA 1", gradeLevel: 10 },
-    { id: "cls-10-ipa-2", name: "X IPA 2", gradeLevel: 10 },
-    { id: "cls-11-ips-1", name: "XI IPS 1", gradeLevel: 11 },
-  ]);
-
-  const [studentsByClass] = useState<Record<string, StudentItem[]>>({
-    "cls-10-ipa-1": [
-      { id: "std-1", fullName: "Ahmad Fauzi", nisn: "0081234567", nis: "24001", gender: "L" },
-      { id: "std-2", fullName: "Aisyah Nurul", nisn: "0082345678", nis: "24002", gender: "P" },
-      { id: "std-3", fullName: "Bilal Habasyi", nisn: "0083456789", nis: "24003", gender: "L" },
-    ],
-    "cls-10-ipa-2": [
-      { id: "std-4", fullName: "Fatimah Zahra", nisn: "0084567890", nis: "24004", gender: "P" },
-      { id: "std-5", fullName: "Hasan Basri", nisn: "0085678901", nis: "24005", gender: "L" },
-    ],
-    "cls-11-ips-1": [
-      { id: "std-6", fullName: "Husain Ali", nisn: "0076789012", nis: "23001", gender: "L" },
-    ],
-  });
+  const { data: classrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
 
   useEffect(() => {
     if (classrooms.length > 0 && !selectedClassroomId) {
@@ -57,15 +26,19 @@ export const AttendanceStudentPage: React.FC = () => {
     }
   }, [classrooms, selectedClassroomId]);
 
+  const { data: studentsResponse, isLoading: isLoadingStudents } = useStudents(
+    selectedClassroomId ? { classroomId: selectedClassroomId, limit: 100 } : undefined
+  );
+
+  const currentClassStudents = useMemo(() => {
+    return studentsResponse?.data || [];
+  }, [studentsResponse]);
+
   const {
     data: existingClassroomData,
     isLoading: isLoadingAttendance,
     refetch: refetchAttendance,
   } = useClassroomAttendance(selectedClassroomId, selectedDate);
-
-  const currentClassStudents = useMemo(() => {
-    return studentsByClass[selectedClassroomId] || [];
-  }, [studentsByClass, selectedClassroomId]);
 
   useEffect(() => {
     if (!currentClassStudents.length) {
@@ -89,9 +62,9 @@ export const AttendanceStudentPage: React.FC = () => {
       return {
         studentId: std.id,
         studentName: std.fullName,
-        nisn: std.nisn,
-        nis: std.nis,
-        gender: std.gender,
+        nisn: std.nisn || undefined,
+        nis: std.nis || undefined,
+        gender: std.gender || undefined,
         status: recorded ? recorded.status : "hadir",
         note: recorded?.note || "",
       };
@@ -170,6 +143,7 @@ export const AttendanceStudentPage: React.FC = () => {
   }, [classrooms]);
 
   const isSaving = bulkMutation.isPending;
+  const isTableLoading = isLoadingClassrooms || isLoadingStudents || isLoadingAttendance;
 
   return (
     <div className="space-y-4">
@@ -184,6 +158,7 @@ export const AttendanceStudentPage: React.FC = () => {
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setSelectedClassroomId(e.target.value)
               }
+              disabled={isLoadingClassrooms}
             />
           </div>
           <div>
@@ -288,7 +263,7 @@ export const AttendanceStudentPage: React.FC = () => {
       {/* Student Table */}
       <AttendanceStudentTable
         attendanceRows={attendanceRows}
-        isLoadingData={isLoadingAttendance}
+        isLoadingData={isTableLoading}
         onStatusChange={handleStatusChange}
         onNoteChange={handleNoteChange}
       />

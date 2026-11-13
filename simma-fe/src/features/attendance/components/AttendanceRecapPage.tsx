@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useStudentAttendances, useTeacherAttendances } from "../api/attendance.api";
+import { useClassrooms } from "../../settings";
 import { AttendanceFilterBar } from "./AttendanceFilterBar";
 import { AttendanceRecapSummaryCards } from "./AttendanceRecapSummaryCards";
 import { AttendanceRecapTable } from "./AttendanceRecapTable";
@@ -25,6 +26,8 @@ export const AttendanceRecapPage: React.FC = () => {
   const [selectedStudentSummary, setSelectedStudentSummary] = useState<{ id: string; name?: string } | null>(null);
   const [selectedTeacherSummary, setSelectedTeacherSummary] = useState<{ id: string; name?: string } | null>(null);
 
+  const { data: classrooms = [] } = useClassrooms();
+
   const { data: studentData, isLoading: isLoadingStudent } = useStudentAttendances({
     startDate: startDate || undefined,
     endDate: endDate || undefined,
@@ -44,6 +47,16 @@ export const AttendanceRecapPage: React.FC = () => {
   const teacherRecords = teacherData?.data || [];
 
   const classroomOptions = useMemo(() => {
+    if (classrooms.length > 0) {
+      const list = classrooms.map((c) => ({
+        value: c.id,
+        label: `${c.name} (Tingkat ${c.gradeLevel})`,
+      }));
+      return [
+        { value: "", label: "Semua Rombel" },
+        ...list,
+      ];
+    }
     const map = new Map<string, string>();
     studentRecords.forEach((item) => {
       if (item.classroomId) {
@@ -54,17 +67,20 @@ export const AttendanceRecapPage: React.FC = () => {
       { value: "", label: "Semua Rombel" },
       ...Array.from(map.entries()).map(([value, label]) => ({ value, label })),
     ];
-  }, [studentRecords]);
+  }, [classrooms, studentRecords]);
 
   const classroomMap = useMemo(() => {
     const map = new Map<string, string>();
+    classrooms.forEach((c) => {
+      map.set(c.id, c.name);
+    });
     studentRecords.forEach((item) => {
-      if (item.classroomId) {
+      if (item.classroomId && !map.has(item.classroomId)) {
         map.set(item.classroomId, item.classroom?.name || item.classroomId);
       }
     });
     return map;
-  }, [studentRecords]);
+  }, [classrooms, studentRecords]);
 
   const teacherMap = useMemo(() => {
     const map = new Map<string, string>();
