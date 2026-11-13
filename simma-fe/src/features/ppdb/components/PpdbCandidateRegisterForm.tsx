@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { AlertCircle, ArrowRight, UserPlus, KeyRound } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  UserPlus,
+  KeyRound,
+  GraduationCap,
+  User,
+  School,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
 import type {
   PpdbSchoolType,
   PpdbMajor,
@@ -102,243 +112,288 @@ export const PpdbCandidateRegisterForm: React.FC<PpdbCandidateRegisterFormProps>
   };
 
   return (
-    <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 sm:p-7 space-y-6">
-      <div className="border-b border-slate-700/80 pb-3 flex items-center space-x-2.5">
-        <div className="p-1.5 rounded bg-emerald-500/10 text-emerald-400">
-          <UserPlus className="w-5 h-5" />
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      {/* Header Form */}
+      <div className="px-6 py-6 bg-gradient-to-r from-emerald-50/70 via-white to-white border-b border-slate-100 flex items-center justify-between">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+            <UserPlus className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+              Formulir Pendaftaran Siswa Baru
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Isi kelengkapan identitas calon santri untuk memperoleh nomor registrasi dan akses portal
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm sm:text-base font-bold text-white">
-            Formulir Pendaftaran Akun Calon Siswa Baru
-          </h3>
-          <p className="text-[11px] text-slate-400">
-            Daftarkan akun resmi untuk mengisi formulir, mengunggah berkas, dan memantau seleksi
-          </p>
+        <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-800 text-xs font-semibold">
+          <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
+          <span>T.A. 2025/2026</span>
         </div>
       </div>
 
-      {errorMsg && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{errorMsg}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-        {/* Jalur Pendaftaran */}
-        <div className="p-3.5 bg-slate-900/60 rounded-lg border border-slate-700/60">
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Jalur Pendaftaran PPDB <span className="text-rose-400">*</span>
-            </label>
-            <select
-              value={track}
-              onChange={(e) => setTrack(e.target.value as PpdbTrack)}
-              className="w-full px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="reguler">Jalur Reguler (Tes CBT & Rapor)</option>
-              <option value="prestasi">Jalur Prestasi / Tahfidz Al-Qur'an</option>
-              <option value="afirmasi">Jalur Afirmasi (KIP / PKH / DTKS)</option>
-              <option value="perpindahan_ortu">Jalur Perpindahan Tugas Orang Tua / GTK</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Data Diri Utama */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="sm:col-span-2">
-            <label className="block text-slate-300 font-medium mb-1">
-              Nama Lengkap Calon Siswa (Sesuai Akta/Ijazah) <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Contoh: Muhammad Farhan Al-Fatih"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              NIK (16 Digit Angka) <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              maxLength={16}
-              value={nik}
-              onChange={(e) => setNik(e.target.value.replace(/\D/g, ""))}
-              placeholder="3515xxxxxxxxxxxx"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">NISN (10 Digit, opsional)</label>
-            <input
-              type="text"
-              maxLength={10}
-              value={nisn}
-              onChange={(e) => setNisn(e.target.value.replace(/\D/g, ""))}
-              placeholder="008xxxxxxx"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Tempat Lahir <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={birthPlace}
-              onChange={(e) => setBirthPlace(e.target.value)}
-              placeholder="Kota kelahiran"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Tanggal Lahir <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="date"
-              required
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">Jenis Kelamin</label>
-            <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value as "L" | "P")}
-              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="L">Laki-laki</option>
-              <option value="P">Perempuan</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Nama Ibu Kandung (Wajib EMIS) <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={motherName}
-              onChange={(e) => setMotherName(e.target.value)}
-              placeholder="Sesuai dokumen KK/Akta"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-        </div>
-
-        {/* Data Asal Sekolah */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-700/60">
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">Jenis Sekolah Asal</label>
-            <select
-              value={previousSchoolType}
-              onChange={(e) => setPreviousSchoolType(e.target.value as PpdbSchoolType)}
-              className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="MTs">Madrasah Tsanawiyah (MTs)</option>
-              <option value="SMP">Sekolah Menengah Pertama (SMP)</option>
-              <option value="Pesantren">Pendidikan Pesantren</option>
-              <option value="Lainnya">Lainnya / Kesetaraan</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Nama Madrasah / Sekolah Asal <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={previousSchoolName}
-              onChange={(e) => setPreviousSchoolName(e.target.value)}
-              placeholder="Contoh: MTsN 1 Malang"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-        </div>
-
-        {/* Akun & Kontak */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-700/60">
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Email Aktif <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@pribadi.com"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              No. WhatsApp / HP <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="tel"
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="0812xxxxxxxx"
-              className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-300 font-medium mb-1">
-              Buat Kata Sandi Akun <span className="text-rose-400">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
-                className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 pr-8"
-              />
-              <KeyRound className="w-3.5 h-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2" />
+      <div className="p-6 sm:p-10 space-y-8">
+        {errorMsg && (
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-start space-x-3">
+            <AlertCircle className="w-5 h-5 shrink-0 text-rose-600 mt-0.5" />
+            <div className="space-y-0.5">
+              <span className="font-bold block">Pendaftaran belum dapat diproses</span>
+              <span>{errorMsg}</span>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="pt-3 border-t border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={onGoToLogin}
-            className="text-xs text-slate-400 hover:text-white"
-          >
-            Sudah pernah mendaftar? <span className="text-emerald-400 underline">Masuk Akun</span>
-          </button>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Bagian 1: Jalur Pendaftaran */}
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>1. Pilihan Jalur Seleksi PPDB</span>
+            </div>
+            <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200">
+              <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                Jalur Seleksi Pendaftaran <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={track}
+                onChange={(e) => setTrack(e.target.value as PpdbTrack)}
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+              >
+                <option value="reguler">Jalur Reguler (Tes CBT Potensi Akademik & Rapor)</option>
+                <option value="prestasi">Jalur Prestasi (Tahfidz Al-Qur'an / Kejuaraan Sains)</option>
+                <option value="afirmasi">Jalur Afirmasi (Keluarga Prasejahtera / KIP / PKH)</option>
+                <option value="perpindahan_ortu">Jalur Perpindahan Tugas Orang Tua / GTK Kemenag</option>
+              </select>
+            </div>
+          </div>
 
-          <button
-            type="submit"
-            disabled={registerMutation.isPending}
-            className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white font-bold rounded-md text-xs shadow-lg transition-colors flex items-center justify-center space-x-2"
-          >
-            <span>{registerMutation.isPending ? "Mendaftarkan..." : "Daftar & Lanjut Unggah Berkas"}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </form>
+          {/* Bagian 2: Biodata Calon Siswa */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+              <User className="w-4 h-4 text-emerald-600" />
+              <span>2. Biodata & Identitas Kependudukan Calon Siswa</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Nama Lengkap Calon Siswa (Sesuai Akta Kelahiran/Ijazah) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Contoh: Muhammad Farhan Al-Fatih"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  NIK Calon Siswa (16 Digit Sesuai KK) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength={16}
+                  value={nik}
+                  onChange={(e) => setNik(e.target.value.replace(/\D/g, ""))}
+                  placeholder="3515xxxxxxxxxxxx"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  NISN (10 Digit Angka, opsional)
+                </label>
+                <input
+                  type="text"
+                  maxLength={10}
+                  value={nisn}
+                  onChange={(e) => setNisn(e.target.value.replace(/\D/g, ""))}
+                  placeholder="008xxxxxxx"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Tempat Lahir <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={birthPlace}
+                  onChange={(e) => setBirthPlace(e.target.value)}
+                  placeholder="Kota / Kabupaten Lahir"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Tanggal Lahir <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Jenis Kelamin <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value as "L" | "P")}
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                >
+                  <option value="L">Laki-laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Nama Ibu Kandung (Wajib EMIS Kemenag) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={motherName}
+                  onChange={(e) => setMotherName(e.target.value)}
+                  placeholder="Sesuai dokumen Kartu Keluarga"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bagian 3: Asal Sekolah / Madrasah */}
+          <div className="space-y-4 pt-4 border-t border-slate-200">
+            <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+              <School className="w-4 h-4 text-emerald-600" />
+              <span>3. Asal Madrasah / Sekolah Sebelumnya</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Jenis Lembaga Pendidikan Asal <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  value={previousSchoolType}
+                  onChange={(e) => setPreviousSchoolType(e.target.value as PpdbSchoolType)}
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                >
+                  <option value="MTs">Madrasah Tsanawiyah (MTs)</option>
+                  <option value="SMP">Sekolah Menengah Pertama (SMP)</option>
+                  <option value="Pesantren">Pendidikan Diniyah / Pesantren</option>
+                  <option value="Lainnya">Paket B / Lainnya</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Nama Madrasah / Sekolah Asal <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={previousSchoolName}
+                  onChange={(e) => setPreviousSchoolName(e.target.value)}
+                  placeholder="Contoh: MTsN 1 Kota Semarang"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bagian 4: Akun & Akses Masuk */}
+          <div className="space-y-4 pt-4 border-t border-slate-200">
+            <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+              <Mail className="w-4 h-4 text-emerald-600" />
+              <span>4. Kontak & Kata Sandi Akun Portal Mandiri</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Alamat Email Aktif <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@pribadi.com"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  No. WhatsApp / HP Aktif <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="0812xxxxxxxx"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-medium text-xs mb-1.5">
+                  Kata Sandi Baru <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimal 6 karakter"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm pr-9"
+                  />
+                  <KeyRound className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tombol Submit & Aksi */}
+          <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={onGoToLogin}
+              className="text-xs sm:text-sm text-slate-600 hover:text-emerald-700 transition"
+            >
+              Sudah memiliki akun pendaftaran?{" "}
+              <span className="font-bold text-emerald-700 underline">Masuk di sini</span>
+            </button>
+
+            <button
+              type="submit"
+              disabled={registerMutation.isPending}
+              className="w-full sm:w-auto px-7 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2.5"
+            >
+              <span>{registerMutation.isPending ? "Menyimpan Data..." : "Daftarkan Diri & Dapatkan Akun"}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

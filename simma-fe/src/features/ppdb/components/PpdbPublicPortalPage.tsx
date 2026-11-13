@@ -47,111 +47,116 @@ export const PpdbPublicPortalPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white text-slate-800 py-8 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto space-y-8">
-        {/* Navigation & Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <Link
-            to="/login"
-            className="inline-flex items-center space-x-1.5 text-xs text-slate-500 hover:text-emerald-700 font-medium transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Masuk ke SIMMA Internal</span>
-          </Link>
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span className="text-xs font-semibold text-emerald-800 tracking-wide uppercase">
-              PPDB Online T.A. 2025/2026
-            </span>
-          </div>
-        </div>
-
-        {/* Hero Header */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Penerimaan Peserta Didik Baru Madrasah Aliyah</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Portal Seleksi Siswa Baru
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
-            Layanan resmi pendaftaran mandiri calon siswa madrasah aliyah, upload dokumen persyaratan,
-            dan cetak kartu ujian peserta.
-          </p>
-        </div>
-
-        <div className="space-y-6">
-          {/* Tabs Navigasi */}
-          <div className="flex border-b border-slate-200 overflow-x-auto bg-slate-50/70 p-1.5 rounded-xl border">
+        {/* Top Navbar */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+          <div className="flex items-center space-x-3">
             <button
               type="button"
               onClick={() => setActiveTab("landing")}
-              className={`flex items-center space-x-2 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg whitespace-nowrap transition-all ${
+              className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow hover:bg-emerald-700 transition"
+              title="Ke Beranda PPDB"
+            >
+              <GraduationCap className="w-5 h-5" />
+            </button>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">
+                  PPDB Online Madrasah Aliyah
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                  2025/2026
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Penerimaan Peserta Didik Baru Terpadu EMIS 4.0 Kemenag RI
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 sm:space-x-3 overflow-x-auto">
+            <button
+              type="button"
+              onClick={() => setActiveTab("landing")}
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
                 activeTab === "landing"
-                  ? "bg-white text-emerald-700 shadow-sm border border-emerald-200"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               }`}
             >
-              <span>Beranda & Panduan</span>
+              Beranda
             </button>
 
             {(isCandidateLoggedIn || activeApplicant) ? (
               <button
                 type="button"
                 onClick={() => setActiveTab("dashboard")}
-                className={`flex items-center space-x-2 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg whitespace-nowrap transition-all ${
+                className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === "dashboard"
-                    ? "bg-white text-emerald-700 shadow-sm border border-emerald-200"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
-                <LayoutDashboard className="w-4 h-4 text-emerald-600" />
-                <span>Akun Saya & Berkas</span>
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Portal Pendaftar</span>
               </button>
             ) : (
               <>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("register")}
-                  className={`flex items-center space-x-2 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg whitespace-nowrap transition-all ${
-                    activeTab === "register"
-                      ? "bg-white text-emerald-700 shadow-sm border border-emerald-200"
-                      : "text-slate-600 hover:text-slate-900"
+                  onClick={() => setActiveTab("check-status")}
+                  className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
+                    activeTab === "check-status"
+                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
                 >
-                  <UserPlus className="w-4 h-4 text-emerald-600" />
-                  <span>Daftar Akun Siswa Baru</span>
+                  <Search className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Cek Pengumuman</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveTab("login")}
-                  className={`flex items-center space-x-2 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg whitespace-nowrap transition-all ${
+                  className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
                     activeTab === "login"
-                      ? "bg-white text-emerald-700 shadow-sm border border-emerald-200"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-slate-100 text-slate-900 border border-slate-300"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
                 >
-                  <LogIn className="w-4 h-4 text-emerald-600" />
-                  <span>Masuk Portal Pendaftar</span>
+                  <LogIn className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Masuk Portal</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("register")}
+                  className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm ${
+                    activeTab === "register"
+                      ? "bg-emerald-700 text-white"
+                      : "bg-emerald-600 text-white hover:bg-emerald-700"
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Daftar Baru</span>
                 </button>
               </>
             )}
 
-            <button
-              type="button"
-              onClick={() => setActiveTab("check-status")}
-              className={`flex items-center space-x-2 py-2 px-4 text-xs sm:text-sm font-semibold rounded-lg whitespace-nowrap transition-all ${
-                activeTab === "check-status"
-                  ? "bg-white text-emerald-700 shadow-sm border border-emerald-200"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <Search className="w-4 h-4 text-emerald-600" />
-              <span>Cek Status / Pengumuman</span>
-            </button>
-          </div>
+            <div className="h-5 w-px bg-slate-200 mx-1 hidden sm:block" />
 
-          {/* Tab Contents */}
+            <Link
+              to="/login"
+              className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-slate-600 font-medium transition py-2 px-2"
+              title="Akses GTK / Guru / Admin SIMMA"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">SIMMA GTK</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Tab Contents */}
+        <div className="space-y-6">
           {activeTab === "landing" && (
             <PpdbPublicLandingSection
               onGoToRegister={() => setActiveTab("register")}
@@ -161,7 +166,14 @@ export const PpdbPublicPortalPage: React.FC = () => {
           )}
 
           {activeTab === "register" && !isCandidateLoggedIn && !activeApplicant && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setActiveTab("landing")}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-emerald-700 transition"
+              >
+                <span>&larr; Kembali ke Beranda PPDB</span>
+              </button>
               <PpdbCandidateRegisterForm
                 onSuccess={handleRegisterSuccess}
                 onGoToLogin={() => setActiveTab("login")}
@@ -170,7 +182,14 @@ export const PpdbPublicPortalPage: React.FC = () => {
           )}
 
           {activeTab === "login" && !isCandidateLoggedIn && !activeApplicant && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setActiveTab("landing")}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-emerald-700 transition"
+              >
+                <span>&larr; Kembali ke Beranda PPDB</span>
+              </button>
               <PpdbPortalLoginSection
                 onLoginSuccess={handleLoginSuccess}
                 onGoToRegister={() => setActiveTab("register")}
@@ -200,7 +219,14 @@ export const PpdbPublicPortalPage: React.FC = () => {
           )}
 
           {activeTab === "check-status" && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={() => setActiveTab("landing")}
+                className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-emerald-700 transition"
+              >
+                <span>&larr; Kembali ke Beranda PPDB</span>
+              </button>
               <PpdbCheckStatusSection />
             </div>
           )}
