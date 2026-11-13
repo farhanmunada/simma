@@ -137,26 +137,45 @@ export const AppLayout: React.FC = () => {
                   }
 
                   if (hasSub) {
+                    const primaryHref = item.href || item.subItems![0].href;
                     return (
                       <div key={item.title} className="space-y-0.5">
-                        <button
-                          onClick={() => toggleMenu(item.title)}
+                        <div
                           className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg font-medium transition-colors ${
                             isChildActive
                               ? "text-emerald-800 bg-emerald-50/80 font-semibold"
                               : "text-slate-600 hover:text-emerald-800 hover:bg-emerald-50/60"
                           }`}
                         >
-                          <div className="flex items-center space-x-2.5">
+                          <Link
+                            to={primaryHref}
+                            onClick={() => {
+                              if (!isOpen) {
+                                toggleMenu(item.title);
+                              }
+                            }}
+                            className="flex items-center space-x-2.5 flex-1 min-w-0"
+                          >
                             <Icon className="w-4 h-4 shrink-0" />
-                            <span>{item.title}</span>
-                          </div>
-                          {isOpen ? (
-                            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                          ) : (
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                          )}
-                        </button>
+                            <span className="truncate">{item.title}</span>
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleMenu(item.title);
+                            }}
+                            className="p-1 -mr-1 rounded hover:bg-emerald-100/50 text-slate-400 hover:text-emerald-800 transition-colors"
+                            title={isOpen ? "Tutup submenu" : "Buka submenu"}
+                          >
+                            {isOpen ? (
+                              <ChevronDown className="w-3.5 h-3.5" />
+                            ) : (
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
 
                         {isOpen && (
                           <div className="pl-6 pr-1 space-y-0.5 pt-0.5">
