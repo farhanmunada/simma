@@ -1,4 +1,5 @@
 import React from "react";
+import { Users, GraduationCap, School, Building2 } from "lucide-react";
 import type { EmisReadinessSummary } from "../types";
 
 interface AuditReadinessCardProps {
@@ -19,10 +20,10 @@ export const AuditReadinessCard: React.FC<AuditReadinessCardProps> = ({
   };
 
   const entities = [
-    { name: "Siswa Aktif", data: summary.students, icon: "🎓" },
-    { name: "GTK & Guru", data: summary.teachers, icon: "👨‍🏫" },
-    { name: "Rombongan Belajar", data: summary.classrooms, icon: "🏫" },
-    { name: "Profil Madrasah", data: summary.institution, icon: "🏛️" },
+    { name: "Siswa Aktif", data: summary.students, Icon: GraduationCap },
+    { name: "GTK & Guru", data: summary.teachers, Icon: Users },
+    { name: "Rombongan Belajar", data: summary.classrooms, Icon: School },
+    { name: "Profil Madrasah", data: summary.institution, Icon: Building2 },
   ];
 
   return (
@@ -76,7 +77,9 @@ export const AuditReadinessCard: React.FC<AuditReadinessCardProps> = ({
             className="p-4 rounded-lg bg-gray-50 border border-gray-200 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xl">{item.icon}</span>
+              <span className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
+                <item.Icon className="h-5 w-5" />
+              </span>
               <span
                 className={`text-xs font-bold px-2 py-0.5 rounded ${
                   item.data.percentage >= 95

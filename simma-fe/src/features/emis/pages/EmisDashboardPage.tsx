@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FileCheck } from "lucide-react";
 import { useEmisAudit } from "../api/emis.api";
 import { useAuthStore } from "../../../stores/auth.store";
 import { AuditReadinessCard } from "../components/AuditReadinessCard";
@@ -37,9 +38,9 @@ export const EmisDashboardPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsBapModalOpen(true)}
-            className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-colors flex items-center gap-2"
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
           >
-            <span>📜</span>
+            <FileCheck className="h-4 w-4" />
             <span>Berita Acara (BAP)</span>
           </button>
         </div>

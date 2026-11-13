@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { AlertTriangle, GraduationCap, Users, School, Building2, Archive } from "lucide-react";
 import type { EmisExportType, EmisExportFormat } from "../types";
 import { downloadEmisExport } from "../api/emis.api";
 
@@ -31,37 +32,37 @@ export const ExportCenterCard: React.FC<ExportCenterCardProps> = ({
     type: EmisExportType;
     title: string;
     description: string;
-    icon: string;
+    Icon: React.ComponentType<{ className?: string }>;
   }[] = [
     {
       type: "students",
       title: "Data Siswa EMIS",
       description: "NIK, NISN, NIS, Nama Lengkap, Tempat/Tgl Lahir, Nama & NIK Ibu Kandung, Rombel.",
-      icon: "🎓",
+      Icon: GraduationCap,
     },
     {
       type: "teachers",
       title: "Data GTK & Pendidik",
       description: "NIK, NUPTK, PegID, NIP, Nama, Jenis Kelamin, Pendidikan, Sertifikasi, JTM.",
-      icon: "👨‍🏫",
+      Icon: Users,
     },
     {
       type: "classrooms",
       title: "Rombongan Belajar",
       description: "Nama Rombel, Tingkat Kelas, NUPTK & Nama Wali Kelas, Jumlah Siswa.",
-      icon: "🏫",
+      Icon: School,
     },
     {
       type: "institution",
       title: "Profil Madrasah",
       description: "NSM, NPSN, Nama Resmi, Alamat, Tahun Ajaran, Semester, Kepala Madrasah.",
-      icon: "🏛️",
+      Icon: Building2,
     },
     {
       type: "bundle",
       title: "Master Bundle EMIS",
       description: "Paket lengkap seluruh data siswa, GTK, rombel, profil lembaga dengan checksum.",
-      icon: "📦",
+      Icon: Archive,
     },
   ];
 
@@ -106,7 +107,7 @@ export const ExportCenterCard: React.FC<ExportCenterCardProps> = ({
 
       {!isReadyForExport && (
         <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-2 text-xs text-amber-800">
-          <span className="text-base leading-none">⚠️</span>
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-600" />
           <div>
             <span className="font-bold">Peringatan Kesiapan Data ({overallPercentage}%): </span>
             Masih terdapat anomali data di atas ambang batas toleransi. Anda tetap dapat mengunduh
@@ -129,7 +130,9 @@ export const ExportCenterCard: React.FC<ExportCenterCardProps> = ({
           >
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xl">{item.icon}</span>
+                <span className="p-1.5 bg-emerald-50 text-emerald-700 rounded-lg">
+                  <item.Icon className="h-4 w-4" />
+                </span>
                 <h4 className="font-bold text-sm text-gray-900">{item.title}</h4>
               </div>
               <p className="text-xs text-gray-500 mb-4">{item.description}</p>

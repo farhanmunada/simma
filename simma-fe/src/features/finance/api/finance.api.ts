@@ -39,7 +39,14 @@ export const financeKeys = {
 export const useFeeItems = (params?: QueryParamMap) =>
   useQuery({
     queryKey: financeKeys.feeItems(params),
-    queryFn: () => apiClient<FeeItemDto[]>(API_ENDPOINTS.FINANCE.FEE_ITEMS, { params }),
+    queryFn: async () => {
+      const res = await apiClient<any>(API_ENDPOINTS.FINANCE.FEE_ITEMS, { params });
+      if (Array.isArray(res)) return res as FeeItemDto[];
+      if (res && typeof res === "object" && "data" in res && Array.isArray(res.data)) {
+        return res.data as FeeItemDto[];
+      }
+      return [] as FeeItemDto[];
+    },
   });
 
 export const useCreateFeeItem = () => {
@@ -87,7 +94,14 @@ export const useDeleteFeeItem = () => {
 export const useInvoices = (params?: QueryParamMap) =>
   useQuery({
     queryKey: financeKeys.invoices(params),
-    queryFn: () => apiClient<StudentInvoiceDto[]>(API_ENDPOINTS.FINANCE.INVOICES, { params }),
+    queryFn: async () => {
+      const res = await apiClient<any>(API_ENDPOINTS.FINANCE.INVOICES, { params });
+      if (Array.isArray(res)) return res as StudentInvoiceDto[];
+      if (res && typeof res === "object" && "data" in res && Array.isArray(res.data)) {
+        return res.data as StudentInvoiceDto[];
+      }
+      return [] as StudentInvoiceDto[];
+    },
   });
 
 export const useGenerateInvoices = () => {
@@ -163,10 +177,16 @@ export const useVoidPayment = () => {
 export const useDispensations = (studentId?: string) =>
   useQuery({
     queryKey: financeKeys.dispensations(studentId),
-    queryFn: () =>
-      apiClient<DispensationDto[]>(API_ENDPOINTS.FINANCE.DISPENSATIONS, {
+    queryFn: async () => {
+      const res = await apiClient<any>(API_ENDPOINTS.FINANCE.DISPENSATIONS, {
         params: studentId ? { studentId } : undefined,
-      }),
+      });
+      if (Array.isArray(res)) return res as DispensationDto[];
+      if (res && typeof res === "object" && "data" in res && Array.isArray(res.data)) {
+        return res.data as DispensationDto[];
+      }
+      return [] as DispensationDto[];
+    },
   });
 
 export const useCreateDispensation = () => {
@@ -201,11 +221,23 @@ export const useUpdateDispensationStatus = () => {
 export const useCashflowReport = (params?: QueryParamMap) =>
   useQuery({
     queryKey: financeKeys.cashflow(params),
-    queryFn: () => apiClient<CashflowReportDto>(API_ENDPOINTS.FINANCE.REPORTS_CASHFLOW, { params }),
+    queryFn: async () => {
+      const res = await apiClient<any>(API_ENDPOINTS.FINANCE.REPORTS_CASHFLOW, { params });
+      if (res && typeof res === "object" && "data" in res && !("summary" in res)) {
+        return res.data as CashflowReportDto;
+      }
+      return res as CashflowReportDto;
+    },
   });
 
 export const useArrearsReport = (params?: QueryParamMap) =>
   useQuery({
     queryKey: financeKeys.arrears(params),
-    queryFn: () => apiClient<ArrearsReportDto>(API_ENDPOINTS.FINANCE.REPORTS_ARREARS, { params }),
+    queryFn: async () => {
+      const res = await apiClient<any>(API_ENDPOINTS.FINANCE.REPORTS_ARREARS, { params });
+      if (res && typeof res === "object" && "data" in res && !("summary" in res)) {
+        return res.data as ArrearsReportDto;
+      }
+      return res as ArrearsReportDto;
+    },
   });

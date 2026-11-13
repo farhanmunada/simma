@@ -107,7 +107,7 @@ export class FinanceRepository {
   }
 
   async searchActiveStudents(query: string, limit = 10) {
-    const pattern = `%${query}%`;
+    const pattern = `%${query.trim()}%`;
     return getDb()
       .select({ id: students.id, fullName: students.fullName, nis: students.nis, nisn: students.nisn, status: students.status, classroomId: classStudents.classroomId, classroomName: classrooms.name })
       .from(students)

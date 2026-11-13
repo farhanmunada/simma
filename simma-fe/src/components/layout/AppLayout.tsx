@@ -21,12 +21,12 @@ export const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900 font-sans antialiased">
+    <div className="h-screen flex overflow-hidden bg-slate-50 text-slate-900 font-sans antialiased">
       {/* Master Vertical Navigation Sidebar */}
       <aside
         className={`${
           isCollapsed ? "w-16" : "w-60"
-        } bg-white text-slate-600 flex flex-col shrink-0 border-r border-slate-200 transition-all duration-200 select-none shadow-xs`}
+        } bg-white text-slate-600 flex flex-col shrink-0 h-full border-r border-slate-200 transition-all duration-200 select-none shadow-xs`}
       >
         <div className="h-14 px-3 flex items-center justify-between border-b border-slate-100 bg-emerald-50/30">
           {!isCollapsed ? (

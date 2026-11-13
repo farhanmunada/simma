@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FileText, Layers, Search, Filter } from "lucide-react";
 import { useInvoices } from "../api/finance.api";
 import { GenerateInvoicesModal } from "../components/GenerateInvoicesModal";
+import type { StudentInvoiceDto } from "../types";
 import type { InvoiceStatus } from "../types";
 
 export const FinanceInvoicesPage: React.FC = () => {
@@ -17,6 +18,12 @@ export const FinanceInvoicesPage: React.FC = () => {
   };
 
   const { data: invoices = [], isLoading } = useInvoices(queryParams);
+  const rawInvoices = invoices as any;
+  const invoiceList: StudentInvoiceDto[] = Array.isArray(rawInvoices)
+    ? rawInvoices
+    : Array.isArray(rawInvoices?.data)
+    ? rawInvoices.data
+    : [];
 
   return (
     <div className="space-y-6 p-6">
@@ -113,14 +120,14 @@ export const FinanceInvoicesPage: React.FC = () => {
                     Memuat data tagihan...
                   </td>
                 </tr>
-              ) : invoices.length === 0 ? (
+              ) : invoiceList.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-slate-400">
                     Tidak ada tagihan yang sesuai dengan filter.
                   </td>
                 </tr>
               ) : (
-                invoices.map((inv) => (
+                invoiceList.map((inv) => (
                   <tr key={inv.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-semibold text-slate-800">{inv.invoiceNumber}</td>
                     <td className="px-4 py-3">

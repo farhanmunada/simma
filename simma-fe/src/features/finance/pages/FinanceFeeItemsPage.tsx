@@ -9,6 +9,12 @@ export const FinanceFeeItemsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: feeItems = [], isLoading } = useFeeItems();
+  const rawItems = feeItems as any;
+  const itemList: FeeItemDto[] = Array.isArray(rawItems)
+    ? rawItems
+    : Array.isArray(rawItems?.data)
+    ? rawItems.data
+    : [];
   const deleteMutation = useDeleteFeeItem();
 
   const handleEdit = (item: FeeItemDto) => {
@@ -69,14 +75,14 @@ export const FinanceFeeItemsPage: React.FC = () => {
                     Memuat daftar pos biaya...
                   </td>
                 </tr>
-              ) : feeItems.length === 0 ? (
+              ) : itemList.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-slate-400">
                     Belum ada pos biaya yang dikonfigurasi.
                   </td>
                 </tr>
               ) : (
-                feeItems.map((f) => (
+                itemList.map((f) => (
                   <tr key={f.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-mono font-bold text-slate-800">{f.code}</td>
                     <td className="px-4 py-3 font-semibold text-slate-900">{f.name}</td>

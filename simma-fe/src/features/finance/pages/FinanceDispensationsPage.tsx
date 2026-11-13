@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { Check, X, ShieldAlert, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Check, X, Clock, AlertCircle } from "lucide-react";
 import { useDispensations, useUpdateDispensationStatus } from "../api/finance.api";
-import type { DispensationStatus } from "../types";
+import type { DispensationStatus, DispensationDto } from "../types";
 
 export const FinanceDispensationsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("");
 
   const { data: dispensations = [], isLoading } = useDispensations();
+  const rawDispensations = dispensations as any;
+  const dispensationList: DispensationDto[] = Array.isArray(rawDispensations)
+    ? rawDispensations
+    : Array.isArray(rawDispensations?.data)
+    ? rawDispensations.data
+    : [];
   const updateStatusMutation = useUpdateDispensationStatus();
 
   const handleUpdateStatus = async (id: string, status: DispensationStatus) => {
@@ -24,8 +30,8 @@ export const FinanceDispensationsPage: React.FC = () => {
   };
 
   const filteredDispensations = statusFilter
-    ? dispensations.filter((d) => d.status === statusFilter)
-    : dispensations;
+    ? dispensationList.filter((d) => d.status === statusFilter)
+    : dispensationList;
 
   return (
     <div className="space-y-6 p-6">

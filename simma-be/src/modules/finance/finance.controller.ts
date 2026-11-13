@@ -85,7 +85,7 @@ export class FinanceController {
   // Cashier POS
   searchCashierStudents = async (req: FastifyRequest, reply: FastifyReply) => {
     const { q } = parseData(CashierSearchQuerySchema, req.query);
-    const data = await this.service.searchStudents(q);
+    const data = await this.service.searchStudents(q || "");
     return reply.status(200).send({ data });
   };
 
