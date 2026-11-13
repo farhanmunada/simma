@@ -13,6 +13,8 @@ import {
   useEnrollApplicant,
   useDeleteApplicant,
 } from "../api/ppdb.api";
+import { apiClient } from "../../../lib/api-client";
+import { API_ENDPOINTS } from "../../../config/endpoints";
 import type { PpdbApplicant, PpdbStatus } from "../types";
 import { Card } from "../../../components/ui/Card";
 import { ConfirmDialog } from "../../../components/ui/ConfirmDialog";
@@ -55,10 +57,20 @@ export const PpdbDashboardPage: React.FC = () => {
   const enrollMutation = useEnrollApplicant();
   const deleteMutation = useDeleteApplicant();
 
-  const handleOpenDetailModal = (app: PpdbApplicant) => {
+  const handleOpenDetailModal = async (app: PpdbApplicant) => {
     setActiveApplicant(app);
     setNewStatus(app.status);
     setNotes(app.notes || "");
+    try {
+      const fresh = await apiClient<PpdbApplicant>(
+        API_ENDPOINTS.PPDB.APPLICANT_DETAIL(app.id)
+      );
+      if (fresh) {
+        setActiveApplicant(fresh);
+      }
+    } catch {
+      // ignore
+    }
   };
 
   const handleSaveStatus = async (e: React.FormEvent) => {

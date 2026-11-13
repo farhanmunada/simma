@@ -3,6 +3,7 @@ import type { PpdbApplicant, PpdbStatus } from "../types";
 import { Modal } from "../../../components/ui/Modal";
 import { Button } from "../../../components/ui/Button";
 import { API_ENDPOINTS } from "../../../config/endpoints";
+import { PpdbDocumentVerificationList } from "./PpdbDocumentVerificationList";
 
 interface PpdbDetailModalProps {
   applicant: PpdbApplicant | null;
@@ -85,6 +86,12 @@ export const PpdbDetailModal: React.FC<PpdbDetailModalProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Verification of Uploaded Documents */}
+        <PpdbDocumentVerificationList
+          applicantId={applicant.id}
+          documents={applicant.documentsList || []}
+        />
 
         <div className="space-y-3 pt-2">
           <div>
