@@ -1,12 +1,14 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router";
 import { SetupWizardPage } from "./components/SetupWizardPage";
+import { InstitutionProfilePage } from "./components/InstitutionProfilePage";
 
 export const SettingsRoutes: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Child Routes */}
       <Routes>
+        <Route path="profile" element={<InstitutionProfilePage />} />
         <Route path="wizard" element={<SetupWizardPage />} />
 
         {/* Redirect master data lama ke Kesiswaan */}
@@ -18,8 +20,8 @@ export const SettingsRoutes: React.FC = () => {
         {/* Redirect guru ke modul Kepegawaian */}
         <Route path="teachers" element={<Navigate to="/teachers" replace />} />
 
-        <Route index element={<Navigate to="/settings/wizard" replace />} />
-        <Route path="*" element={<Navigate to="/settings/wizard" replace />} />
+        <Route index element={<Navigate to="/settings/profile" replace />} />
+        <Route path="*" element={<Navigate to="/settings/profile" replace />} />
       </Routes>
     </div>
   );

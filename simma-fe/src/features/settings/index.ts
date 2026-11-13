@@ -1,4 +1,5 @@
 export * from "./SettingsRoutes";
+export * from "./components/InstitutionProfilePage";
 export * from "./components/SetupWizardPage";
 export * from "./components/AcademicYearsPage";
 export * from "./components/SemestersPage";

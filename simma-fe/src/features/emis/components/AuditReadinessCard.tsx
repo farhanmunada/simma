@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 import { Users, GraduationCap, School, Building2 } from "lucide-react";
 import type { EmisReadinessSummary } from "../types";
 
@@ -101,6 +102,14 @@ export const AuditReadinessCard: React.FC<AuditReadinessCardProps> = ({
                 Anomali: {item.data.invalid ?? 0}
               </span>
             </div>
+            {item.name === "Profil Lembaga" && (
+              <Link
+                to="/settings/profile"
+                className="text-[11px] text-emerald-600 hover:text-emerald-700 hover:underline mt-2 inline-flex items-center font-medium"
+              >
+                Perbarui Profil &rarr;
+              </Link>
+            )}
           </div>
         ))}
       </div>

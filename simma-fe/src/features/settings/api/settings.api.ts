@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
 import { API_ENDPOINTS } from "../../../config/endpoints";
 import type {
+  Institution,
+  UpdateInstitutionDto,
   AcademicYear,
   CreateAcademicYearDto,
   UpdateAcademicYearDto,
@@ -37,6 +39,28 @@ function extractSingle<T>(res: unknown): T {
     }
   }
   return res as T;
+}
+
+// ----------------------------------------------------
+// 0. INSTITUTION / PROFIL MADRASAH
+// ----------------------------------------------------
+export async function getInstitution(): Promise<Institution> {
+  const res = await apiClient<unknown>(API_ENDPOINTS.SETUP.INSTITUTION);
+  return extractSingle<Institution>(res);
+}
+
+export async function updateInstitution(
+  data: UpdateInstitutionDto,
+  id?: string,
+): Promise<Institution> {
+  const endpoint = id
+    ? API_ENDPOINTS.SETUP.INSTITUTION_DETAIL(id)
+    : API_ENDPOINTS.SETUP.INSTITUTION;
+  const res = await apiClient<unknown>(endpoint, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return extractSingle<Institution>(res);
 }
 
 // ----------------------------------------------------
@@ -513,6 +537,27 @@ export function useDeleteTeacher() {
     mutationFn: (id: string) => deleteTeacher(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+}
+
+// ----------------------------------------------------
+// 6. INSTITUTION HOOKS
+// ----------------------------------------------------
+export function useInstitution() {
+  return useQuery({
+    queryKey: ["institution"],
+    queryFn: () => getInstitution(),
+  });
+}
+
+export function useUpdateInstitution() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id?: string; data: UpdateInstitutionDto }) =>
+      updateInstitution(data, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["institution"] });
     },
   });
 }

@@ -2,6 +2,7 @@ import React from "react";
 import {
   Mail,
   Settings,
+  Building2,
   Users,
   BookOpen,
   CalendarCheck,
@@ -46,6 +47,12 @@ export const navGroups: NavGroup[] = [
   {
     group: "Administrasi & TU",
     items: [
+      {
+        title: "Profil Madrasah",
+        href: "/settings/profile",
+        icon: Building2,
+        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
+      },
       {
         title: "Tata Usaha & Surat",
         icon: Mail,

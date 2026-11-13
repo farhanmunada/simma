@@ -111,8 +111,10 @@ export interface Institution {
   npsn: string;
   name: string;
   level?: "MA";
-  status: "NEGERI" | "SWASTA";
+  status: "negeri" | "swasta" | "NEGERI" | "SWASTA";
   address?: string | null;
+  logoPath?: string | null;
+  emisData?: Record<string, any>;
   village?: string | null;
   district?: string | null;
   city?: string | null;
@@ -123,6 +125,16 @@ export interface Institution {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export type UpdateInstitutionDto = Partial<{
+  nsm: string;
+  npsn: string;
+  name: string;
+  status: "negeri" | "swasta" | "NEGERI" | "SWASTA";
+  address: string;
+  logoPath?: string | null;
+  emisData?: Record<string, any>;
+}>;
 
 export interface SetupWizardData {
   institution: {
