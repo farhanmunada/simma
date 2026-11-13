@@ -25,7 +25,7 @@ export class EmisController {
   getAuditReadiness = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(emisAuditQuerySchema, req.query);
     const data = await this.service.getAuditReadiness(query);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   exportStudents = async (req: FastifyRequest, reply: FastifyReply) => {

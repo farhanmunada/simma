@@ -22,6 +22,7 @@ export interface EmisAnomalyItem {
 export interface EmisEntityReadiness {
   total: number;
   ready: number;
+  valid?: number;
   invalid: number;
   percentage: number;
 }

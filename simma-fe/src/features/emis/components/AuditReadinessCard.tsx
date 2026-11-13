@@ -96,9 +96,9 @@ export const AuditReadinessCard: React.FC<AuditReadinessCardProps> = ({
               {item.name}
             </div>
             <div className="text-xs text-gray-500 mt-1 flex justify-between">
-              <span>Valid: {item.data.valid}</span>
+              <span>Valid: {item.data.valid ?? (item.data as any).ready ?? 0}</span>
               <span className="text-rose-600 font-medium">
-                Anomali: {item.data.invalid}
+                Anomali: {item.data.invalid ?? 0}
               </span>
             </div>
           </div>

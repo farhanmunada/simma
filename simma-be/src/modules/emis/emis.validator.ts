@@ -282,6 +282,7 @@ export function calculateReadiness(total: number, ready: number): EmisEntityRead
   return {
     total,
     ready,
+    valid: ready,
     invalid: Math.max(0, total - ready),
     percentage,
   };

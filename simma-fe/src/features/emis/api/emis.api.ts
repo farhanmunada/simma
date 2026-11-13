@@ -18,7 +18,10 @@ export const EMIS_QUERY_KEYS = {
 export function useEmisAudit() {
   return useQuery({
     queryKey: EMIS_QUERY_KEYS.audit,
-    queryFn: () => apiClient<EmisAuditResponse>(API_ENDPOINTS.EMIS.AUDIT),
+    queryFn: async () => {
+      const res = await apiClient<any>(API_ENDPOINTS.EMIS.AUDIT);
+      return (res?.data && res.data.summary ? res.data : res) as EmisAuditResponse;
+    },
   });
 }
 
