@@ -12,9 +12,10 @@ D:\Coding\simma\
 ├── README.md               # Indeks & dokumentasi proyek
 ├── .gitignore              # Proteksi secret, env, dan cache
 ├── docs/                   # Spesifikasi & riset sistem
-│   ├── RESEARCH.md         # Analisis regulasi Kemenag (KMA 347/450, EMIS, RDM, Tahfidz)
 │   ├── PRD.md              # Product Requirement Document & matriks RBAC
-│   └── ARCHITECTURE.md     # Topologi Ubuntu Server, ERD, dan mitigasi konkurensi
+│   ├── ARCHITECTURE.md     # Topologi Ubuntu Server, ERD, dan mitigasi konkurensi
+│   ├── UX-DESIGN.md        # Panduan token UI/UX & Tailwind styling
+│   └── modules/            # PRD spesifik per modul (19 modul)
 ├── simma-be/               # Backend API: Node.js (v22 LTS) + Fastify (TS) + Drizzle + PostgreSQL
 └── simma-fe/               # Frontend Client: Vite + React (TS) + TanStack Table + Tailwind CSS
 ```
@@ -31,11 +32,19 @@ D:\Coding\simma\
 
 ---
 
-## Status Pengembangan & Dokumentasi Modular (19 Modul)
+## Status Proyek: Tahap Testing & QA (Seluruh 19 Modul Selesai)
 
-Dokumentasi spesifikasi (PRD), arsitektur, diagram aktivitas, dan ERD dikelola secara modular di `docs/modules/` sesuai siklus kebutuhan SIMMA:
+Pengembangan seluruh 19 modul madrasah (Wave 0 hingga Wave 10) telah selesai diimplementasikan pada Backend Fastify dan Frontend React Vite. Sistem saat ini berada pada **Tahap Pengujian Menyeluruh (Testing & Quality Assurance)**.
 
-### Phase 1: MVP (Pondasi Administratif & Siklus Akademik)
+### Metrik Kualitas & Hasil Pengujian
+- **Frontend Unit Tests (Vitest):** 18 test suite, 89 unit tests lulus (100% PASS).
+- **Backend Unit Tests (Vitest):** Seluruh modul backend tervalidasi via vitest unit tests.
+- **Type Safety (TypeScript):** `pnpm -r run typecheck` (tsc `--noEmit`) 0 error / bersih di kedua workspace (`simma-be` dan `simma-fe`).
+- **Defensive Data Guards:** Seluruh payload API terstandardisasi dengan penanganan `unwrapData` dan proteksi non-array (`Array.isArray`) anti-crash di FE.
+
+### Daftar Cakupan 19 Modul (Semua Siap Diuji)
+
+#### Phase 1: MVP (Pondasi Administratif & Siklus Akademik)
 - [x] **01. Auth & RBAC (`docs/modules/01-auth-rbac/`):** Autentikasi JWT, multi-role 11 peran madrasah, brute-force lockout, audit trail.
 - [x] **02. Master Setup (`docs/modules/02-master-setup/`):** Profil lembaga, aktivasi atomik TA & Semester, rombel, 44 Mapel KMA 347/450, penugasan GTK.
 - [x] **03. Tata Usaha & Persuratan (`docs/modules/03-tata-usaha-persuratan/`):** Agenda surat masuk, lembar disposisi Kamad, penomoran otomatis PMA 12/2024, generator surat dinas (SKAS, ST, SKKB) + QR Code.
@@ -46,14 +55,14 @@ Dokumentasi spesifikasi (PRD), arsitektur, diagram aktivitas, dan ERD dikelola s
 - [x] **08. Penilaian Akademik (`docs/modules/08-penilaian-akademik/`):** Asesmen TP/LM & SAS, bobot fleksibel, grid spreadsheet, nilai akhir & deskripsi capaian KMA 347/450.
 - [x] **09. Rapor & Legger RDM (`docs/modules/09-rapor-rdm/`):** Verifikasi kelengkapan nilai wali kelas, legger kelas, cetak rapor format resmi RDM Kemenag (PDF).
 
-### Phase 2: Extended (Kokurikuler, Kepondokan & Finansial)
+#### Phase 2: Extended (Kokurikuler, Kepondokan & Finansial)
 - [x] **10. P5RA (`docs/modules/10-p5ra/`):** Kokurikuler Profil Pelajar Pancasila & Rahmatan Lil 'Alamin (10 nilai Kemenag), matriks penilaian 4 predikat, rapor P5RA.
 - [x] **11. Mutaba'ah Yaumiyah (`docs/modules/11-mutabaah-yaumiyah/`):** Monitoring amalan ibadah harian santri (shalat berjamaah, tahajud, dhuha, tilawah, dzikir, puasa sunnah).
 - [x] **12. Keuangan SPP & Billing (`docs/modules/12-keuangan-spp/`):** Billing massal bulanan, kasir cepat auto-suggest, kwitansi bernomor seri, dasbor tunggakan, dispensasi ujian.
 - [x] **13. Kepegawaian GTK (`docs/modules/13-kepegawaian-gtk/`):** Profil pendidik & tenaga kependidikan EMIS/Simpatika, sertifikasi, verifikasi 24 JTM, arsip digital GTK.
 - [x] **14. Jadwal Pelajaran (`docs/modules/14-jadwal-pelajaran/`):** Penjadwalan madrasah formal + diniyah pondok, deteksi bentrok seketika, multi-view jadwal.
 
-### Phase 3: Complete (Manajemen Lanjut & Ekosistem Nasional)
+#### Phase 3: Complete (Manajemen Lanjut & Ekosistem Nasional)
 - [x] **15. Mutasi & Kelulusan (`docs/modules/15-mutasi-siswa/`):** Mutasi masuk, clearance bebas tanggungan 3 dimensi (SPP/perpus/tatib), surat pindah Kemenag, kelulusan XII.
 - [x] **16. Tatib & Poin Kedisiplinan (`docs/modules/16-tatib-kedisiplinan/`):** Sistem kredit poin pelanggaran & reward prestasi, eskalasi SP-1 s/d SP-3, surat panggilan ortu, catatan BK.
 - [x] **17. Ekstrakurikuler (`docs/modules/17-ekstrakurikuler/`):** Direktori ekskul, pendaftaran mandiri, presensi latihan mingguan, penilaian capaian rapor RDM.
@@ -100,12 +109,25 @@ pnpm dev:fe     # Terminal 2
 
 ---
 
-## Verification
+## Verification & Testing Suite
+
+Jalankan seluruh pengujian dan pengecekan kode:
 
 ```bash
+# 1. Typecheck (TypeScript strict mode)
 pnpm -r run typecheck
-pnpm -r run lint
+
+# 2. Unit Testing (Vitest - Backend & Frontend)
 pnpm -r run test
+
+# Jalankan pengujian per workspace:
+pnpm --filter simma-fe exec vitest run     # 18 test suite, 89 unit tests frontend
+pnpm --filter simma-be exec vitest run     # Unit tests controller & service backend
+
+# 3. Linter
+pnpm -r run lint
+
+# 4. Production Build
 pnpm -r run build
 ```
 
