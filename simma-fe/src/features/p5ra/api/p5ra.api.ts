@@ -11,6 +11,13 @@ import type {
   P5raStudentAssessmentItem,
 } from "../types";
 
+function unwrapData<T>(res: unknown): T {
+  if (res && typeof res === "object" && "data" in res) {
+    return (res as { data: T }).data;
+  }
+  return res as T;
+}
+
 export const p5raQueryKeys = {
   all: ["p5ra"] as const,
   projects: (params?: Record<string, unknown>) => ["p5ra", "projects", params] as const,
@@ -33,11 +40,13 @@ export async function fetchP5raProjects(params?: {
   const res = await apiClient<P5raProjectItem[]>(API_ENDPOINTS.P5RA.PROJECTS, {
     params,
   });
-  return res ?? [];
+  const unwrapped = unwrapData<P5raProjectItem[]>(res);
+  return Array.isArray(unwrapped) ? unwrapped : [];
 }
 
 export async function fetchP5raProjectDetail(projectId: string): Promise<P5raProjectDetail> {
-  return apiClient<P5raProjectDetail>(API_ENDPOINTS.P5RA.PROJECT_DETAIL(projectId));
+  const res = await apiClient<P5raProjectDetail>(API_ENDPOINTS.P5RA.PROJECT_DETAIL(projectId));
+  return unwrapData<P5raProjectDetail>(res);
 }
 
 export async function createP5raProject(data: {
@@ -51,10 +60,11 @@ export async function createP5raProject(data: {
   startDate?: string;
   endDate?: string;
 }): Promise<P5raProjectItem> {
-  return apiClient<P5raProjectItem>(API_ENDPOINTS.P5RA.PROJECTS, {
+  const res = await apiClient<P5raProjectItem>(API_ENDPOINTS.P5RA.PROJECTS, {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return unwrapData<P5raProjectItem>(res);
 }
 
 export async function updateP5raProject(
@@ -69,10 +79,11 @@ export async function updateP5raProject(
     endDate: string;
   }>
 ): Promise<P5raProjectItem> {
-  return apiClient<P5raProjectItem>(API_ENDPOINTS.P5RA.PROJECT_DETAIL(projectId), {
+  const res = await apiClient<P5raProjectItem>(API_ENDPOINTS.P5RA.PROJECT_DETAIL(projectId), {
     method: "PUT",
     body: JSON.stringify(data),
   });
+  return unwrapData<P5raProjectItem>(res);
 }
 
 export async function deleteP5raProject(projectId: string): Promise<void> {
@@ -92,7 +103,9 @@ export async function assignProjectClassrooms(
 }
 
 export async function fetchP5raTargets(projectId: string): Promise<P5raTargetItem[]> {
-  return apiClient<P5raTargetItem[]>(API_ENDPOINTS.P5RA.TARGETS(projectId));
+  const res = await apiClient<P5raTargetItem[]>(API_ENDPOINTS.P5RA.TARGETS(projectId));
+  const unwrapped = unwrapData<P5raTargetItem[]>(res);
+  return Array.isArray(unwrapped) ? unwrapped : [];
 }
 
 export async function createP5raTarget(
@@ -107,10 +120,11 @@ export async function createP5raTarget(
     orderIndex?: number;
   }
 ): Promise<P5raTargetItem> {
-  return apiClient<P5raTargetItem>(API_ENDPOINTS.P5RA.TARGETS(projectId), {
+  const res = await apiClient<P5raTargetItem>(API_ENDPOINTS.P5RA.TARGETS(projectId), {
     method: "POST",
     body: JSON.stringify(data),
   });
+  return unwrapData<P5raTargetItem>(res);
 }
 
 export async function deleteP5raTarget(projectId: string, targetId: string): Promise<void> {
@@ -123,9 +137,11 @@ export async function fetchP5raAssessments(
   projectId: string,
   classroomId?: string
 ): Promise<StudentAssessmentRow[]> {
-  return apiClient<StudentAssessmentRow[]>(API_ENDPOINTS.P5RA.ASSESSMENTS(projectId), {
+  const res = await apiClient<StudentAssessmentRow[]>(API_ENDPOINTS.P5RA.ASSESSMENTS(projectId), {
     params: classroomId ? { classroomId } : undefined,
   });
+  const unwrapped = unwrapData<StudentAssessmentRow[]>(res);
+  return Array.isArray(unwrapped) ? unwrapped : [];
 }
 
 export async function saveBatchAssessments(
@@ -152,30 +168,33 @@ export async function generateStudentNotes(
   projectId: string,
   studentId: string
 ): Promise<{ processNotes: string }> {
-  return apiClient<{ processNotes: string }>(
+  const res = await apiClient<{ processNotes: string }>(
     API_ENDPOINTS.P5RA.NOTES_GENERATE(projectId, studentId),
     {
       method: "POST",
     }
   );
+  return unwrapData<{ processNotes: string }>(res);
 }
 
 export async function fetchP5raRecap(
   projectId: string,
   classroomId?: string
 ): Promise<P5raRecapResponse> {
-  return apiClient<P5raRecapResponse>(API_ENDPOINTS.P5RA.RECAP(projectId), {
+  const res = await apiClient<P5raRecapResponse>(API_ENDPOINTS.P5RA.RECAP(projectId), {
     params: classroomId ? { classroomId } : undefined,
   });
+  return unwrapData<P5raRecapResponse>(res);
 }
 
 export async function fetchStudentP5raReport(
   projectId: string,
   studentId: string
 ): Promise<P5raReportViewData> {
-  return apiClient<P5raReportViewData>(
+  const res = await apiClient<P5raReportViewData>(
     API_ENDPOINTS.P5RA.STUDENT_REPORT(projectId, studentId)
   );
+  return unwrapData<P5raReportViewData>(res);
 }
 
 export async function downloadStudentP5raPdf(

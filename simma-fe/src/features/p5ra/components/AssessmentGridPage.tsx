@@ -21,10 +21,11 @@ export const AssessmentGridPage: React.FC = () => {
   const [isSavedSuccess, setIsSavedSuccess] = useState(false);
 
   const { data: project } = useP5raProjectDetail(projectId);
-  const { data: studentRows = [], isLoading } = useP5raAssessments(
+  const { data: rawStudentRows = [], isLoading } = useP5raAssessments(
     projectId,
     selectedClassroomId || undefined
   );
+  const safeStudentRows = Array.isArray(rawStudentRows) ? rawStudentRows : [];
 
   const [assessmentMap, setAssessmentMap] = useState<
     Record<string, Record<string, P5raPredicate>>
@@ -36,11 +37,11 @@ export const AssessmentGridPage: React.FC = () => {
   const saveNotesMutation = useSaveStudentNotes(projectId);
 
   useEffect(() => {
-    if (studentRows.length > 0) {
+    if (safeStudentRows.length > 0) {
       const initialAssessments: Record<string, Record<string, P5raPredicate>> = {};
       const initialNotes: Record<string, string> = {};
 
-      studentRows.forEach((row) => {
+      safeStudentRows.forEach((row) => {
         initialAssessments[row.student.id] = {};
         row.assessments?.forEach((a) => {
           initialAssessments[row.student.id][a.targetId] = a.predicate;
@@ -53,7 +54,7 @@ export const AssessmentGridPage: React.FC = () => {
       setAssessmentMap(initialAssessments);
       setNotesMap(initialNotes);
     }
-  }, [studentRows]);
+  }, [safeStudentRows]);
 
   const handlePredicateChange = (
     studentId: string,
@@ -132,7 +133,7 @@ export const AssessmentGridPage: React.FC = () => {
     }
   };
 
-  const targets = project?.targets || [];
+  const targets = Array.isArray(project?.targets) ? project.targets : [];
 
   return (
     <div className="space-y-5">
@@ -196,7 +197,7 @@ export const AssessmentGridPage: React.FC = () => {
         <div className="p-8 text-center text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl">
           Belum ada target capaian dimensi yang ditambahkan ke projek ini. Silakan tambahkan target capaian di halaman detail projek terlebih dahulu.
         </div>
-      ) : studentRows.length === 0 ? (
+      ) : safeStudentRows.length === 0 ? (
         <div className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200 rounded-xl">
           Tidak ada siswa yang terdaftar pada rombel projek ini.
         </div>
@@ -220,8 +221,8 @@ export const AssessmentGridPage: React.FC = () => {
                 <th className="p-3 w-20 text-center border-l border-slate-200">Aksi</th>
               </tr>
             </thead>
-                        <tbody className="divide-y divide-slate-100">
-              {studentRows.map((row, idx) => (
+            <tbody className="divide-y divide-slate-100">
+              {safeStudentRows.map((row, idx) => (
                 <AssessmentRow
                   key={row.student.id}
                   row={row}

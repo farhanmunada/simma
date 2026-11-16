@@ -78,7 +78,7 @@ export const SchedulesPage: React.FC = () => {
 
   const handleEditSchedule = (scheduleId: string) => {
     // Look up schedule cell details from matrix
-    if (!matrix) return;
+    if (!matrix || !Array.isArray(matrix.rows)) return;
     for (const row of matrix.rows) {
       for (const day of Object.keys(row.cells) as DayOfWeek[]) {
         const cell = row.cells[day];

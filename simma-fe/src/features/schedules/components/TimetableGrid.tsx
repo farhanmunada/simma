@@ -42,7 +42,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
     );
   }
 
-  if (!matrix || matrix.rows.length === 0) {
+  if (!matrix || !Array.isArray(matrix.rows) || matrix.rows.length === 0) {
     return (
       <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-6 text-center">
         <BookOpen className="h-8 w-8 text-slate-400" />

@@ -158,7 +158,7 @@ export const PlotScheduleModal: React.FC<PlotScheduleModalProps> = ({
             label="Jam / Waktu"
             value={timeSlotId}
             onChange={(e) => setTimeSlotId(e.target.value)}
-            options={timeSlots.map((s) => ({
+            options={(Array.isArray(timeSlots) ? timeSlots : []).map((s) => ({
               value: s.id,
               label: `${s.name} (${s.startTime}-${s.endTime}) [${s.sessionType}]`,
             }))}
@@ -170,14 +170,14 @@ export const PlotScheduleModal: React.FC<PlotScheduleModalProps> = ({
             label="Kelas"
             value={classroomId}
             onChange={(e) => setClassroomId(e.target.value)}
-            options={classrooms.map((c) => ({ value: c.id, label: c.name }))}
+            options={(Array.isArray(classrooms) ? classrooms : []).map((c) => ({ value: c.id, label: c.name }))}
           />
 
           <Select
             label="Mata Pelajaran"
             value={subjectId}
             onChange={(e) => setSubjectId(e.target.value)}
-            options={subjects.map((s) => ({ value: s.id, label: s.name }))}
+            options={(Array.isArray(subjects) ? subjects : []).map((s) => ({ value: s.id, label: s.name }))}
           />
         </div>
 
@@ -186,7 +186,7 @@ export const PlotScheduleModal: React.FC<PlotScheduleModalProps> = ({
             label="Guru Pengampu"
             value={teacherId}
             onChange={(e) => setTeacherId(e.target.value)}
-            options={teachers.map((t) => ({ value: t.id, label: t.name }))}
+            options={(Array.isArray(teachers) ? teachers : []).map((t) => ({ value: t.id, label: t.name }))}
           />
 
           <Select
@@ -195,7 +195,7 @@ export const PlotScheduleModal: React.FC<PlotScheduleModalProps> = ({
             onChange={(e) => setRoomId(e.target.value)}
             options={[
               { value: "", label: "-- Ruang Kelas Utama --" },
-              ...rooms.map((r) => ({ value: r.id, label: `${r.name} (${r.code})` })),
+              ...(Array.isArray(rooms) ? rooms : []).map((r) => ({ value: r.id, label: `${r.name} (${r.code})` })),
             ]}
           />
         </div>

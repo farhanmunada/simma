@@ -67,11 +67,11 @@ export const ScheduleFilterBar: React.FC<ScheduleFilterBarProps> = ({
   const getTargetOptions = () => {
     switch (viewType) {
       case "classroom":
-        return classrooms.map((c) => ({ value: c.id, label: `Kelas: ${c.name}` }));
+        return (Array.isArray(classrooms) ? classrooms : []).map((c) => ({ value: c.id, label: `Kelas: ${c.name}` }));
       case "teacher":
-        return teachers.map((t) => ({ value: t.id, label: `Guru: ${t.name}` }));
+        return (Array.isArray(teachers) ? teachers : []).map((t) => ({ value: t.id, label: `Guru: ${t.name}` }));
       case "room":
-        return rooms.map((r) => ({ value: r.id, label: `Ruang: ${r.name} (${r.code})` }));
+        return (Array.isArray(rooms) ? rooms : []).map((r) => ({ value: r.id, label: `Ruang: ${r.name} (${r.code})` }));
     }
   };
 

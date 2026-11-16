@@ -18,10 +18,11 @@ export const ProjectsListPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { data: projects = [], isLoading } = useP5raProjects({
+  const { data: rawProjects = [], isLoading } = useP5raProjects({
     theme: selectedTheme || undefined,
     status: selectedStatus || undefined,
   });
+  const projects = Array.isArray(rawProjects) ? rawProjects : [];
 
   const createMutation = useCreateP5raProject();
   const deleteMutation = useDeleteP5raProject();

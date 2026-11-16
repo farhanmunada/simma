@@ -35,33 +35,33 @@ export class DisciplineController {
   getRules = async (request: FastifyRequest, reply: FastifyReply) => {
     const query = request.query as { type?: string; category?: string };
     const data = await this.service.getRules(query.type, query.category);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createRule = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = parseData(CreateDisciplineRuleSchema, request.body);
     const data = await this.service.createRule(body as any);
-    return reply.status(201).send({ data, message: "Aturan tata tertib berhasil dibuat" });
+    return reply.status(201).send({ data, message: "Aturan tata tertib berhasil dibuat", success: true });
   };
 
   updateRule = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(DisciplineIdParamSchema, request.params);
     const body = parseData(UpdateDisciplineRuleSchema, request.body);
     const data = await this.service.updateRule(id, body as any);
-    return reply.status(200).send({ data, message: "Aturan tata tertib berhasil diperbarui" });
+    return reply.status(200).send({ data, message: "Aturan tata tertib berhasil diperbarui", success: true });
   };
 
   deleteRule = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(DisciplineIdParamSchema, request.params);
     await this.service.deleteRule(id);
-    return reply.status(200).send({ message: "Aturan tata tertib berhasil dihapus" });
+    return reply.status(200).send({ message: "Aturan tata tertib berhasil dihapus", success: true });
   };
 
   // --- Infractions ---
   getInfractions = async (request: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(QueryStudentInfractionsSchema, request.query);
     const data = await this.service.getInfractions(query);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createInfraction = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -75,6 +75,7 @@ export class DisciplineController {
     return reply.status(201).send({
       data: infraction,
       escalation,
+      success: true,
       message:
         infraction.status === "pending_approval"
           ? "Pelanggaran > 50 poin memerlukan persetujuan Waka Kesiswaan"
@@ -92,26 +93,26 @@ export class DisciplineController {
       body.status,
       body.notes,
     );
-    return reply.status(200).send({ data, message: `Status pelanggaran berhasil diubah ke ${body.status}` });
+    return reply.status(200).send({ data, message: `Status pelanggaran berhasil diubah ke ${body.status}`, success: true });
   };
 
   deleteInfraction = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(DisciplineIdParamSchema, request.params);
     await this.service.deleteInfraction(id);
-    return reply.status(200).send({ message: "Catatan kedisiplinan berhasil dihapus" });
+    return reply.status(200).send({ message: "Catatan kedisiplinan berhasil dihapus", success: true });
   };
 
   // --- Student Profiles & Leaderboard ---
   getStudentProfile = async (request: FastifyRequest, reply: FastifyReply) => {
     const { studentId } = parseData(StudentIdParamSchema, request.params);
     const data = await this.service.getStudentProfile(studentId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   getLeaderboard = async (request: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(LeaderboardQuerySchema, request.query);
     const data = await this.service.getLeaderboard(query.classroomId, query.type, query.limit);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   // --- Counseling Sessions (Rahasia BK) ---
@@ -124,48 +125,48 @@ export class DisciplineController {
       query.counselorId,
       query.status,
     );
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createCounselingSession = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = parseData(CreateCounselingSessionSchema, request.body);
     const user = (request as any).user;
     const data = await this.service.createCounselingSession(body as any, user?.sub);
-    return reply.status(201).send({ data, message: "Sesi konseling BK berhasil dijadwalkan" });
+    return reply.status(201).send({ data, message: "Sesi konseling BK berhasil dijadwalkan", success: true });
   };
 
   updateCounselingSession = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(DisciplineIdParamSchema, request.params);
     const body = parseData(UpdateCounselingSessionSchema, request.body);
     const data = await this.service.updateCounselingSession(id, body as any);
-    return reply.status(200).send({ data, message: "Sesi konseling BK berhasil diperbarui" });
+    return reply.status(200).send({ data, message: "Sesi konseling BK berhasil diperbarui", success: true });
   };
 
   deleteCounselingSession = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(DisciplineIdParamSchema, request.params);
     await this.service.deleteCounselingSession(id);
-    return reply.status(200).send({ message: "Sesi konseling BK berhasil dihapus" });
+    return reply.status(200).send({ message: "Sesi konseling BK berhasil dihapus", success: true });
   };
 
   // --- Parent Summons ---
   getParentSummons = async (request: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(ParentSummonQuerySchema, request.query);
     const data = await this.service.getParentSummons(query.studentId, query.status);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createParentSummon = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = parseData(CreateParentSummonSchema, request.body);
     const user = (request as any).user;
     const data = await this.service.createParentSummon(body, user?.sub);
-    return reply.status(201).send({ data, message: "Surat panggilan orang tua berhasil diterbitkan" });
+    return reply.status(201).send({ data, message: "Surat panggilan orang tua berhasil diterbitkan", success: true });
   };
 
   updateParentSummon = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(DisciplineIdParamSchema, request.params);
     const body = parseData(UpdateParentSummonSchema, request.body);
     const data = await this.service.updateParentSummon(id, body);
-    return reply.status(200).send({ data, message: "Surat panggilan orang tua berhasil diperbarui" });
+    return reply.status(200).send({ data, message: "Surat panggilan orang tua berhasil diperbarui", success: true });
   };
 
   exportSummonPdf = async (request: FastifyRequest, reply: FastifyReply) => {

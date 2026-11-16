@@ -13,6 +13,13 @@ import type {
 } from "../types";
 import type { DayOfWeek } from "@simma/shared";
 
+function unwrapData<T>(res: unknown): T {
+  if (res && typeof res === "object" && "data" in res) {
+    return (res as { data: T }).data;
+  }
+  return res as T;
+}
+
 export const SCHEDULE_QUERY_KEYS = {
   rooms: ["schedules", "rooms"] as const,
   timeSlots: ["schedules", "timeSlots"] as const,
@@ -28,7 +35,7 @@ export function useScheduleRooms(params?: { roomType?: string; isActive?: boolea
     queryFn: () =>
       apiClient<ScheduleRoomItem[]>(API_ENDPOINTS.SCHEDULES.ROOMS, {
         params: params as Record<string, string | number | boolean>,
-      }),
+      }).then((res) => unwrapData<ScheduleRoomItem[]>(res) ?? []),
   });
 }
 
@@ -39,7 +46,7 @@ export function useCreateScheduleRoom() {
       apiClient<ScheduleRoomItem>(API_ENDPOINTS.SCHEDULES.ROOMS, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ScheduleRoomItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEYS.rooms });
     },
@@ -53,7 +60,7 @@ export function useUpdateScheduleRoom() {
       apiClient<ScheduleRoomItem>(API_ENDPOINTS.SCHEDULES.ROOM_DETAIL(id), {
         method: "PUT",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ScheduleRoomItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEYS.rooms });
     },
@@ -80,7 +87,7 @@ export function useScheduleTimeSlots(params?: { dayOfWeek?: DayOfWeek; sessionTy
     queryFn: () =>
       apiClient<ScheduleTimeSlotItem[]>(API_ENDPOINTS.SCHEDULES.TIME_SLOTS, {
         params: params as Record<string, string | number | boolean>,
-      }),
+      }).then((res) => unwrapData<ScheduleTimeSlotItem[]>(res) ?? []),
   });
 }
 
@@ -91,7 +98,7 @@ export function useCreateScheduleTimeSlot() {
       apiClient<ScheduleTimeSlotItem>(API_ENDPOINTS.SCHEDULES.TIME_SLOTS, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ScheduleTimeSlotItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEYS.timeSlots });
     },
@@ -105,7 +112,7 @@ export function useUpdateScheduleTimeSlot() {
       apiClient<ScheduleTimeSlotItem>(API_ENDPOINTS.SCHEDULES.TIME_SLOT_DETAIL(id), {
         method: "PUT",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ScheduleTimeSlotItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEYS.timeSlots });
     },
@@ -142,7 +149,7 @@ export function useScheduleMatrix(
           academicYearId,
           semesterId,
         },
-      }),
+      }).then((res) => unwrapData<ScheduleMatrixView>(res)),
     enabled: Boolean(targetId),
   });
 }
@@ -162,7 +169,7 @@ export function useCheckScheduleCollision() {
       apiClient<CollisionResult>(API_ENDPOINTS.SCHEDULES.CHECK_COLLISION, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<CollisionResult>(res)),
   });
 }
 
@@ -173,7 +180,7 @@ export function useCreateSchedule() {
       apiClient<ScheduleItem>(API_ENDPOINTS.SCHEDULES.LIST, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ScheduleItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
     },
@@ -187,7 +194,7 @@ export function useUpdateSchedule() {
       apiClient<ScheduleItem>(API_ENDPOINTS.SCHEDULES.DETAIL(id), {
         method: "PUT",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ScheduleItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
     },
@@ -214,7 +221,7 @@ export function useCreateBatchSchedule() {
       apiClient<{ message: string; count: number }>(API_ENDPOINTS.SCHEDULES.BATCH, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<{ message: string; count: number }>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
     },

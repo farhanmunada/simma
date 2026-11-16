@@ -71,4 +71,41 @@ describe("Schedules Feature Module (Frontend)", () => {
       "sem-1",
     ]);
   });
+
+  it("should safely handle malformed or empty matrix in TimetableGrid without throwing", async () => {
+    const { TimetableGrid } = await import("./components/TimetableGrid");
+
+    expect(
+      TimetableGrid({
+        matrix: undefined,
+        isLoading: false,
+        viewType: "classroom",
+        onSlotClick: () => {},
+        onEditSchedule: () => {},
+        onDeleteSchedule: () => {},
+      })
+    ).toBeDefined();
+
+    expect(
+      TimetableGrid({
+        matrix: {} as any,
+        isLoading: false,
+        viewType: "classroom",
+        onSlotClick: () => {},
+        onEditSchedule: () => {},
+        onDeleteSchedule: () => {},
+      })
+    ).toBeDefined();
+
+    expect(
+      TimetableGrid({
+        matrix: { rows: [] } as any,
+        isLoading: false,
+        viewType: "classroom",
+        onSlotClick: () => {},
+        onEditSchedule: () => {},
+        onDeleteSchedule: () => {},
+      })
+    ).toBeDefined();
+  });
 });

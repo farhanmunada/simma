@@ -128,7 +128,7 @@ export const ProjectDetailPage: React.FC = () => {
           <div>
             <span className="text-slate-400 block mb-1">Rombongan Belajar (Rombel):</span>
             <div className="flex flex-wrap gap-1.5">
-              {project.classrooms?.length ? (
+              {Array.isArray(project.classrooms) && project.classrooms.length ? (
                 project.classrooms.map((c) => (
                   <span
                     key={c.id}
@@ -156,7 +156,7 @@ export const ProjectDetailPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-emerald-600" />
             <h2 className="text-sm font-bold text-slate-900">
-              Target Capaian Dimensi & Elemen ({project.targets?.length || 0})
+              Target Capaian Dimensi & Elemen ({Array.isArray(project.targets) ? project.targets.length : 0})
             </h2>
           </div>
           <Button
@@ -170,7 +170,7 @@ export const ProjectDetailPage: React.FC = () => {
           </Button>
         </div>
 
-        {!project.targets || project.targets.length === 0 ? (
+        {!Array.isArray(project.targets) || project.targets.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-400">
             Belum ada target capaian dimensi yang ditambahkan. Klik "Tambah Target" untuk memasukkan dimensi dan elemen Kemenag.
           </div>

@@ -32,26 +32,26 @@ export class P5raController {
   listProjects = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(P5raProjectQuerySchema, req.query);
     const data = await this.service.listProjects(query);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   getProject = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId } = parseData(ProjectIdParamSchema, req.params);
     const data = await this.service.getProject(projectId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createProject = async (req: FastifyRequest, reply: FastifyReply) => {
     const body = parseData(CreateP5raProjectSchema, req.body);
     const data = await this.service.createProject(body);
-    return reply.status(201).send({ data });
+    return reply.status(201).send({ data, success: true });
   };
 
   updateProject = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId } = parseData(ProjectIdParamSchema, req.params);
     const body = parseData(UpdateP5raProjectSchema, req.body);
     const data = await this.service.updateProject(projectId, body);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   deleteProject = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -63,21 +63,21 @@ export class P5raController {
   listTargets = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId } = parseData(ProjectIdParamSchema, req.params);
     const data = await this.service.listTargets(projectId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createTarget = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId } = parseData(ProjectIdParamSchema, req.params);
     const body = parseData(CreateP5raTargetSchema, req.body);
     const data = await this.service.addTarget(projectId, body);
-    return reply.status(201).send({ data });
+    return reply.status(201).send({ data, success: true });
   };
 
   updateTarget = async (req: FastifyRequest, reply: FastifyReply) => {
     const { targetId } = parseData(TargetIdParamSchema, req.params);
     const body = parseData(UpdateP5raTargetSchema, req.body);
     const data = await this.service.updateTarget(targetId, body);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   deleteTarget = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -90,7 +90,7 @@ export class P5raController {
     const { projectId } = parseData(ProjectIdParamSchema, req.params);
     const query = parseData(P5raAssessmentQuerySchema, req.query);
     const data = await this.service.getAssessments(projectId, query.classroomId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   saveBatchAssessments = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -104,7 +104,7 @@ export class P5raController {
   getStudentNotes = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId, studentId } = parseData(StudentReportParamSchema, req.params);
     const data = await this.service.getStudentNotes(projectId, studentId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   saveStudentNotes = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -118,13 +118,13 @@ export class P5raController {
   generateProcessNotes = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId, studentId } = parseData(StudentReportParamSchema, req.params);
     const generatedNotes = await this.service.generateProcessNotes(projectId, studentId);
-    return reply.status(200).send({ data: { processNotes: generatedNotes } });
+    return reply.status(200).send({ data: { processNotes: generatedNotes }, success: true });
   };
 
   getStudentReport = async (req: FastifyRequest, reply: FastifyReply) => {
     const { projectId, studentId } = parseData(StudentReportParamSchema, req.params);
     const data = await this.service.getStudentReport(projectId, studentId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   getStudentReportPdf = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -143,7 +143,7 @@ export class P5raController {
     const { projectId } = parseData(ProjectIdParamSchema, req.params);
     const query = parseData(P5raAssessmentQuerySchema, req.query);
     const data = await this.service.getProjectRecap(projectId, query.classroomId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 }
 

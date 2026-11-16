@@ -28,7 +28,9 @@ export default function InfractionsPage() {
   const createMutation = useCreateStudentInfraction();
   const approveMutation = useUpdateInfractionApproval();
 
-  const infractions: StudentInfractionItem[] = infractionsData ?? [];
+  const infractions: StudentInfractionItem[] = Array.isArray(infractionsData)
+    ? infractionsData
+    : [];
 
   const filtered = infractions.filter((item: StudentInfractionItem) => {
     if (!search) return true;

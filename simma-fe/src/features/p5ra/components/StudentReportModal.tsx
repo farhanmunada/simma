@@ -115,7 +115,7 @@ export const StudentReportModal: React.FC<StudentReportModalProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {report.targetsWithAssessment.map((item, idx) => (
+                  {(Array.isArray(report.targetsWithAssessment) ? report.targetsWithAssessment : []).map((item, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/60">
                       <td className="p-2.5 align-top">
                         <span className="font-semibold text-slate-900 block">

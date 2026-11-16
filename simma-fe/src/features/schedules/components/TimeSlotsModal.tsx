@@ -141,7 +141,7 @@ export const TimeSlotsModal: React.FC<TimeSlotsModalProps> = ({ isOpen, onClose,
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {timeSlots.length === 0 ? (
+              {!Array.isArray(timeSlots) || timeSlots.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-4 text-center text-slate-400">
                     Belum ada slot waktu terdaftar.

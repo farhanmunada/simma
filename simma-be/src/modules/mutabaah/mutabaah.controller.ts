@@ -35,26 +35,26 @@ export class MutabaahController {
       category: query.category,
       isActive,
     });
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   getActivityById = async (req: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(IdParamSchema, req.params);
     const data = await this.service.getActivityById(id);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createActivity = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(CreateMutabaahActivitySchema, req.body);
     const data = await this.service.createActivity(input);
-    return reply.status(201).send({ data });
+    return reply.status(201).send({ data, success: true });
   };
 
   updateActivity = async (req: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(IdParamSchema, req.params);
     const input = parseData(UpdateMutabaahActivitySchema, req.body);
     const data = await this.service.updateActivity(id, input);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   deleteActivity = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -68,14 +68,14 @@ export class MutabaahController {
   getDailyChecklist = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(QueryMutabaahDailyChecklistSchema, req.query);
     const data = await this.service.getDailyChecklist(query);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   saveDailyChecklist = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(BatchUpsertMutabaahEntriesSchema, req.body);
     const userId = req.user?.sub;
     const result = await this.service.saveBatchDailyEntries(input, userId);
-    return reply.status(200).send({ data: result });
+    return reply.status(200).send({ data: result, success: true });
   };
 
   // --- Uzur Syar'i ---
@@ -83,14 +83,14 @@ export class MutabaahController {
   getUzurRecords = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = req.query as { studentId?: string };
     const data = await this.service.getUzurRecords(query.studentId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createUzurRecord = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(CreateMutabaahUzurRecordSchema, req.body);
     const userId = req.user?.sub;
     const data = await this.service.createUzurRecord(input, userId);
-    return reply.status(201).send({ data });
+    return reply.status(201).send({ data, success: true });
   };
 
   deleteUzurRecord = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -104,13 +104,13 @@ export class MutabaahController {
   getComplianceRecap = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(QueryComplianceSchema, req.query);
     const data = await this.service.getComplianceRecap(query);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   getEarlyWarnings = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = req.query as { classroomId?: string };
     const data = await this.service.getEarlyWarnings(query.classroomId);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   // --- Rapor Mutaba'ah PDF ---

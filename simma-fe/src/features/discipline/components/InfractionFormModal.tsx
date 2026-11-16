@@ -58,7 +58,7 @@ export function InfractionFormModal({
 
   const studentOptions = [
     { value: "", label: "-- Pilih Siswa --" },
-    ...studentsList.map((st) => ({
+    ...(Array.isArray(studentsList) ? studentsList : []).map((st) => ({
       value: st.id,
       label: `${st.fullName}${st.className ? ` (${st.className})` : ""}`,
     })),
@@ -66,7 +66,7 @@ export function InfractionFormModal({
 
   const ruleOptions = [
     { value: "", label: "-- Input Manual / Non-Katalog --" },
-    ...rules.map((r) => ({
+    ...(Array.isArray(rules) ? rules : []).map((r) => ({
       value: r.id,
       label: `[${r.code}] ${r.name} (${r.points} poin)`,
     })),

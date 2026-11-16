@@ -16,6 +16,13 @@ import type {
   QueryComplianceInput,
 } from "@simma/shared";
 
+function unwrapData<T>(res: unknown): T {
+  if (res && typeof res === "object" && "data" in res) {
+    return (res as { data: T }).data;
+  }
+  return res as T;
+}
+
 export const mutabaahKeys = {
   all: ["mutabaah"] as const,
   activities: (category?: string) => [...mutabaahKeys.all, "activities", { category }] as const,
@@ -34,7 +41,7 @@ export const useMutabaahActivities = (category?: string) =>
     queryFn: () =>
       apiClient<MutabaahActivityDto[]>(API_ENDPOINTS.MUTABAAH.ACTIVITIES, {
         params: category ? { category } : undefined,
-      }),
+      }).then((res) => unwrapData<MutabaahActivityDto[]>(res)),
   });
 
 export const useCreateMutabaahActivity = () => {
@@ -44,7 +51,7 @@ export const useCreateMutabaahActivity = () => {
       apiClient<MutabaahActivityDto>(API_ENDPOINTS.MUTABAAH.ACTIVITIES, {
         method: "POST",
         body: JSON.stringify(body),
-      }),
+      }).then((res) => unwrapData<MutabaahActivityDto>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: mutabaahKeys.activities() });
     },
@@ -58,7 +65,7 @@ export const useUpdateMutabaahActivity = () => {
       apiClient<MutabaahActivityDto>(API_ENDPOINTS.MUTABAAH.ACTIVITY_DETAIL(id), {
         method: "PATCH",
         body: JSON.stringify(body),
-      }),
+      }).then((res) => unwrapData<MutabaahActivityDto>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: mutabaahKeys.activities() });
     },
@@ -84,7 +91,7 @@ export const useDailyChecklist = (params: { date: string; classroomId?: string }
     queryFn: () =>
       apiClient<ClassroomDailyChecklistResponseDto>(API_ENDPOINTS.MUTABAAH.CHECKLIST, {
         params,
-      }),
+      }).then((res) => unwrapData<ClassroomDailyChecklistResponseDto>(res)),
     enabled: Boolean(params.date),
   });
 
@@ -95,7 +102,7 @@ export const useSaveDailyChecklist = () => {
       apiClient<{ count: number; date: string }>(API_ENDPOINTS.MUTABAAH.CHECKLIST, {
         method: "POST",
         body: JSON.stringify(body),
-      }),
+      }).then((res) => unwrapData<{ count: number; date: string }>(res)),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: mutabaahKeys.checklist({ date: variables.date }),
@@ -111,7 +118,7 @@ export const useUzurRecords = (studentId?: string) =>
     queryFn: () =>
       apiClient<MutabaahUzurRecordDto[]>(API_ENDPOINTS.MUTABAAH.UZUR, {
         params: studentId ? { studentId } : undefined,
-      }),
+      }).then((res) => unwrapData<MutabaahUzurRecordDto[]>(res)),
   });
 
 export const useCreateUzurRecord = () => {
@@ -121,7 +128,7 @@ export const useCreateUzurRecord = () => {
       apiClient<MutabaahUzurRecordDto>(API_ENDPOINTS.MUTABAAH.UZUR, {
         method: "POST",
         body: JSON.stringify(body),
-      }),
+      }).then((res) => unwrapData<MutabaahUzurRecordDto>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: mutabaahKeys.all });
     },
@@ -152,7 +159,7 @@ export const useComplianceRecap = (params: QueryComplianceInput) =>
           classroomId: params.classroomId,
           studentId: params.studentId,
         },
-      }),
+      }).then((res) => unwrapData<StudentComplianceSummary[]>(res)),
     enabled: Boolean(params.startDate && params.endDate),
   });
 
@@ -162,7 +169,7 @@ export const useEarlyWarnings = (classroomId?: string) =>
     queryFn: () =>
       apiClient<EarlyWarningAlert[]>(API_ENDPOINTS.MUTABAAH.EARLY_WARNINGS, {
         params: classroomId ? { classroomId } : undefined,
-      }),
+      }).then((res) => unwrapData<EarlyWarningAlert[]>(res) ?? []),
   });
 
 export async function fetchMonthlyReportPdf(

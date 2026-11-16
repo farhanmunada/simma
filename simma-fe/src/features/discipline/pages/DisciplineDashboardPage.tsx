@@ -23,8 +23,10 @@ export default function DisciplineDashboardPage() {
   const { data: rulesData } = useDisciplineRules();
   const createInfractionMutation = useCreateStudentInfraction();
 
-  const leaderboardList: StudentDisciplineSummaryItem[] = leaderboardData ?? [];
-  const infractions = infractionsData ?? [];
+  const leaderboardList: StudentDisciplineSummaryItem[] = Array.isArray(leaderboardData)
+    ? leaderboardData
+    : [];
+  const infractions = Array.isArray(infractionsData) ? infractionsData : [];
 
   const totalInfractions = infractions.filter((i) => i.type === "infraction").length;
   const totalRewards = infractions.filter((i) => i.type === "reward").length;
@@ -76,7 +78,7 @@ export default function DisciplineDashboardPage() {
         onSubmit={async (data) => {
           await createInfractionMutation.mutateAsync(data);
         }}
-        rules={rulesData ?? []}
+        rules={Array.isArray(rulesData) ? rulesData : []}
         studentsList={studentsList}
         isLoading={createInfractionMutation.isPending}
       />

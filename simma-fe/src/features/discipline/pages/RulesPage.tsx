@@ -22,7 +22,7 @@ export default function RulesPage() {
   const createMutation = useCreateDisciplineRule();
   const updateMutation = useUpdateDisciplineRule();
 
-  const rules: DisciplineRuleItem[] = rulesData ?? [];
+  const rules: DisciplineRuleItem[] = Array.isArray(rulesData) ? rulesData : [];
 
   const filtered = rules.filter((r) => {
     if (!search) return true;

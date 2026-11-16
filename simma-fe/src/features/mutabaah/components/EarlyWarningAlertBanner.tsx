@@ -11,7 +11,7 @@ export const EarlyWarningAlertBanner: React.FC<EarlyWarningAlertBannerProps> = (
   warnings,
   onSelectStudent,
 }) => {
-  if (!warnings || warnings.length === 0) return null;
+  if (!Array.isArray(warnings) || warnings.length === 0) return null;
 
   return (
     <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50/70 p-4 shadow-xs">

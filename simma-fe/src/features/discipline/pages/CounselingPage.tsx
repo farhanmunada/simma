@@ -21,7 +21,7 @@ export default function CounselingPage() {
   const createMutation = useCreateCounselingSession();
   const updateMutation = useUpdateCounselingSession();
 
-  const sessions: CounselingSessionItem[] = sessionsData ?? [];
+  const sessions: CounselingSessionItem[] = Array.isArray(sessionsData) ? sessionsData : [];
 
   const filtered = sessions.filter((s) => {
     if (!search) return true;

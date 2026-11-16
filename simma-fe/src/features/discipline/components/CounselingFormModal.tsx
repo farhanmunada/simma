@@ -98,7 +98,7 @@ export function CounselingFormModal({
 
   const studentOptions = [
     { value: "", label: "-- Pilih Santri / Klien --" },
-    ...studentsList.map((st) => ({
+    ...(Array.isArray(studentsList) ? studentsList : []).map((st) => ({
       value: st.id,
       label: `${st.fullName}${st.className ? ` (${st.className})` : ""}`,
     })),

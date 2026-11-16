@@ -20,6 +20,13 @@ import type {
   UpdateParentSummonInput,
 } from "@simma/shared";
 
+function unwrapData<T>(res: unknown): T {
+  if (res && typeof res === "object" && "data" in res) {
+    return (res as { data: T }).data;
+  }
+  return res as T;
+}
+
 export const DISCIPLINE_QUERY_KEYS = {
   rules: ["discipline", "rules"] as const,
   infractions: (params?: Record<string, unknown>) => ["discipline", "infractions", params] as const,
@@ -36,7 +43,7 @@ export function useDisciplineRules(params?: { type?: string; category?: string }
     queryFn: () =>
       apiClient<DisciplineRuleItem[]>(API_ENDPOINTS.DISCIPLINE.RULES, {
         params: params as Record<string, string>,
-      }),
+      }).then((res) => unwrapData<DisciplineRuleItem[]>(res) ?? []),
   });
 }
 
@@ -47,7 +54,7 @@ export function useCreateDisciplineRule() {
       apiClient<DisciplineRuleItem>(API_ENDPOINTS.DISCIPLINE.RULES, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<DisciplineRuleItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DISCIPLINE_QUERY_KEYS.rules });
     },
@@ -61,7 +68,7 @@ export function useUpdateDisciplineRule() {
       apiClient<DisciplineRuleItem>(API_ENDPOINTS.DISCIPLINE.RULE_DETAIL(id), {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<DisciplineRuleItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DISCIPLINE_QUERY_KEYS.rules });
     },
@@ -88,7 +95,7 @@ export function useStudentInfractions(params?: QueryStudentInfractionsInput) {
     queryFn: () =>
       apiClient<StudentInfractionItem[]>(API_ENDPOINTS.DISCIPLINE.INFRACTIONS, {
         params: params as Record<string, string | number | boolean>,
-      }),
+      }).then((res) => unwrapData<StudentInfractionItem[]>(res) ?? []),
   });
 }
 
@@ -113,7 +120,7 @@ export function useUpdateInfractionApproval() {
       apiClient<StudentInfractionItem>(API_ENDPOINTS.DISCIPLINE.INFRACTION_APPROVAL(id), {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<StudentInfractionItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discipline"] });
     },
@@ -144,7 +151,7 @@ export function useDisciplineLeaderboard(params?: {
     queryFn: () =>
       apiClient<StudentDisciplineSummaryItem[]>(API_ENDPOINTS.DISCIPLINE.LEADERBOARD, {
         params: params as Record<string, string | number>,
-      }),
+      }).then((res) => unwrapData<StudentDisciplineSummaryItem[]>(res) ?? []),
   });
 }
 
@@ -152,7 +159,9 @@ export function useStudentDisciplineProfile(studentId: string) {
   return useQuery({
     queryKey: DISCIPLINE_QUERY_KEYS.studentProfile(studentId),
     queryFn: () =>
-      apiClient<any>(API_ENDPOINTS.DISCIPLINE.STUDENT_PROFILE(studentId)),
+      apiClient<any>(API_ENDPOINTS.DISCIPLINE.STUDENT_PROFILE(studentId)).then((res) =>
+        unwrapData<any>(res)
+      ),
     enabled: !!studentId,
   });
 }
@@ -168,7 +177,7 @@ export function useCounselingSessions(params?: {
     queryFn: () =>
       apiClient<CounselingSessionItem[]>(API_ENDPOINTS.DISCIPLINE.COUNSELING, {
         params: params as Record<string, string>,
-      }),
+      }).then((res) => unwrapData<CounselingSessionItem[]>(res) ?? []),
   });
 }
 
@@ -179,7 +188,7 @@ export function useCreateCounselingSession() {
       apiClient<CounselingSessionItem>(API_ENDPOINTS.DISCIPLINE.COUNSELING, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<CounselingSessionItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discipline", "counseling"] });
     },
@@ -193,7 +202,7 @@ export function useUpdateCounselingSession() {
       apiClient<CounselingSessionItem>(API_ENDPOINTS.DISCIPLINE.COUNSELING_DETAIL(id), {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<CounselingSessionItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discipline", "counseling"] });
     },
@@ -220,7 +229,7 @@ export function useParentSummons(params?: { studentId?: string; status?: string 
     queryFn: () =>
       apiClient<ParentSummonItem[]>(API_ENDPOINTS.DISCIPLINE.SUMMONS, {
         params: params as Record<string, string>,
-      }),
+      }).then((res) => unwrapData<ParentSummonItem[]>(res) ?? []),
   });
 }
 
@@ -231,7 +240,7 @@ export function useCreateParentSummon() {
       apiClient<ParentSummonItem>(API_ENDPOINTS.DISCIPLINE.SUMMONS, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ParentSummonItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discipline", "summons"] });
     },
@@ -245,7 +254,7 @@ export function useUpdateParentSummon() {
       apiClient<ParentSummonItem>(API_ENDPOINTS.DISCIPLINE.SUMMON_DETAIL(id), {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
+      }).then((res) => unwrapData<ParentSummonItem>(res)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["discipline", "summons"] });
     },

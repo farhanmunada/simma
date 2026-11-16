@@ -80,4 +80,18 @@ describe("P5RA Frontend Module", () => {
       expect(P5RA_DIMENSIONS.length).toBe(6);
     });
   });
+
+  describe("API Safety", () => {
+    it("should export all API hooks and functions", async () => {
+      const api = await import("./api/p5ra.api");
+      expect(typeof api.fetchP5raProjects).toBe("function");
+      expect(typeof api.fetchP5raProjectDetail).toBe("function");
+      expect(typeof api.fetchP5raTargets).toBe("function");
+      expect(typeof api.fetchP5raAssessments).toBe("function");
+      expect(typeof api.fetchP5raRecap).toBe("function");
+      expect(typeof api.fetchStudentP5raReport).toBe("function");
+      expect(typeof api.useP5raProjects).toBe("function");
+      expect(typeof api.useP5raProjectDetail).toBe("function");
+    });
+  });
 });

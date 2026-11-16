@@ -56,7 +56,7 @@ export function ParentSummonModal({
 
   const studentOptions = [
     { value: "", label: "-- Pilih Santri --" },
-    ...studentsList.map((st) => ({
+    ...(Array.isArray(studentsList) ? studentsList : []).map((st) => ({
       value: st.id,
       label: `${st.fullName}${st.className ? ` (${st.className})` : ""}`,
     })),

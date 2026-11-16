@@ -73,4 +73,13 @@ describe("Mutabaah Feature Module (Frontend)", () => {
     expect(mod.ComplianceTable).toBeDefined();
     expect(mod.ActivityFormModal).toBeDefined();
   });
+
+  it("should safely handle non-array warnings in EarlyWarningAlertBanner without throwing", async () => {
+    const { EarlyWarningAlertBanner } = await import("./components/EarlyWarningAlertBanner");
+
+    // Passing malformed object should return null, not crash
+    expect(EarlyWarningAlertBanner({ warnings: {} as any })).toBeNull();
+    expect(EarlyWarningAlertBanner({ warnings: null as any })).toBeNull();
+    expect(EarlyWarningAlertBanner({ warnings: [] })).toBeNull();
+  });
 });

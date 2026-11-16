@@ -23,7 +23,7 @@ export default function SummonsPage() {
   const createMutation = useCreateParentSummon();
   const updateMutation = useUpdateParentSummon();
 
-  const summons: ParentSummonItem[] = summonsData ?? [];
+  const summons: ParentSummonItem[] = Array.isArray(summonsData) ? summonsData : [];
 
   const filtered = summons.filter((item) => {
     if (!search) return true;

@@ -72,14 +72,14 @@ export const RecapOverviewPage: React.FC = () => {
           </p>
         </div>
 
-        {project?.classrooms && project.classrooms.length > 0 && (
+        {Array.isArray(project?.classrooms) && project.classrooms.length > 0 && (
           <div className="w-44">
             <Select
               value={selectedClassroomId}
               onChange={(e) => setSelectedClassroomId(e.target.value)}
               options={[
                 { label: "Semua Rombel", value: "" },
-                ...project.classrooms.map((c) => ({ label: c.name, value: c.id })),
+                ...(Array.isArray(project?.classrooms) ? project.classrooms.map((c) => ({ label: c.name, value: c.id })) : []),
               ]}
             />
           </div>
@@ -143,7 +143,7 @@ export const RecapOverviewPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {recap?.targets.map((row, idx) => (
+              {(Array.isArray(recap?.targets) ? recap.targets : []).map((row, idx) => (
                 <tr key={row.target.id} className="hover:bg-slate-50/50">
                   <td className="p-3 text-center text-slate-400">{idx + 1}</td>
                   <td className="p-3">
@@ -183,9 +183,9 @@ export const RecapOverviewPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {studentRows.map((row, idx) => {
+              {(Array.isArray(studentRows) ? studentRows : []).map((row, idx) => {
                 const totalAssessed = row.assessments?.length || 0;
-                const totalTargets = recap?.targets.length || 0;
+                const totalTargets = Array.isArray(recap?.targets) ? recap.targets.length : 0;
                 const isComplete = totalTargets > 0 && totalAssessed >= totalTargets;
 
                 return (

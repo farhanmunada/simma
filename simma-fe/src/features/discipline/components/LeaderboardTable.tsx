@@ -17,6 +17,8 @@ export function LeaderboardTable({
   activeType,
   onTypeChange,
 }: LeaderboardTableProps) {
+  const safeData = Array.isArray(data) ? data : [];
+
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
       <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -81,14 +83,14 @@ export function LeaderboardTable({
                   Memuat data peringkat kedisiplinan...
                 </td>
               </tr>
-            ) : data.length === 0 ? (
+            ) : safeData.length === 0 ? (
               <tr>
                 <td colSpan={9} className="py-8 text-center text-slate-400">
                   Belum ada data kedisiplinan yang tercatat.
                 </td>
               </tr>
             ) : (
-              data.map((item, idx) => (
+              safeData.map((item, idx) => (
                 <tr key={item.studentId} className="hover:bg-slate-50/80 transition">
                   <td className="px-4 py-3 text-center font-bold text-slate-700">{idx + 1}</td>
                   <td className="px-4 py-3 font-semibold text-slate-900">{item.studentName}</td>

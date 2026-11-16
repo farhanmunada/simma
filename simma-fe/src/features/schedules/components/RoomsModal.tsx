@@ -124,7 +124,7 @@ export const RoomsModal: React.FC<RoomsModalProps> = ({ isOpen, onClose, rooms }
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {rooms.length === 0 ? (
+              {!Array.isArray(rooms) || rooms.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-3 py-4 text-center text-slate-400">
                     Belum ada data ruangan khusus terdaftar.
