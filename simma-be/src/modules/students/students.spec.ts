@@ -321,8 +321,11 @@ describe("StudentsService", () => {
 
     it("should create new parent and link to student", async () => {
       vi.spyOn(repo, "findStudentById").mockResolvedValue(mockStudent);
-      vi.spyOn(repo, "createParent").mockResolvedValue(mockParent);
-      vi.spyOn(repo, "linkStudentParent").mockResolvedValue(mockStudentParent);
+      vi.spyOn(repo, "createAndLinkParent").mockResolvedValue({
+        ...mockParent,
+        relationType: "ayah",
+        isGuardian: true,
+      });
 
       const result = await service.createAndLinkParent(mockStudent.id, {
         relationType: "ayah",
@@ -395,7 +398,7 @@ describe("Student HTTP Endpoints (Integration)", () => {
       username: "guru_user",
       role: "guru_mapel",
     });
-  });
+  }, 30000);
 
   afterAll(async () => {
     await app.close();

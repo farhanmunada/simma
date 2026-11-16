@@ -189,6 +189,32 @@ export class StudentsRepository {
     return row;
   }
 
+  async createAndLinkParent(
+    studentId: string,
+    parentData: NewParent,
+    linkData: { relationType: "ayah" | "ibu" | "wali"; isGuardian: boolean },
+  ): Promise<StudentParentDetail> {
+    const db = getDb();
+    return await db.transaction(async (tx) => {
+      const [parent] = await tx.insert(parents).values(parentData).returning();
+      const [link] = await tx
+        .insert(studentParents)
+        .values({
+          studentId,
+          parentId: parent.id,
+          relationType: linkData.relationType,
+          isGuardian: linkData.isGuardian,
+        })
+        .returning();
+
+      return {
+        ...parent,
+        relationType: link.relationType,
+        isGuardian: link.isGuardian,
+      };
+    });
+  }
+
   async findClassroomById(id: string): Promise<Classroom | null> {
     const db = getDb();
     const [row] = await db

@@ -49,6 +49,7 @@ export const semesters = pgTable("semesters", {
 export const teachers = pgTable("teachers", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  positionId: uuid("position_id").references(() => positions.id, { onDelete: "set null" }),
   nik: text("nik").notNull().unique(),
   nuptk: text("nuptk"),
   fullName: text("full_name").notNull(),
@@ -56,6 +57,19 @@ export const teachers = pgTable("teachers", {
   certification: text("certification"),
   emisData: jsonb("emis_data").$type<Record<string, unknown>>().default({}),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const positions = pgTable("positions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  category: text("category").notNull().default("Pendidik"), // Pendidik, Tenaga Kependidikan
+  isLeadership: boolean("is_leadership").notNull().default(false),
+  allowance: integer("allowance").notNull().default(0),
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -98,6 +112,9 @@ export type NewSemester = typeof semesters.$inferInsert;
 
 export type Teacher = typeof teachers.$inferSelect;
 export type NewTeacher = typeof teachers.$inferInsert;
+
+export type Position = typeof positions.$inferSelect;
+export type NewPosition = typeof positions.$inferInsert;
 
 export type Classroom = typeof classrooms.$inferSelect;
 export type NewClassroom = typeof classrooms.$inferInsert;

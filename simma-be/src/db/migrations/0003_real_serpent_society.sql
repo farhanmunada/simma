@@ -1,0 +1,35 @@
+CREATE TABLE "ppdb_applicants" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"registration_number" text NOT NULL,
+	"academic_year_id" uuid,
+	"full_name" text NOT NULL,
+	"nik" text NOT NULL,
+	"nisn" text,
+	"birth_place" text NOT NULL,
+	"birth_date" date NOT NULL,
+	"gender" text NOT NULL,
+	"religion" text DEFAULT 'Islam' NOT NULL,
+	"phone" text,
+	"email" text,
+	"address" text,
+	"previous_school_type" text DEFAULT 'MTs' NOT NULL,
+	"previous_school_name" text NOT NULL,
+	"npsn_origin" text,
+	"father_name" text,
+	"father_phone" text,
+	"mother_name" text NOT NULL,
+	"mother_phone" text,
+	"guardian_name" text,
+	"chosen_major" text DEFAULT 'MIPA' NOT NULL,
+	"status" text DEFAULT 'submitted' NOT NULL,
+	"notes" text,
+	"documents" jsonb DEFAULT '{}'::jsonb,
+	"student_id" uuid,
+	"enrolled_at" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "ppdb_applicants_registration_number_unique" UNIQUE("registration_number")
+);
+--> statement-breakpoint
+ALTER TABLE "ppdb_applicants" ADD CONSTRAINT "ppdb_applicants_academic_year_id_academic_years_id_fk" FOREIGN KEY ("academic_year_id") REFERENCES "public"."academic_years"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ppdb_applicants" ADD CONSTRAINT "ppdb_applicants_student_id_students_id_fk" FOREIGN KEY ("student_id") REFERENCES "public"."students"("id") ON DELETE set null ON UPDATE no action;

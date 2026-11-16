@@ -70,6 +70,7 @@ export type UpdateSubjectInput = z.input<typeof UpdateSubjectSchema>;
 // Teacher
 export const CreateTeacherSchema = z.object({
   userId: z.string().uuid("User ID tidak valid").nullable().optional(),
+  positionId: z.string().uuid("Position ID tidak valid").nullable().optional(),
   nik: z.string().length(16, "NIK harus 16 digit"),
   nuptk: z.string().max(20).nullable().optional(),
   fullName: z.string().min(1, "Nama lengkap guru wajib diisi").max(255),

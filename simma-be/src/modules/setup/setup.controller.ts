@@ -34,26 +34,32 @@ export class SetupController {
   // --- Institutions ---
   getInstitution = async (_req: FastifyRequest, reply: FastifyReply) => {
     const data = await this.service.getInstitution();
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   getInstitutionById = async (req: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(IdParamSchema, req.params);
     const data = await this.service.getInstitutionById(id);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   createInstitution = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(CreateInstitutionSchema, req.body);
     const data = await this.service.createInstitution(input);
-    return reply.status(201).send({ data });
+    return reply.status(201).send({ data, success: true });
   };
 
   updateInstitution = async (req: FastifyRequest, reply: FastifyReply) => {
-    const { id } = parseData(IdParamSchema, req.params);
+    let id = (req.params as Record<string, string> | undefined)?.id;
+    if (!id) {
+      const active = await this.service.getInstitution();
+      id = active.id;
+    } else {
+      id = parseData(IdParamSchema, req.params).id;
+    }
     const input = parseData(UpdateInstitutionSchema, req.body);
     const data = await this.service.updateInstitution(id, input);
-    return reply.status(200).send({ data });
+    return reply.status(200).send({ data, success: true });
   };
 
   // --- Academic Years ---
