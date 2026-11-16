@@ -1,0 +1,4 @@
+# GitHub Linguist Overrides
+# Exclude HTML boilerplate from language statistics
+*.html linguist-detectable=false
+docs/** linguist-documentation=true
