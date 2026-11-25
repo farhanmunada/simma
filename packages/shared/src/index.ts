@@ -1,4 +1,6 @@
 export * from "./constants.js";
+export * from "./gtk-codes.js";
+export * from "./institution-defaults.js";
 export * from "./schemas/auth.schema.js";
 export * from "./schemas/setup.schema.js";
 export * from "./schemas/students.schema.js";

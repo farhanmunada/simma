@@ -4,11 +4,11 @@ import { ROLES } from "../constants.js";
 export const LoginSchema = z.object({
   username: z
     .string()
-    .min(3, "Username minimal 3 karakter")
-    .max(50, "Username maksimal 50 karakter"),
+    .min(3, "Kode/Username minimal 3 karakter")
+    .max(50, "Kode/Username maksimal 50 karakter"),
   password: z
     .string()
-    .min(6, "Password minimal 6 karakter")
+    .min(4, "Kode/Password minimal 4 karakter")
     .max(128, "Password terlalu panjang"),
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
@@ -22,6 +22,7 @@ export const AuthUserSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
   role: z.enum(ROLES),
+  secondaryRoles: z.array(z.enum(ROLES)).optional().default([]),
   teacherId: z.string().uuid().nullable().optional(),
   isActive: z.boolean(),
   lastLogin: z.coerce.date().nullable().optional(),
@@ -57,6 +58,7 @@ export const AuthPayloadSchema = z.object({
   sub: z.string().uuid(),
   username: z.string(),
   role: z.enum(ROLES),
+  secondaryRoles: z.array(z.enum(ROLES)).optional().default([]),
   teacherId: z.string().uuid().nullable().optional(),
 });
 export type AuthPayload = z.infer<typeof AuthPayloadSchema>;

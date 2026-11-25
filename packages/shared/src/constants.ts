@@ -1,18 +1,22 @@
 // RBAC roles matching PRD Section 2.1
 export const ROLES = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "waka_kesiswaan",
   "waka_sarpras",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
   "wali_kelas",
   "guru_tahfidz",
   "pembina_ekskul",
+  "musyrif",
   "admin_tu",
   "bendahara",
   "guru_bk",
+  "pustakawan",
   "calon_siswa",
 ] as const;
 

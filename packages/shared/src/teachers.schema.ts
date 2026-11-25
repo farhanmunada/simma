@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  ROLES,
   EMPLOYMENT_TYPES,
   GTK_TYPES,
   DUTY_STATUSES,
@@ -31,9 +32,49 @@ export const TeacherProfileSchema = z.object({
   certificationField: z.string().max(100).nullable().optional(),
 });
 
+export const TeacherAccountConfigSchema = z.object({
+  primaryRole: z.enum(ROLES),
+  secondaryRoles: z.array(z.enum(ROLES)).optional().default([]),
+  employeeCode: z
+    .string()
+    .regex(/^\d{4}$/, "Kode GTK wajib tepat 4 digit angka")
+    .optional(),
+  isActive: z.boolean().optional().default(true),
+  resetPasswordToCode: z.boolean().optional().default(false),
+});
+
+export const TeacherScopeTypeEnum = z.enum(["tahfidz", "mutabaah", "p5ra"]);
+export type TeacherScopeType = z.infer<typeof TeacherScopeTypeEnum>;
+
+export const TeacherAssignmentsInputSchema = z.object({
+  homeroomClassroomId: z.string().uuid().nullable().optional(),
+  subjectAssignments: z
+    .array(
+      z.object({
+        classroomId: z.string().uuid(),
+        subjectId: z.string().uuid(),
+      }),
+    )
+    .optional(),
+  extracurricularIds: z.array(z.string().uuid()).optional(),
+  classroomScopes: z
+    .array(
+      z.object({
+        classroomId: z.string().uuid(),
+        scopeType: TeacherScopeTypeEnum,
+      }),
+    )
+    .optional(),
+});
+
 export const CreateTeacherFullSchema = z.object({
   userId: z.string().uuid().nullable().optional(),
   positionId: z.string().uuid().nullable().optional(),
+  employeeCode: z
+    .string()
+    .regex(/^\d{4}$/, "Kode GTK wajib tepat 4 digit angka")
+    .nullable()
+    .optional(),
   nik: z.string().length(16, "NIK harus 16 digit"),
   nuptk: z.string().max(20).nullable().optional(),
   fullName: z.string().min(1, "Nama lengkap GTK wajib diisi").max(255),
@@ -41,6 +82,8 @@ export const CreateTeacherFullSchema = z.object({
   certification: z.string().max(100).nullable().optional(),
   emisData: z.record(z.unknown()).optional().default({}),
   profile: TeacherProfileSchema.optional(),
+  account: TeacherAccountConfigSchema.optional(),
+  assignments: TeacherAssignmentsInputSchema.optional(),
 });
 
 export const UpdateTeacherFullSchema = CreateTeacherFullSchema.partial();
