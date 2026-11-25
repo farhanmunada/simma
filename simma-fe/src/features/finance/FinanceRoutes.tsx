@@ -11,10 +11,10 @@ import { MODULE_ROLES } from "../../config/roles";
 import { useAuthStore } from "../../stores/auth.store";
 
 const tabs = [
-  { name: "Kasir POS", href: "/finance/cashier", icon: CreditCard, roles: MODULE_ROLES.FINANCE_ADMIN },
+  { name: "Kasir POS", href: "/finance/cashier", icon: CreditCard, roles: MODULE_ROLES.FINANCE_CASHIER },
   { name: "Tagihan Siswa", href: "/finance/invoices", icon: FileText },
   { name: "Pos Biaya & Tarif", href: "/finance/fee-items", icon: Tag, roles: MODULE_ROLES.FINANCE_ADMIN },
-  { name: "Dispensasi", href: "/finance/dispensations", icon: ShieldAlert, roles: MODULE_ROLES.FINANCE_ADMIN },
+  { name: "Dispensasi", href: "/finance/dispensations", icon: ShieldAlert, roles: MODULE_ROLES.FINANCE_CASHIER },
   { name: "Laporan & Arus Kas", href: "/finance/reports", icon: BarChart3, roles: MODULE_ROLES.FINANCE_ADMIN },
 ];
 
@@ -57,7 +57,7 @@ export const FinanceRoutes: React.FC = () => {
           index
           element={
             <Navigate
-              to={hasRole(MODULE_ROLES.FINANCE_ADMIN) ? "cashier" : "invoices"}
+              to={hasRole(MODULE_ROLES.FINANCE_CASHIER) ? "cashier" : "invoices"}
               replace
             />
           }
@@ -65,7 +65,7 @@ export const FinanceRoutes: React.FC = () => {
         <Route
           path="cashier"
           element={
-            <RouteRoleGuard roles={MODULE_ROLES.FINANCE_ADMIN}>
+            <RouteRoleGuard roles={MODULE_ROLES.FINANCE_CASHIER}>
               <FinanceCashierPage />
             </RouteRoleGuard>
           }
@@ -82,7 +82,7 @@ export const FinanceRoutes: React.FC = () => {
         <Route
           path="dispensations"
           element={
-            <RouteRoleGuard roles={MODULE_ROLES.FINANCE_ADMIN}>
+            <RouteRoleGuard roles={MODULE_ROLES.FINANCE_CASHIER}>
               <FinanceDispensationsPage />
             </RouteRoleGuard>
           }
@@ -99,7 +99,7 @@ export const FinanceRoutes: React.FC = () => {
           path="*"
           element={
             <Navigate
-              to={hasRole(MODULE_ROLES.FINANCE_ADMIN) ? "cashier" : "invoices"}
+              to={hasRole(MODULE_ROLES.FINANCE_CASHIER) ? "cashier" : "invoices"}
               replace
             />
           }

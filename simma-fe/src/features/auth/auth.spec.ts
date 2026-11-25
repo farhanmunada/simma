@@ -167,6 +167,12 @@ describe("Auth Store & API Integration", () => {
     expect(MODULE_ROLES.FINANCE_MENU).toContain("bendahara");
     expect(MODULE_ROLES.SETTINGS).toContain("kepala_madrasah");
     expect(MODULE_ROLES.TEACHERS).toEqual(["super_admin", "operator"]);
+    expect(MODULE_ROLES.SCHEDULES).not.toContain("bendahara");
+    expect(MODULE_ROLES.SCHEDULES).not.toContain("pustakawan");
+    expect(MODULE_ROLES.SCHEDULES).not.toContain("guru_bk");
+    expect(MODULE_ROLES.SCHEDULES).not.toContain("waka_sarpras");
+    expect(MODULE_ROLES.TRANSFERS).toContain("bendahara");
+    expect(MODULE_ROLES.TRANSFERS).toContain("pustakawan");
   });
 
   it("should evaluate secondaryRoles in hasRole for multi-role GTK accounts", () => {

@@ -228,8 +228,12 @@ export const DashboardOverview: React.FC = () => {
       {/* Role-Gated KPI Metrics */}
       {canViewAdminMetrics && <AdminMetricsSection />}
 
-      {/* Delegated Scope Summary (for Teachers & Staff) */}
-      {scope && (
+      {/* Delegated Scope Summary (only for teachers/coaches or staff with delegations) */}
+      {scope &&
+        (scope.homeroomClassroomIds.length > 0 ||
+          scope.subjectAssignments.length > 0 ||
+          scope.extracurricularIds.length > 0 ||
+          hasRole(["wali_kelas", "guru_mapel", "guru_diniyah", "guru_tahfidz", "pembina_ekskul", "guru"])) && (
         <Card className="border-emerald-200 bg-emerald-50/30">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2.5">

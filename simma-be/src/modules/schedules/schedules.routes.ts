@@ -9,7 +9,6 @@ const readRoles: Role[] = [
   "kepala_madrasah",
   "waka_kurikulum",
   "waka_kesiswaan",
-  "waka_sarpras",
   "admin_tu",
   "guru",
   "guru_mapel",
@@ -18,9 +17,6 @@ const readRoles: Role[] = [
   "guru_tahfidz",
   "pembina_ekskul",
   "musyrif",
-  "bendahara",
-  "guru_bk",
-  "pustakawan",
 ];
 
 const writeRoles: Role[] = [

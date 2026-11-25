@@ -16,12 +16,14 @@ const financeReadRoles: Role[] = [
 
 const cashierRoles: Role[] = [
   "super_admin",
+  "operator",
   "bendahara",
   "admin_tu",
 ];
 
 const financeAdminRoles: Role[] = [
   "super_admin",
+  "operator",
   "bendahara",
   "kepala_madrasah",
 ];

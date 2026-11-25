@@ -12,6 +12,7 @@ const readRoles: Role[] = [
   "admin_tu",
   "wali_kelas",
   "bendahara",
+  "pustakawan",
 ];
 
 const writeRoles: Role[] = [
@@ -24,10 +25,12 @@ const writeRoles: Role[] = [
 
 const clearanceRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "admin_tu",
   "bendahara",
+  "pustakawan",
 ];
 
 const approveRoles: Role[] = [

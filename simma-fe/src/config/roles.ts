@@ -77,6 +77,7 @@ export const MODULE_ROLES: Record<string, UserRole[]> = {
     "wali_kelas",
   ],
   FINANCE_MENU: ["super_admin", "operator", "admin_tu", "kepala_madrasah", "bendahara"],
+  FINANCE_CASHIER: ["super_admin", "operator", "bendahara", "admin_tu"],
   FINANCE_ADMIN: ["super_admin", "operator", "bendahara", "kepala_madrasah"],
   GRADES: [
     "super_admin",
@@ -95,7 +96,6 @@ export const MODULE_ROLES: Record<string, UserRole[]> = {
     "kepala_madrasah",
     "waka_kurikulum",
     "waka_kesiswaan",
-    "waka_sarpras",
     "admin_tu",
     "guru",
     "guru_mapel",
@@ -104,9 +104,6 @@ export const MODULE_ROLES: Record<string, UserRole[]> = {
     "guru_tahfidz",
     "pembina_ekskul",
     "musyrif",
-    "bendahara",
-    "guru_bk",
-    "pustakawan",
   ],
   LETTERS: [
     "super_admin",
@@ -187,6 +184,18 @@ export const MODULE_ROLES: Record<string, UserRole[]> = {
     "guru_mapel",
     "wali_kelas",
   ],
+  STUDENTS_SIDEBAR: [
+    "super_admin",
+    "operator",
+    "admin_tu",
+    "kepala_madrasah",
+    "waka_kurikulum",
+    "waka_kesiswaan",
+    "guru_mapel",
+    "wali_kelas",
+    "bendahara",
+    "pustakawan",
+  ],
   STUDENTS_MASTER: ["super_admin", "operator", "admin_tu", "waka_kurikulum"],
   TRANSFERS: [
     "super_admin",
@@ -196,6 +205,7 @@ export const MODULE_ROLES: Record<string, UserRole[]> = {
     "waka_kesiswaan",
     "admin_tu",
     "bendahara",
+    "pustakawan",
   ],
   EMIS: [
     "super_admin",

@@ -111,14 +111,22 @@ export const navGroups: NavGroup[] = [
         icon: CreditCard,
         roles: MODULE_ROLES.FINANCE_MENU,
         subItems: [
-          { title: "Kasir Loket Cepat", href: "/finance/cashier" },
+          {
+            title: "Kasir Loket Cepat",
+            href: "/finance/cashier",
+            roles: MODULE_ROLES.FINANCE_CASHIER,
+          },
           { title: "Tagihan Siswa", href: "/finance/invoices" },
           {
             title: "Pos & Tarif Biaya",
             href: "/finance/fee-items",
             roles: MODULE_ROLES.FINANCE_ADMIN,
           },
-          { title: "Dispensasi", href: "/finance/dispensations" },
+          {
+            title: "Dispensasi",
+            href: "/finance/dispensations",
+            roles: MODULE_ROLES.FINANCE_CASHIER,
+          },
           {
             title: "Laporan Keuangan",
             href: "/finance/reports",
@@ -205,14 +213,18 @@ export const navGroups: NavGroup[] = [
       {
         title: "Kesiswaan",
         icon: Users,
-        roles: MODULE_ROLES.STUDENTS,
+        roles: MODULE_ROLES.STUDENTS_SIDEBAR,
         subItems: [
           {
             title: "PPDB & Pendaftar",
             href: "/ppdb-admin",
             roles: MODULE_ROLES.PPDB_ADMIN,
           },
-          { title: "Kesiswaan & Buku Induk", href: "/students" },
+          {
+            title: "Kesiswaan & Buku Induk",
+            href: "/students",
+            roles: MODULE_ROLES.STUDENTS,
+          },
           {
             title: "Kelas & Rombel",
             href: "/students/classrooms",
