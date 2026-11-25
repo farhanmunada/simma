@@ -5,6 +5,7 @@ import { financeController } from "./finance.controller.js";
 
 const financeReadRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "bendahara",
   "admin_tu",

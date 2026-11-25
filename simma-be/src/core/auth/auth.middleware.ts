@@ -9,6 +9,22 @@ declare module "fastify" {
   }
 }
 
+export function getUserAllRoles(user?: JwtAuthPayload | null): Role[] {
+  if (!user) return [];
+  const list = [user.role, ...(user.secondaryRoles ?? [])];
+  return Array.from(new Set(list));
+}
+
+export function userHasAnyRole(
+  user: JwtAuthPayload | undefined | null,
+  ...roles: Role[]
+): boolean {
+  if (!user) return false;
+  const all = getUserAllRoles(user);
+  if (all.includes("super_admin")) return true;
+  return roles.some((r) => all.includes(r));
+}
+
 export async function authenticate(
   request: FastifyRequest,
   _reply: FastifyReply,
@@ -33,11 +49,7 @@ export function requireRoles(...allowedRoles: Role[]) {
       throw new UnauthorizedError("Autentikasi diperlukan");
     }
 
-    if (request.user.role === "super_admin") {
-      return;
-    }
-
-    if (!allowedRoles.includes(request.user.role)) {
+    if (!userHasAnyRole(request.user, ...allowedRoles)) {
       throw new ForbiddenError("Akses ditolak: role tidak memiliki izin");
     }
   };

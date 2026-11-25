@@ -5,6 +5,7 @@ import { schedulesController } from "./schedules.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "waka_kesiswaan",
@@ -12,14 +13,19 @@ const readRoles: Role[] = [
   "admin_tu",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
   "wali_kelas",
   "guru_tahfidz",
   "pembina_ekskul",
+  "musyrif",
   "bendahara",
+  "guru_bk",
+  "pustakawan",
 ];
 
 const writeRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "admin_tu",

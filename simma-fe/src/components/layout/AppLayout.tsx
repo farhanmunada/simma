@@ -32,12 +32,20 @@ export const AppLayout: React.FC = () => {
           {!isCollapsed ? (
             <>
               <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-700 border border-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow-xs">
-                  S
+                <div className="w-8 h-8 rounded-lg bg-white border border-emerald-200 flex items-center justify-center overflow-hidden shadow-xs shrink-0">
+                  <img
+                    src="/images/logo-manbaul-hikmah.png"
+                    alt="Logo PIPP Manba'ul Hikmah"
+                    className="w-7 h-7 object-contain"
+                  />
                 </div>
-                <div>
-                  <span className="font-bold text-slate-900 tracking-tight text-sm block leading-none">SIMMA</span>
-                  <span className="text-[10px] text-emerald-700 font-medium">Madrasah Aliyah</span>
+                <div className="min-w-0">
+                  <span className="font-bold text-slate-900 tracking-tight text-xs block leading-tight truncate">
+                    Manba'ul Hikmah
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-medium block truncate">
+                    SIMMA Temanggung
+                  </span>
                 </div>
               </div>
               <button
@@ -80,15 +88,18 @@ export const AppLayout: React.FC = () => {
 
                 {visibleItems.map((item) => {
                   const Icon = item.icon;
-                  const hasSub = item.subItems && item.subItems.length > 0;
+                  const visibleSubItems = (item.subItems ?? []).filter(
+                    (sub) => !sub.roles || hasRole(sub.roles),
+                  );
+                  const hasSub = visibleSubItems.length > 0;
                   const isOpen = openMenus[item.title];
                   const isDirectActive = item.href && location.pathname === item.href;
                   const isChildActive =
-                    hasSub && item.subItems?.some((sub) => location.pathname === sub.href);
+                    hasSub && visibleSubItems.some((sub) => location.pathname === sub.href);
 
                   // Collapsed Rail View: Clickable icon with hover tooltip / direct jump
                   if (isCollapsed) {
-                    const targetUrl = item.href || (item.subItems ? item.subItems[0].href : "/");
+                    const targetUrl = item.href || (hasSub ? visibleSubItems[0].href : "/");
                     const isActive = isDirectActive || isChildActive;
 
                     return (
@@ -110,7 +121,7 @@ export const AppLayout: React.FC = () => {
                             {item.title}
                           </p>
                           {hasSub ? (
-                            item.subItems!.map((sub) => (
+                            visibleSubItems.map((sub) => (
                               <Link
                                 key={sub.href}
                                 to={sub.href}
@@ -137,7 +148,7 @@ export const AppLayout: React.FC = () => {
                   }
 
                   if (hasSub) {
-                    const primaryHref = item.href || item.subItems![0].href;
+                    const primaryHref = item.href || visibleSubItems[0].href;
                     return (
                       <div key={item.title} className="space-y-0.5">
                         <div
@@ -179,7 +190,7 @@ export const AppLayout: React.FC = () => {
 
                         {isOpen && (
                           <div className="pl-6 pr-1 space-y-0.5 pt-0.5">
-                            {item.subItems!.map((sub) => {
+                            {visibleSubItems.map((sub) => {
                               const isSubActive = location.pathname === sub.href;
                               return (
                                 <Link

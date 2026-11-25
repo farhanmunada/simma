@@ -10,6 +10,7 @@ export const ppdbRoutes: FastifyPluginAsync = async (app) => {
       authenticate,
       requireRoles(
         "super_admin",
+        "operator",
         "admin_tu",
         "kepala_madrasah",
         "waka_kesiswaan",
@@ -21,7 +22,7 @@ export const ppdbRoutes: FastifyPluginAsync = async (app) => {
   const writeAuthGuard = {
     preHandler: [
       authenticate,
-      requireRoles("super_admin", "admin_tu", "waka_kesiswaan"),
+      requireRoles("super_admin", "operator", "admin_tu", "waka_kesiswaan"),
     ],
   };
 

@@ -44,6 +44,8 @@ export {
   teacherRanks,
   teacherDocuments,
   teacherWorkloads,
+  teacherSubjectAssignments,
+  teacherClassroomScopes,
 } from "./teachers";
 export {
   feeItems,
@@ -161,6 +163,10 @@ export type {
   NewTeacherDocument,
   TeacherWorkload,
   NewTeacherWorkload,
+  TeacherSubjectAssignment,
+  NewTeacherSubjectAssignment,
+  TeacherClassroomScope,
+  NewTeacherClassroomScope,
 } from "./teachers";
 export type {
   FeeItemRow,

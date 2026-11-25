@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { LoginSchema, RefreshTokenSchema } from "./auth.schema.js";
 import { authService, AuthService } from "./auth.service.js";
 import { UnauthorizedError, ValidationError } from "../../core/errors/app-error.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import type { LoginInput, RefreshTokenInput } from "./auth.types.js";
 
 export class AuthController {
@@ -53,6 +54,15 @@ export class AuthController {
 
     const user = await this.service.getMe(request.user.sub);
     return reply.status(200).send({ data: user });
+  };
+
+  getMyScope = async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!request.user?.sub) {
+      throw new UnauthorizedError("Autentikasi diperlukan");
+    }
+
+    const scope = await teacherScopeService.getScopeForUser(request.user);
+    return reply.status(200).send({ data: scope });
   };
 }
 

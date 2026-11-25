@@ -9,6 +9,8 @@ import { Button } from "../../../components/ui/Button";
 import { Select } from "../../../components/ui/Select";
 import { useClassroomLegger } from "../api/reports.api";
 import { useSemesters, useClassrooms, useAcademicYears } from "../../settings/api/settings.api";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useMyScope } from "../../auth/api/auth.api";
 import {
   type LeggerQueryParams,
 } from "../types";
@@ -28,9 +30,24 @@ export const ClassroomLeggerPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Reference queries
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const isPrivileged = hasRole([
+    "super_admin",
+    "operator",
+    "kepala_madrasah",
+    "waka_kurikulum",
+    "admin_tu",
+  ]);
+  const { data: scope } = useMyScope();
   const { data: academicYears = [] } = useAcademicYears();
   const { data: semesters = [], isLoading: isLoadingSemesters } = useSemesters();
-  const { data: classrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
+  const { data: rawClassrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
+
+  const classrooms = useMemo(() => {
+    if (isPrivileged || !scope) return rawClassrooms;
+    const allowed = new Set(scope.assignedClassroomIds);
+    return rawClassrooms.filter((c) => allowed.has(c.id));
+  }, [rawClassrooms, isPrivileged, scope]);
 
   const academicYearMap = useMemo(
     () => new Map(academicYears.map((ay) => [ay.id, ay.name])),

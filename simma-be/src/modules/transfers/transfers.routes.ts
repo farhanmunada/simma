@@ -5,6 +5,7 @@ import { transfersController } from "./transfers.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "waka_kesiswaan",
@@ -15,6 +16,7 @@ const readRoles: Role[] = [
 
 const writeRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "admin_tu",

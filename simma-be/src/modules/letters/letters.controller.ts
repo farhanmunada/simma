@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { ValidationError } from "../../core/errors/index.js";
+import { getUserAllRoles, teacherScopeService } from "../../core/auth/index.js";
 import { LettersService } from "./letters.service.js";
 import { LettersGeneratorService } from "./letters-generator.service.js";
 import { generateOfficialLetterPdf } from "./letters.pdf.js";
@@ -85,6 +86,15 @@ export class LettersController {
   getDispositions = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = req.query as { incomingLetterId?: string; targetRole?: string; status?: string };
     const data = await this.service.getDispositions(query);
+    if (!teacherScopeService.isPrivileged(req.user, ["admin_tu", "kepala_madrasah"])) {
+      const roles = getUserAllRoles(req.user);
+      const filtered = data.filter(
+        (d: any) =>
+          (d.targetUserId && d.targetUserId === req.user?.sub) ||
+          (d.targetRole && roles.includes(d.targetRole)),
+      );
+      return reply.status(200).send({ message: "Daftar disposisi", data: filtered });
+    }
     return reply.status(200).send({ message: "Daftar disposisi", data });
   };
 

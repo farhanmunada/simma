@@ -5,6 +5,7 @@ import { emisController } from "./emis.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "admin_tu",
   "kepala_madrasah",
   "waka_kurikulum",
@@ -13,12 +14,14 @@ const readRoles: Role[] = [
 
 const exportRoles: Role[] = [
   "super_admin",
+  "operator",
   "admin_tu",
   "kepala_madrasah",
 ];
 
 const bapCreateRoles: Role[] = [
   "super_admin",
+  "operator",
   "admin_tu",
 ];
 

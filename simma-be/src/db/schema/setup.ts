@@ -50,6 +50,7 @@ export const teachers = pgTable("teachers", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
   positionId: uuid("position_id").references(() => positions.id, { onDelete: "set null" }),
+  employeeCode: text("employee_code").unique(),
   nik: text("nik").notNull().unique(),
   nuptk: text("nuptk"),
   fullName: text("full_name").notNull(),

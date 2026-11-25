@@ -14,13 +14,32 @@ import type {
   AdditionalDutyType,
   SimpatikaStatus,
   GradeGroup,
+  Role,
+  TeacherScopeType,
 } from "@simma/shared";
+
+export interface TeacherAccountSummary {
+  userId: string;
+  username: string;
+  role: Role;
+  secondaryRoles: Role[];
+  isActive: boolean;
+}
+
+export interface TeacherAssignmentsDetail {
+  homeroomClassroomId: string | null;
+  subjectAssignments: Array<{ classroomId: string; subjectId: string }>;
+  extracurricularIds: string[];
+  classroomScopes: Array<{ classroomId: string; scopeType: TeacherScopeType }>;
+}
 
 export interface TeacherWithDetails extends Teacher {
   position?: Position | null;
   profile?: TeacherProfile | null;
   currentRank?: TeacherRankRecord | null;
   currentWorkload?: TeacherWorkload | null;
+  account?: TeacherAccountSummary | null;
+  assignments?: TeacherAssignmentsDetail;
   educationCount?: number;
   documentCount?: number;
 }
@@ -28,6 +47,8 @@ export interface TeacherWithDetails extends Teacher {
 export interface TeacherFullDetail extends Teacher {
   position?: Position | null;
   profile: TeacherProfile | null;
+  account?: TeacherAccountSummary | null;
+  assignments?: TeacherAssignmentsDetail;
   educations: TeacherEducation[];
   ranks: TeacherRankRecord[];
   documents: TeacherDocument[];

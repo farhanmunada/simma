@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Award, Users, FileCheck2 } from "lucide-react";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useMyScope } from "../../auth/api/auth.api";
 import {
   useExtracurricularStats,
   useExtracurriculars,
@@ -36,8 +38,31 @@ export const ExtracurricularPage: React.FC = () => {
   const deleteMemberMutation = useDeleteExtracurricularMember();
   const batchGradesMutation = useBatchUpsertExtracurricularGrades();
 
-  const extracurricularList = ekskulData?.data ?? [];
-  const memberList = membersData?.data ?? [];
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const isPrivileged = hasRole([
+    "super_admin",
+    "operator",
+    "kepala_madrasah",
+    "waka_kesiswaan",
+    "waka_kurikulum",
+    "admin_tu",
+  ]);
+  const { data: scope } = useMyScope();
+
+  const rawExtracurricularList = ekskulData?.data ?? [];
+  const rawMemberList = membersData?.data ?? [];
+
+  const extracurricularList = useMemo(() => {
+    if (isPrivileged || !scope) return rawExtracurricularList;
+    const allowed = new Set(scope.extracurricularIds);
+    return rawExtracurricularList.filter((e) => allowed.has(e.id));
+  }, [rawExtracurricularList, isPrivileged, scope]);
+
+  const memberList = useMemo(() => {
+    if (isPrivileged || !scope) return rawMemberList;
+    const allowed = new Set(scope.extracurricularIds);
+    return rawMemberList.filter((m) => allowed.has(m.extracurricularId));
+  }, [rawMemberList, isPrivileged, scope]);
 
   const handleOpenAdd = () => {
     setEditingItem(null);
@@ -138,6 +163,7 @@ export const ExtracurricularPage: React.FC = () => {
         <ExtracurricularTable
           items={extracurricularList}
           isLoading={isEkskulLoading}
+          canManage={isPrivileged}
           onAdd={handleOpenAdd}
           onEdit={handleOpenEdit}
           onDelete={handleDeleteEkskul}

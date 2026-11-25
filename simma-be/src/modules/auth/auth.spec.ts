@@ -30,6 +30,7 @@ const mockUser: UserRecord = {
   username: "testguru",
   passwordHash: "",
   role: "guru_mapel",
+  secondaryRoles: [],
   teacherId: null,
   isActive: true,
   lastLogin: null,
@@ -164,6 +165,21 @@ describe("Auth Middleware", () => {
 
     const check = requireRoles("kepala_madrasah");
     await expect(check(req, rep)).rejects.toThrow(ForbiddenError);
+  });
+
+  it("should allow user matching secondaryRoles", async () => {
+    const req = {
+      user: {
+        sub: mockUser.id,
+        username: "2101",
+        role: "wali_kelas",
+        secondaryRoles: ["guru_mapel", "pembina_ekskul"],
+      },
+    } as unknown as FastifyRequest;
+    const rep = {} as FastifyReply;
+
+    const check = requireRoles("pembina_ekskul");
+    await expect(check(req, rep)).resolves.toBeUndefined();
   });
 });
 
@@ -374,6 +390,34 @@ describe("Auth HTTP Endpoints (Integration)", () => {
     expect(response.statusCode).toBe(401);
     const json = JSON.parse(response.body);
     expect(json.error.code).toBe("UNAUTHORIZED");
+  });
+
+  it("POST /api/v1/auth/login with 4-digit numeric code should return 200", async () => {
+    const codeHash = await bcrypt.hash("2101", 10);
+    const codeUser: UserRecord = {
+      ...mockUser,
+      username: "2101",
+      passwordHash: codeHash,
+      role: "wali_kelas",
+      secondaryRoles: ["guru_mapel"],
+    };
+    vi.spyOn(authRepository, "findByUsername").mockImplementation(
+      async (username: string) => (username === "2101" ? codeUser : null),
+    );
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/login",
+      payload: {
+        username: "2101",
+        password: "2101",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const json = JSON.parse(response.body);
+    expect(json.user.username).toBe("2101");
+    expect(json.user.secondaryRoles).toContain("guru_mapel");
   });
 
   it("GET /api/v1/auth/me should return 200 and profile with valid Bearer token", async () => {

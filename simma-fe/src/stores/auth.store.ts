@@ -1,23 +1,15 @@
 import { create } from "zustand";
+import type { Role } from "@simma/shared";
 
-export type UserRole =
-  | "super_admin"
-  | "admin_tu"
-  | "kepala_madrasah"
-  | "waka_kurikulum"
-  | "waka_kesiswaan"
-  | "wali_kelas"
-  | "guru_mapel"
-  | "guru"
-  | "siswa"
-  | "orang_tua"
-  | "calon_siswa";
+export type UserRole = Role | "siswa" | "orang_tua";
 
 export interface AuthUser {
   id: string;
   email: string;
   fullName: string;
   role: UserRole;
+  secondaryRoles?: UserRole[];
+  teacherId?: string | null;
   avatarUrl?: string | null;
 }
 
@@ -87,8 +79,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   hasRole: (roles) => {
     const user = get().user;
     if (!user) return false;
-    if (user.role === "super_admin") return true;
+    const allRoles = [user.role, ...(user.secondaryRoles ?? [])];
+    if (allRoles.includes("super_admin")) return true;
     const allowed = Array.isArray(roles) ? roles : [roles];
-    return allowed.includes(user.role);
+    return allowed.some((r) => allRoles.includes(r));
   },
 }));

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import type { Role } from "@simma/shared";
 
 // Base columns reused across tables
@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   role: text("role").$type<Role>().notNull(),
+  secondaryRoles: jsonb("secondary_roles").$type<Role[]>().notNull().default([]),
   teacherId: uuid("teacher_id"), // FK to teachers — set after teachers table exists
   isActive: boolean("is_active").notNull().default(true),
   lastLogin: timestamp("last_login", { withTimezone: true }),

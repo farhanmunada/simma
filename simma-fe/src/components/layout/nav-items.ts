@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Mail,
-  Settings,
   Building2,
   Users,
   BookOpen,
@@ -19,13 +18,21 @@ import {
   Database,
   Package,
 } from "lucide-react";
+import { MODULE_ROLES } from "../../config/roles";
+import type { UserRole } from "../../stores/auth.store";
+
+export interface NavSubItem {
+  title: string;
+  href: string;
+  roles?: UserRole[];
+}
 
 export interface NavItem {
   title: string;
   href?: string;
   icon: React.ElementType;
-  roles?: string[];
-  subItems?: { title: string; href: string }[];
+  roles?: UserRole[];
+  subItems?: NavSubItem[];
 }
 
 export interface NavGroup {
@@ -34,7 +41,6 @@ export interface NavGroup {
 }
 
 export const navGroups: NavGroup[] = [
-  // 1. HARIAN & OPERASIONAL UTAMA (Paling Sering Diakses Tiap Hari)
   {
     group: "Utama & Harian",
     items: [
@@ -46,17 +52,21 @@ export const navGroups: NavGroup[] = [
       {
         title: "Presensi",
         icon: CalendarCheck,
-        roles: ["super_admin", "admin_tu", "guru", "wali_kelas"],
+        roles: MODULE_ROLES.ATTENDANCE,
         subItems: [
           { title: "Presensi Siswa", href: "/attendance/students" },
-          { title: "Presensi Guru", href: "/attendance/teachers" },
+          {
+            title: "Presensi Guru",
+            href: "/attendance/teachers",
+            roles: MODULE_ROLES.ATTENDANCE_TEACHERS,
+          },
           { title: "Rekapitulasi", href: "/attendance/recap" },
         ],
       },
       {
         title: "Tahfidz & Tasmi'",
         icon: BookOpen,
-        roles: ["super_admin", "guru", "wali_kelas"],
+        roles: MODULE_ROLES.TAHFIDZ,
         subItems: [
           { title: "Setoran Hafalan", href: "/tahfidz" },
           { title: "Ujian Tasmi'", href: "/tahfidz/tasmi" },
@@ -65,57 +75,59 @@ export const navGroups: NavGroup[] = [
       {
         title: "Mutaba'ah Yaumiyah",
         icon: ClipboardCheck,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_kesiswaan",
-          "wali_kelas",
-          "guru",
-        ],
+        roles: MODULE_ROLES.MUTABAAH,
         subItems: [
           { title: "Checklist Harian", href: "/mutabaah/checklist" },
           { title: "Monitoring & Rapor", href: "/mutabaah/compliance" },
-          { title: "Katalog Amalan", href: "/mutabaah/activities" },
+          {
+            title: "Katalog Amalan",
+            href: "/mutabaah/activities",
+            roles: MODULE_ROLES.MUTABAAH_ACTIVITIES,
+          },
         ],
       },
       {
         title: "Tata Tertib & BK",
         icon: ShieldAlert,
-        roles: [
-          "super_admin",
-          "kepala_madrasah",
-          "waka_kesiswaan",
-          "guru_bk",
-          "wali_kelas",
-          "guru",
-          "guru_mapel",
-          "admin_tu",
-        ],
+        roles: MODULE_ROLES.DISCIPLINE,
         subItems: [
           { title: "Dashboard & Leaderboard", href: "/discipline" },
           { title: "Pelanggaran & Apresiasi", href: "/discipline/infractions" },
-          { title: "Bimbingan Konseling (BK)", href: "/discipline/counseling" },
-          { title: "Panggilan Orang Tua", href: "/discipline/summons" },
+          {
+            title: "Bimbingan Konseling (BK)",
+            href: "/discipline/counseling",
+            roles: MODULE_ROLES.DISCIPLINE_COUNSELING,
+          },
+          {
+            title: "Panggilan Orang Tua",
+            href: "/discipline/summons",
+            roles: MODULE_ROLES.DISCIPLINE_SUMMONS,
+          },
           { title: "Katalog Aturan Tatib", href: "/discipline/rules" },
         ],
       },
       {
         title: "Keuangan & SPP",
         icon: CreditCard,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "bendahara"],
+        roles: MODULE_ROLES.FINANCE_MENU,
         subItems: [
           { title: "Kasir Loket Cepat", href: "/finance/cashier" },
           { title: "Tagihan Siswa", href: "/finance/invoices" },
-          { title: "Pos & Tarif Biaya", href: "/finance/fee-items" },
+          {
+            title: "Pos & Tarif Biaya",
+            href: "/finance/fee-items",
+            roles: MODULE_ROLES.FINANCE_ADMIN,
+          },
           { title: "Dispensasi", href: "/finance/dispensations" },
-          { title: "Laporan Keuangan", href: "/finance/reports" },
+          {
+            title: "Laporan Keuangan",
+            href: "/finance/reports",
+            roles: MODULE_ROLES.FINANCE_ADMIN,
+          },
         ],
       },
     ],
   },
-
-  // 2. AKADEMIK & PEMBELAJARAN (Rutin Mingguan, Bulanan, & Semesteran)
   {
     group: "Akademik & Pembelajaran",
     items: [
@@ -123,18 +135,18 @@ export const navGroups: NavGroup[] = [
         title: "Penilaian",
         href: "/grades",
         icon: GraduationCap,
-        roles: ["super_admin", "guru", "wali_kelas"],
+        roles: MODULE_ROLES.GRADES,
       },
       {
         title: "Jadwal Pelajaran",
         href: "/schedules",
         icon: Calendar,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
+        roles: MODULE_ROLES.SCHEDULES,
       },
       {
         title: "Tata Usaha & Surat",
         icon: Mail,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
+        roles: MODULE_ROLES.LETTERS_MENU,
         subItems: [
           { title: "Surat Masuk", href: "/letters/incoming" },
           { title: "Disposisi Kamad", href: "/letters/dispositions" },
@@ -147,25 +159,18 @@ export const navGroups: NavGroup[] = [
         title: "Projek P5RA",
         href: "/p5ra",
         icon: Layers,
-        roles: ["super_admin", "kepala_madrasah", "waka_kurikulum", "guru", "wali_kelas"],
+        roles: MODULE_ROLES.P5RA,
       },
       {
         title: "Ekstrakurikuler",
         href: "/extracurricular",
         icon: Award,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_kesiswaan",
-          "wali_kelas",
-          "guru",
-        ],
+        roles: MODULE_ROLES.EXTRACURRICULAR,
       },
       {
         title: "Rapor & Legger",
         icon: FileSpreadsheet,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "wali_kelas", "guru"],
+        roles: MODULE_ROLES.REPORTS,
         subItems: [
           { title: "Rapor Siswa", href: "/reports" },
           { title: "Legger Nilai", href: "/reports/legger" },
@@ -173,25 +178,15 @@ export const navGroups: NavGroup[] = [
       },
     ],
   },
-
-  // 3. KEPEGAWAIAN & ASET (Bulanan / Semesteran)
   {
     group: "Kepegawaian & Fasilitas",
     items: [
       {
         title: "Kepegawaian GTK",
         icon: UserCheck,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_kurikulum",
-          "guru",
-          "guru_mapel",
-          "wali_kelas",
-        ],
+        roles: MODULE_ROLES.TEACHERS,
         subItems: [
-          { title: "Direktori GTK", href: "/teachers" },
+          { title: "Direktori & Akun GTK", href: "/teachers" },
           { title: "Beban Kerja (24 JTM)", href: "/teachers/workloads" },
           { title: "Monitoring Mutu", href: "/teachers/monitoring" },
         ],
@@ -200,48 +195,64 @@ export const navGroups: NavGroup[] = [
         title: "Sarana & Prasarana",
         href: "/facilities",
         icon: Package,
-        roles: [
-          "super_admin",
-          "admin_tu",
-          "kepala_madrasah",
-          "waka_sarpras",
-          "guru",
-          "guru_mapel",
-          "wali_kelas",
-        ],
+        roles: MODULE_ROLES.FACILITIES,
       },
     ],
   },
-
-  // 4. KESISWAAN, PPDB & EMIS (Semesteran & Tahunan saat Tahun Ajaran Baru)
   {
     group: "Kesiswaan & Registrasi Tahunan",
     items: [
       {
         title: "Kesiswaan",
         icon: Users,
-        roles: ["super_admin", "admin_tu", "waka_kesiswaan", "wali_kelas", "waka_kurikulum"],
+        roles: MODULE_ROLES.STUDENTS,
         subItems: [
-          { title: "PPDB & Pendaftar", href: "/ppdb-admin" },
+          {
+            title: "PPDB & Pendaftar",
+            href: "/ppdb-admin",
+            roles: MODULE_ROLES.PPDB_ADMIN,
+          },
           { title: "Kesiswaan & Buku Induk", href: "/students" },
-          { title: "Kelas & Rombel", href: "/students/classrooms" },
-          { title: "Penempatan Rombel", href: "/students/assign" },
-          { title: "Mutasi & Kelulusan", href: "/transfers" },
-          { title: "Tahun Ajaran", href: "/students/academic-years" },
-          { title: "Semester", href: "/students/semesters" },
-          { title: "Mata Pelajaran", href: "/students/subjects" },
+          {
+            title: "Kelas & Rombel",
+            href: "/students/classrooms",
+            roles: MODULE_ROLES.STUDENTS_MASTER,
+          },
+          {
+            title: "Penempatan Rombel",
+            href: "/students/assign",
+            roles: MODULE_ROLES.STUDENTS_MASTER,
+          },
+          {
+            title: "Mutasi & Kelulusan",
+            href: "/transfers",
+            roles: MODULE_ROLES.TRANSFERS,
+          },
+          {
+            title: "Tahun Ajaran",
+            href: "/students/academic-years",
+            roles: MODULE_ROLES.STUDENTS_MASTER,
+          },
+          {
+            title: "Semester",
+            href: "/students/semesters",
+            roles: MODULE_ROLES.STUDENTS_MASTER,
+          },
+          {
+            title: "Mata Pelajaran",
+            href: "/students/subjects",
+            roles: MODULE_ROLES.STUDENTS_MASTER,
+          },
         ],
       },
       {
         title: "Ekspor EMIS 4.0",
         href: "/emis",
         icon: Database,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah", "waka_kurikulum", "waka_kesiswaan"],
+        roles: MODULE_ROLES.EMIS,
       },
     ],
   },
-
-  // 5. PENGATURAN SISTEM & PROFIL (1x Saat Inisiasi / Sangat Jarang Diakses)
   {
     group: "Pengaturan & Lembaga",
     items: [
@@ -249,7 +260,7 @@ export const navGroups: NavGroup[] = [
         title: "Profil Madrasah",
         href: "/settings/profile",
         icon: Building2,
-        roles: ["super_admin", "admin_tu", "kepala_madrasah"],
+        roles: MODULE_ROLES.SETTINGS,
       },
     ],
   },
@@ -259,6 +270,7 @@ export const navItems: NavItem[] = navGroups.flatMap((g) => g.items);
 
 export const roleLabelMap: Record<string, string> = {
   super_admin: "Super Admin",
+  operator: "Operator Madrasah",
   admin_tu: "Admin TU",
   kepala_madrasah: "Kepala Madrasah",
   waka_sarpras: "Waka Sarpras",
@@ -268,7 +280,13 @@ export const roleLabelMap: Record<string, string> = {
   bendahara: "Bendahara",
   wali_kelas: "Wali Kelas",
   guru_mapel: "Guru Mapel",
+  guru_diniyah: "Guru Diniyah",
+  guru_tahfidz: "Guru Tahfidz",
+  pembina_ekskul: "Pembina Ekskul",
+  musyrif: "Musyrif Asrama",
+  pustakawan: "Pustakawan",
   guru: "Guru",
   siswa: "Siswa",
   orang_tua: "Orang Tua",
+  calon_siswa: "Calon Siswa",
 };

@@ -5,6 +5,7 @@ import { p5raController } from "./p5ra.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "admin_tu",
   "kepala_madrasah",
   "waka_kurikulum",
@@ -15,6 +16,7 @@ const readRoles: Role[] = [
 
 const manageProjectRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "wali_kelas",
@@ -23,6 +25,7 @@ const manageProjectRoles: Role[] = [
 
 const assessRoles: Role[] = [
   "super_admin",
+  "operator",
   "waka_kurikulum",
   "wali_kelas",
   "guru_mapel",

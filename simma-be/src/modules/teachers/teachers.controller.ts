@@ -121,6 +121,21 @@ export class TeachersController {
     const data = await this.service.getPositions();
     return reply.status(200).send({ data });
   };
+
+  getNextCode = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { role } = req.query as { role?: string };
+    const data = await this.service.getNextCodeForRole(role);
+    return reply.status(200).send({ data });
+  };
+
+  resetPasswordToCode = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { id } = req.params as { id: string };
+    const data = await this.service.resetAccountPasswordToCode(id);
+    return reply.status(200).send({
+      message: `Password akun GTK berhasil direset ke kode ${data.employeeCode}.`,
+      data,
+    });
+  };
 }
 
 export const teachersController = new TeachersController();

@@ -20,6 +20,7 @@ import {
 } from "../../db/schema/index.js";
 import type { TeacherQueryParams } from "@simma/shared";
 import type { TeacherFullDetail, TeacherWithDetails } from "./teachers.types.js";
+import { teachersAccountRepository } from "./teachers-account.repository.js";
 
 export class TeachersRepository {
   async findTeachers(params: TeacherQueryParams): Promise<{ data: TeacherWithDetails[]; total: number }> {
@@ -28,7 +29,7 @@ export class TeachersRepository {
 
     if (params.search) {
       const term = `%${params.search}%`;
-      conditions.push(or(ilike(teachers.fullName, term), ilike(teachers.nik, term), ilike(teachers.nuptk, term))!);
+      conditions.push(or(ilike(teachers.fullName, term), ilike(teachers.nik, term), ilike(teachers.nuptk, term), ilike(teachers.employeeCode, term))!);
     }
     if (params.employmentType) {
       conditions.push(eq(teachers.employmentType, params.employmentType));
@@ -53,13 +54,14 @@ export class TeachersRepository {
       .map((t) => t.positionId)
       .filter((id): id is string => Boolean(id));
 
-    const [profiles, ranks, workloads, posRows] = await Promise.all([
+    const [profiles, ranks, workloads, posRows, accountMap] = await Promise.all([
       db.select().from(teacherProfiles).where(inArray(teacherProfiles.teacherId, teacherIds)),
       db.select().from(teacherRanks).where(and(inArray(teacherRanks.teacherId, teacherIds), eq(teacherRanks.isCurrent, true))),
       db.select().from(teacherWorkloads).where(inArray(teacherWorkloads.teacherId, teacherIds)),
       positionIds.length > 0
         ? db.select().from(positions).where(inArray(positions.id, positionIds))
         : Promise.resolve([]),
+      teachersAccountRepository.getBatchAccountMap(teacherIds),
     ]);
 
     const profileMap = new Map(profiles.map((p) => [p.teacherId, p]));
@@ -73,6 +75,7 @@ export class TeachersRepository {
       profile: profileMap.get(t.id) ?? null,
       currentRank: rankMap.get(t.id) ?? null,
       currentWorkload: workloadMap.get(t.id) ?? null,
+      account: accountMap.get(t.id) ?? null,
     }));
 
     return { data, total };
@@ -87,7 +90,7 @@ export class TeachersRepository {
 
     if (!teacher) return null;
 
-    const [profiles, educations, ranks, documents, workloads, posRows] = await Promise.all([
+    const [profiles, educations, ranks, documents, workloads, posRows, accountMap, assignments] = await Promise.all([
       db.select().from(teacherProfiles).where(eq(teacherProfiles.teacherId, id)),
       db.select().from(teacherEducation).where(eq(teacherEducation.teacherId, id)).orderBy(desc(teacherEducation.graduationYear)),
       db.select().from(teacherRanks).where(eq(teacherRanks.teacherId, id)).orderBy(desc(teacherRanks.tmtRank)),
@@ -96,12 +99,16 @@ export class TeachersRepository {
       teacher.positionId
         ? db.select().from(positions).where(eq(positions.id, teacher.positionId))
         : Promise.resolve([]),
+      teachersAccountRepository.getBatchAccountMap([id]),
+      teachersAccountRepository.getTeacherAssignmentsDetail(id),
     ]);
 
     return {
       ...teacher,
       position: posRows[0] ?? null,
       profile: profiles[0] ?? null,
+      account: accountMap.get(id) ?? null,
+      assignments,
       educations,
       ranks,
       documents,
@@ -119,54 +126,54 @@ export class TeachersRepository {
     return teacher ?? null;
   }
 
-  async createTeacherWithProfile(teacherData: NewTeacher, profileData?: Partial<TeacherProfile>): Promise<TeacherFullDetail> {
+  async createTeacherWithProfile(
+    teacherData: NewTeacher,
+    profileData?: Partial<TeacherProfile>,
+    accountConfig?: any,
+    assignmentsConfig?: any,
+  ): Promise<TeacherFullDetail> {
     const db = getDb();
-    return await db.transaction(async (tx) => {
+    const createdId = await db.transaction(async (tx) => {
       const [newTeacher] = await tx.insert(teachers).values(teacherData).returning();
-      let createdProfile: TeacherProfile | null = null;
       if (profileData) {
-        const [profile] = await tx.insert(teacherProfiles).values({
+        await tx.insert(teacherProfiles).values({
           ...profileData,
           teacherId: newTeacher.id,
           birthDate: profileData.birthDate ? String(profileData.birthDate) : null,
           tmtFirst: profileData.tmtFirst ? String(profileData.tmtFirst) : null,
           tmtPns: profileData.tmtPns ? String(profileData.tmtPns) : null,
-        }).returning();
-        createdProfile = profile;
+        });
       }
-
-      return {
-        ...newTeacher,
-        position: null,
-        profile: createdProfile,
-        educations: [],
-        ranks: [],
-        documents: [],
-        workloads: [],
-      };
+      if (accountConfig) {
+        await teachersAccountRepository.provisionAccountInTx(tx, {
+          teacherId: newTeacher.id,
+          existingUserId: newTeacher.userId ?? null,
+          existingCode: newTeacher.employeeCode ?? null,
+          ...accountConfig,
+        });
+      }
+      if (assignmentsConfig) {
+        await teachersAccountRepository.syncAssignmentsInTx(tx, newTeacher.id, assignmentsConfig);
+      }
+      return newTeacher.id;
     });
+    return (await this.findTeacherById(createdId))!;
   }
 
   async updateTeacherWithProfile(
     id: string,
     teacherData: Partial<NewTeacher>,
-    profileData?: Partial<TeacherProfile>
+    profileData?: Partial<TeacherProfile>,
+    accountConfig?: any,
+    assignmentsConfig?: any,
   ): Promise<TeacherFullDetail> {
     const db = getDb();
-    return await db.transaction(async (tx) => {
+    await db.transaction(async (tx) => {
       if (Object.keys(teacherData).length > 0) {
-        await tx
-          .update(teachers)
-          .set({ ...teacherData, updatedAt: new Date() })
-          .where(eq(teachers.id, id));
+        await tx.update(teachers).set({ ...teacherData, updatedAt: new Date() }).where(eq(teachers.id, id));
       }
-
       if (profileData && Object.keys(profileData).length > 0) {
-        const [existing] = await tx
-          .select()
-          .from(teacherProfiles)
-          .where(eq(teacherProfiles.teacherId, id));
-
+        const [existing] = await tx.select().from(teacherProfiles).where(eq(teacherProfiles.teacherId, id));
         const formatted = {
           ...profileData,
           birthDate: profileData.birthDate ? String(profileData.birthDate) : undefined,
@@ -174,22 +181,26 @@ export class TeachersRepository {
           tmtPns: profileData.tmtPns ? String(profileData.tmtPns) : undefined,
           updatedAt: new Date(),
         };
-
         if (existing) {
-          await tx
-            .update(teacherProfiles)
-            .set(formatted)
-            .where(eq(teacherProfiles.teacherId, id));
+          await tx.update(teacherProfiles).set(formatted).where(eq(teacherProfiles.teacherId, id));
         } else {
-          await tx
-            .insert(teacherProfiles)
-            .values({ ...formatted, teacherId: id });
+          await tx.insert(teacherProfiles).values({ ...formatted, teacherId: id });
         }
       }
-
-      const updated = await this.findTeacherById(id);
-      return updated!;
+      if (accountConfig) {
+        const [row] = await tx.select({ userId: teachers.userId, employeeCode: teachers.employeeCode }).from(teachers).where(eq(teachers.id, id));
+        await teachersAccountRepository.provisionAccountInTx(tx, {
+          teacherId: id,
+          existingUserId: row?.userId ?? null,
+          existingCode: row?.employeeCode ?? null,
+          ...accountConfig,
+        });
+      }
+      if (assignmentsConfig) {
+        await teachersAccountRepository.syncAssignmentsInTx(tx, id, assignmentsConfig);
+      }
     });
+    return (await this.findTeacherById(id))!;
   }
 
   async softDeleteTeacher(id: string): Promise<boolean> {

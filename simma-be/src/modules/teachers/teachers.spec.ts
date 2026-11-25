@@ -217,5 +217,40 @@ describe("Teachers Module (GTK Kepegawaian)", () => {
       expect(exportRows[0].isCertified).toBe(true);
       expect(exportRows[0].isEligibleTpg).toBe(true);
     });
+
+    it("validates 4-digit numeric employeeCode and account enrolment schema", () => {
+      const valid = CreateTeacherFullSchema.safeParse({
+        nik: "3201012345678902",
+        fullName: "Ustadzah Fatimah, S.Pd.",
+        employmentType: "GTY",
+        account: {
+          primaryRole: "wali_kelas",
+          secondaryRoles: ["guru_mapel", "pembina_ekskul"],
+          employeeCode: "2101",
+          isActive: true,
+        },
+        assignments: {
+          homeroomClassroomId: "11111111-1111-1111-1111-111111111111",
+          subjectAssignments: [
+            {
+              classroomId: "11111111-1111-1111-1111-111111111111",
+              subjectId: "22222222-2222-2222-2222-222222222222",
+            },
+          ],
+        },
+      });
+      expect(valid.success).toBe(true);
+
+      const invalidCode = CreateTeacherFullSchema.safeParse({
+        nik: "3201012345678902",
+        fullName: "Ustadzah Fatimah",
+        employmentType: "GTY",
+        account: {
+          primaryRole: "wali_kelas",
+          employeeCode: "WK01",
+        },
+      });
+      expect(invalidCode.success).toBe(false);
+    });
   });
 });

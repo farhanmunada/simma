@@ -5,6 +5,7 @@ import { disciplineController } from "./discipline.controller.js";
 
 const allStaffRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "waka_kurikulum",
@@ -12,6 +13,8 @@ const allStaffRoles: Role[] = [
   "wali_kelas",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
+  "musyrif",
   "admin_tu",
 ];
 

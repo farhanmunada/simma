@@ -5,8 +5,10 @@ import { gradesController } from "./grades.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
   "wali_kelas",
   "kepala_madrasah",
   "waka_kurikulum",
@@ -16,8 +18,10 @@ const readRoles: Role[] = [
 
 const writeRoles: Role[] = [
   "super_admin",
+  "operator",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
   "wali_kelas",
 ];
 

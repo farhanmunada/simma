@@ -5,6 +5,7 @@ import { tahfidzController } from "./tahfidz.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "waka_kesiswaan",
@@ -14,7 +15,7 @@ const readRoles: Role[] = [
   "admin_tu",
 ];
 
-const writeRoles: Role[] = ["super_admin", "guru_tahfidz"];
+const writeRoles: Role[] = ["super_admin", "operator", "guru_tahfidz"];
 
 export const tahfidzRoutes: FastifyPluginAsync = async (app) => {
   // Global auth for all tahfidz endpoints

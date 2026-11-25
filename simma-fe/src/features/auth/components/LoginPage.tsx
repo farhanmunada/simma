@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-import { School, ArrowRight, Lock } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 import { useAuthStore } from "../../../stores/auth.store";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
@@ -51,22 +51,36 @@ export const LoginPage: React.FC = () => {
         <div className="md:col-span-5 bg-emerald-800 text-white p-8 sm:p-10 flex flex-col justify-between">
           <div>
             <div className="flex items-center space-x-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-emerald-700/80 border border-emerald-600 flex items-center justify-center font-bold text-white text-lg">
-                <School className="w-5 h-5 text-emerald-200" />
+              <div className="w-11 h-11 rounded-xl bg-white/95 border border-emerald-500/40 flex items-center justify-center overflow-hidden shadow-xs">
+                <img
+                  src="/images/logo-manbaul-hikmah.png"
+                  alt="Logo PIPP Manba'ul Hikmah"
+                  className="w-9 h-9 object-contain"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
               </div>
-              <span className="font-bold tracking-tight text-xl text-white">SIMMA</span>
+              <div>
+                <span className="font-bold tracking-tight text-lg text-white block leading-tight">
+                  PIPP Manba'ul Hikmah
+                </span>
+                <span className="text-[11px] text-emerald-200/90 font-medium">
+                  SIMMA — Madrasah Aliyah
+                </span>
+              </div>
             </div>
 
             <h2 className="text-xl font-bold tracking-tight text-white mb-2 leading-snug">
-              Sistem Informasi Madrasah Aliyah
+              Sistem Informasi Madrasah &amp; Pesantren
             </h2>
             <p className="text-xs text-emerald-100/90 leading-relaxed">
-              Tata kelola terpadu kurikulum Kemenag, presensi santri, data induk kesiswaan, dan tata usaha madrasah.
+              Tata kelola terpadu kurikulum Kemenag &amp; Salafiyah, presensi santri, data induk EMIS 4.0, tahfidz, dan administrasi PIPP Manba'ul Hikmah Wonoboyo, Temanggung.
             </p>
           </div>
 
           <div className="pt-6 border-t border-emerald-700/60 text-[11px] text-emerald-200/80 flex items-center justify-between">
-            <span>Kementerian Agama RI</span>
+            <span>Est. 1998 &bull; Temanggung</span>
             <span>Tahun Ajaran 2026/2027</span>
           </div>
         </div>
@@ -93,25 +107,25 @@ export const LoginPage: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <Input
                 id="login-email"
-                label="Email atau Username"
+                label="Kode GTK (4 Digit) / Username"
                 type="text"
                 autoComplete="username"
-                placeholder="nama@madrasah.sch.id"
+                placeholder="Contoh: 1001, 2101, 2201"
                 error={errors.email?.message}
                 {...register("email", {
-                  required: "Email atau username wajib diisi",
+                  required: "Kode GTK atau username wajib diisi",
                 })}
               />
 
               <Input
                 id="login-password"
-                label="Kata Sandi"
+                label="Kode / Kata Sandi"
                 type="password"
                 autoComplete="current-password"
-                placeholder="••••••••"
+                placeholder="Masukkan kode 4 digit"
                 error={errors.password?.message}
                 {...register("password", {
-                  required: "Kata sandi wajib diisi",
+                  required: "Kode / kata sandi wajib diisi",
                 })}
               />
 

@@ -215,3 +215,23 @@ export const useUpsertTeacherWorkload = () => {
 export const fetchEmisGtkData = () =>
   apiClient<{ data: unknown[] }>(API_ENDPOINTS.TEACHERS.EMIS_EXPORT).then((r) => r.data);
 
+export const fetchNextTeacherCode = (role: string) =>
+  apiClient<{ data: { code: string; role: string } }>(API_ENDPOINTS.TEACHERS.NEXT_CODE, {
+    params: { role },
+  }).then((r) => r.data);
+
+export const useResetTeacherPassword = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (teacherId: string) =>
+      apiClient<{ message: string; data: { employeeCode: string } }>(
+        API_ENDPOINTS.TEACHERS.RESET_PASSWORD(teacherId),
+        { method: "POST" },
+      ),
+    onSuccess: (_, teacherId) => {
+      queryClient.invalidateQueries({ queryKey: teacherKeys.detail(teacherId) });
+      queryClient.invalidateQueries({ queryKey: teacherKeys.lists() });
+    },
+  });
+};
+

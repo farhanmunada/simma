@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { X, Save, UserCheck, KeyRound, User, BookOpenCheck, CheckCircle2 } from "lucide-react";
+import type { Role } from "@simma/shared";
 import {
-  EMPLOYMENT_TYPES,
-  GTK_TYPES,
-  DUTY_STATUSES,
-  type EmploymentType,
-  type GtkType,
-  type DutyStatus,
-} from "@simma/shared";
-import type { TeacherListItem, TeacherProfileDto } from "../types";
-import { usePositions } from "../api/teachers.api";
+  usePositions,
+  useTeacherDetail,
+  useResetTeacherPassword,
+  fetchNextTeacherCode,
+} from "../api/teachers.api";
+import type { TeacherListItem } from "../types";
+import { TeacherAccountTab, type TeacherAccountFormState } from "./form/TeacherAccountTab";
+import { TeacherIdentityTab, type TeacherIdentityFormState } from "./form/TeacherIdentityTab";
+import { TeacherBioFormTab, type TeacherBioFormState } from "./form/TeacherBioFormTab";
+import { TeacherEnrolmentTab, type TeacherEnrolmentFormState } from "./form/TeacherEnrolmentTab";
+import {
+  DEFAULT_ACCOUNT,
+  DEFAULT_IDENTITY,
+  DEFAULT_BIO,
+  DEFAULT_ENROLMENT,
+  mapTeacherToFormStates,
+  buildTeacherSubmitPayload,
+} from "./form/teacher-form-mapper";
 
 interface TeacherFormModalProps {
   isOpen: boolean;
@@ -18,298 +28,199 @@ interface TeacherFormModalProps {
   initialData?: TeacherListItem | null;
 }
 
+type ModalTab = "account" | "identity" | "bio" | "enrolment";
+
 export const TeacherFormModal: React.FC<TeacherFormModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   initialData,
 }) => {
+  const isEdit = Boolean(initialData?.id);
   const { data: positions = [] } = usePositions();
-  const [fullName, setFullName] = useState("");
-  const [positionId, setPositionId] = useState<string>("");
-  const [nik, setNik] = useState("");
-  const [nuptk, setNuptk] = useState("");
-  const [employmentType, setEmploymentType] = useState<EmploymentType>("GTY");
-  const [certification, setCertification] = useState("");
-  const [nip, setNip] = useState("");
-  const [pegId, setPegId] = useState("");
-  const [nrg, setNrg] = useState("");
-  const [gender, setGender] = useState<"L" | "P">("L");
-  const [gtkType, setGtkType] = useState<GtkType>("pendidik");
-  const [dutyStatus, setDutyStatus] = useState<DutyStatus>("aktif");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { data: teacherDetail } = useTeacherDetail(isOpen && initialData?.id ? initialData.id : "");
+  const resetPasswordMutation = useResetTeacherPassword();
+
+  const [activeTab, setActiveTab] = useState<ModalTab>("account");
+  const [account, setAccount] = useState<TeacherAccountFormState>(DEFAULT_ACCOUNT);
+  const [identity, setIdentity] = useState<TeacherIdentityFormState>(DEFAULT_IDENTITY);
+  const [bio, setBio] = useState<TeacherBioFormState>(DEFAULT_BIO);
+  const [enrolment, setEnrolment] = useState<TeacherEnrolmentFormState>(DEFAULT_ENROLMENT);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingCode, setIsFetchingCode] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resetNotice, setResetNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (initialData) {
-      setFullName(initialData.fullName || "");
-      setPositionId(initialData.positionId || "");
-      setNik(initialData.nik || "");
-      setNuptk(initialData.nuptk || "");
-      setEmploymentType(initialData.employmentType || "GTY");
-      setCertification(initialData.certification || "");
-      const p = initialData.profile;
-      setNip(p?.nip || "");
-      setPegId(p?.pegId || "");
-      setNrg(p?.nrg || "");
-      setGender((p?.gender as "L" | "P") || "L");
-      setGtkType(p?.gtkType || "pendidik");
-      setDutyStatus(p?.dutyStatus || "aktif");
-      setPhone(p?.phone || "");
-      setEmail(p?.email || "");
-    } else {
-      setFullName("");
-      setPositionId("");
-      setNik("");
-      setNuptk("");
-      setEmploymentType("GTY");
-      setCertification("");
-      setNip("");
-      setPegId("");
-      setNrg("");
-      setGender("L");
-      setGtkType("pendidik");
-      setDutyStatus("aktif");
-      setPhone("");
-      setEmail("");
-    }
-    setError(null);
-  }, [initialData, isOpen]);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fullName.trim()) return setError("Nama lengkap wajib diisi");
-    if (nik.length !== 16) return setError("NIK harus tepat 16 digit");
-
-    setLoading(true);
-    setError(null);
+  const handleGenerateCode = async (role: Role) => {
+    setIsFetchingCode(true);
     try {
-      const payload = {
-        fullName: fullName.trim(),
-        positionId: positionId || null,
-        nik: nik.trim(),
-        nuptk: nuptk.trim() || null,
-        employmentType,
-        certification: certification.trim() || null,
-        profile: {
-          nip: nip.trim() || null,
-          pegId: pegId.trim() || null,
-          nrg: nrg.trim() || null,
-          gender,
-          gtkType,
-          dutyStatus,
-          phone: phone.trim() || null,
-          email: email.trim() || null,
-        },
-      };
-      await onSubmit(payload);
-      onClose();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan data GTK");
+      const res = await fetchNextTeacherCode(role);
+      setAccount((prev) => ({ ...prev, employeeCode: res.code }));
+    } catch {
+      // Abaikan jika gagal auto-fetch; operator dapat mengetik manual 4 digit
     } finally {
-      setLoading(false);
+      setIsFetchingCode(false);
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    setActiveTab("account");
+    setError(null);
+    setResetNotice(null);
+
+    if (!initialData) {
+      setAccount(DEFAULT_ACCOUNT);
+      setIdentity(DEFAULT_IDENTITY);
+      setBio(DEFAULT_BIO);
+      setEnrolment(DEFAULT_ENROLMENT);
+      void handleGenerateCode("guru_mapel");
+      return;
+    }
+
+    const detail = teacherDetail && teacherDetail.id === initialData.id ? teacherDetail : null;
+    const mapped = mapTeacherToFormStates(detail ?? initialData);
+    setAccount(mapped.account);
+    setIdentity(mapped.identity);
+    setBio(mapped.bio);
+    setEnrolment(mapped.enrolment);
+  }, [isOpen, initialData, teacherDetail]);
+
+  if (!isOpen) return null;
+
+  const handleResetPassword = async () => {
+    if (!initialData?.id) return;
+    try {
+      const res = await resetPasswordMutation.mutateAsync(initialData.id);
+      setResetNotice(`Password berhasil direset ke kode ${res.data.employeeCode}.`);
+    } catch (err: any) {
+      setError(err?.message || "Gagal mereset password GTK.");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!identity.fullName.trim()) {
+      setActiveTab("identity");
+      setError("Nama lengkap & gelar wajib diisi.");
+      return;
+    }
+    if (!/^\d{4}$/.test(account.employeeCode)) {
+      setActiveTab("account");
+      setError("Kode login GTK wajib tepat 4 digit angka (contoh: 2101).");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(buildTeacherSubmitPayload(account, identity, bio, enrolment));
+      onClose();
+    } catch (err: any) {
+      setError(err?.message || "Terjadi kesalahan saat menyimpan data GTK.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const tabs: { id: ModalTab; label: string; icon: React.ReactNode }[] = [
+    { id: "account", label: "Akun & Kode", icon: <KeyRound className="w-3.5 h-3.5" /> },
+    { id: "identity", label: "Kepegawaian", icon: <UserCheck className="w-3.5 h-3.5" /> },
+    { id: "bio", label: "Biodata & Kontak", icon: <User className="w-3.5 h-3.5" /> },
+    { id: "enrolment", label: "Delegasi Tugas", icon: <BookOpenCheck className="w-3.5 h-3.5" /> },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900">
-            {initialData ? "Edit Biodata GTK" : "Tambah Guru & Tendik (GTK)"}
-          </h3>
-          <button onClick={onClose} className="p-1 rounded-lg text-gray-400 hover:bg-gray-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden border border-gray-100 my-4">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-emerald-50/40">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">
+              {isEdit ? "Edit Data, Akun & Delegasi GTK" : "Tambah GTK & Buat Kode Akun Baru"}
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Dikelola oleh Operator: biodata lengkap GTK, kode login 4 digit angka, dan penugasan kelas/mapel.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4">
+        <div className="px-6 pt-3 border-b border-gray-100 flex gap-1 overflow-x-auto bg-gray-50/50">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 whitespace-nowrap transition-colors ${
+                activeTab === tab.id
+                  ? "border-emerald-600 text-emerald-700 bg-white rounded-t-lg"
+                  : "border-transparent text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[72vh] overflow-y-auto">
           {error && (
-            <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">
               {error}
             </div>
           )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap (Gelar) *</label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Contoh: Dra. Hj. Siti Zubaidah, M.Ag."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-              />
+          {resetNotice && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{resetNotice}</span>
             </div>
+          )}
 
-            <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Jabatan Resmi Madrasah</label>
-              <select
-                value={positionId}
-                onChange={(e) => setPositionId(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-              >
-                <option value="">-- Pilih Jabatan Resmi --</option>
-                {positions.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.category})
-                  </option>
-                ))}
-              </select>
-            </div>
+          {activeTab === "account" && (
+            <TeacherAccountTab
+              data={account}
+              isEdit={isEdit}
+              isFetchingCode={isFetchingCode}
+              isResetting={resetPasswordMutation.isPending}
+              onChange={setAccount}
+              onGenerateCode={handleGenerateCode}
+              onResetPassword={isEdit ? handleResetPassword : undefined}
+            />
+          )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">NIK (16 Digit) *</label>
-              <input
-                type="text"
-                maxLength={16}
-                required
-                value={nik}
-                onChange={(e) => setNik(e.target.value.replace(/\D/g, ""))}
-                placeholder="3201..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-              />
-            </div>
+          {activeTab === "identity" && (
+            <TeacherIdentityTab data={identity} positions={positions} onChange={setIdentity} />
+          )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">NUPTK (16 Digit)</label>
-              <input
-                type="text"
-                maxLength={16}
-                value={nuptk}
-                onChange={(e) => setNuptk(e.target.value.replace(/\D/g, ""))}
-                placeholder="Opsional / Jika ada"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-              />
-            </div>
+          {activeTab === "bio" && <TeacherBioFormTab data={bio} onChange={setBio} />}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Status Kepegawaian *</label>
-              <select
-                value={employmentType}
-                onChange={(e) => setEmploymentType(e.target.value as EmploymentType)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-              >
-                {EMPLOYMENT_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
+          {activeTab === "enrolment" && (
+            <TeacherEnrolmentTab data={enrolment} onChange={setEnrolment} />
+          )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Jenis GTK *</label>
-              <select
-                value={gtkType}
-                onChange={(e) => setGtkType(e.target.value as GtkType)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-              >
-                {GTK_TYPES.map((t) => (
-                  <option key={t} value={t}>{t === "pendidik" ? "Pendidik (Guru)" : "Tenaga Kependidikan (Tendik)"}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">NIP (PNS/PPPK)</label>
-              <input
-                type="text"
-                value={nip}
-                onChange={(e) => setNip(e.target.value)}
-                placeholder="1985..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">NRG (Nomor Registrasi Guru)</label>
-              <input
-                type="text"
-                value={nrg}
-                onChange={(e) => setNrg(e.target.value)}
-                placeholder="Bagi guru tersertifikasi"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">PegID Simpatika</label>
-              <input
-                type="text"
-                value={pegId}
-                onChange={(e) => setPegId(e.target.value)}
-                placeholder="ID Akun Simpatika"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Jenis Kelamin</label>
-              <div className="flex gap-4 pt-2">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    checked={gender === "L"}
-                    onChange={() => setGender("L")}
-                    className="text-emerald-600 focus:ring-emerald-500"
-                  />
-                  Laki-Laki
-                </label>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    checked={gender === "P"}
-                    onChange={() => setGender("P")}
-                    className="text-emerald-600 focus:ring-emerald-500"
-                  />
-                  Perempuan
-                </label>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">No. WhatsApp / Telepon</label>
-              <input
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="0812..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Email Resmi / Madrasah</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@madrasah.sch.id"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-gray-100 flex justify-end gap-2">
+          <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
             >
               Batal
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+              disabled={isSubmitting}
+              className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl flex items-center gap-2 shadow-sm disabled:opacity-50 transition-colors"
             >
-              {loading ? "Menyimpan..." : "Simpan GTK"}
+              <Save className="w-4 h-4" />
+              {isSubmitting ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Simpan & Terbitkan Akun"}
             </button>
           </div>
         </form>

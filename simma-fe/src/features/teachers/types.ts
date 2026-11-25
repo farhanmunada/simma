@@ -108,10 +108,28 @@ export interface PositionDto {
   updatedAt?: string;
 }
 
+import type { Role, TeacherScopeType } from "@simma/shared";
+
+export interface TeacherAccountSummaryDto {
+  userId: string;
+  username: string;
+  role: Role;
+  secondaryRoles: Role[];
+  isActive: boolean;
+}
+
+export interface TeacherAssignmentsDetailDto {
+  homeroomClassroomId: string | null;
+  subjectAssignments: Array<{ classroomId: string; subjectId: string }>;
+  extracurricularIds: string[];
+  classroomScopes: Array<{ classroomId: string; scopeType: TeacherScopeType }>;
+}
+
 export interface TeacherListItem {
   id: string;
   userId: string | null;
   positionId?: string | null;
+  employeeCode?: string | null;
   nik: string;
   nuptk: string | null;
   fullName: string;
@@ -125,16 +143,22 @@ export interface TeacherListItem {
   profile?: TeacherProfileDto | null;
   currentRank?: TeacherRankDto | null;
   currentWorkload?: TeacherWorkloadDto | null;
+  account?: TeacherAccountSummaryDto | null;
+  assignments?: TeacherAssignmentsDetailDto;
 }
 
 export interface TeacherFullDetailDto extends TeacherListItem {
   position?: PositionDto | null;
   profile: TeacherProfileDto | null;
+  account?: TeacherAccountSummaryDto | null;
+  assignments?: TeacherAssignmentsDetailDto;
   educations: TeacherEducationDto[];
   ranks: TeacherRankDto[];
   documents: TeacherDocumentDto[];
   workloads: TeacherWorkloadDto[];
 }
+
+export type TeacherDetail = TeacherFullDetailDto;
 
 export interface WorkloadSummaryDto {
   teacherId: string;

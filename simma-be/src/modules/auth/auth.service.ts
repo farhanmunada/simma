@@ -18,6 +18,7 @@ export function sanitizeUser(user: UserRecord): AuthUser {
     id: user.id,
     username: user.username,
     role: user.role,
+    secondaryRoles: user.secondaryRoles ?? [],
     teacherId: user.teacherId,
     isActive: user.isActive,
     lastLogin: user.lastLogin,
@@ -55,6 +56,7 @@ export class AuthService {
       sub: user.id,
       username: user.username,
       role: user.role,
+      secondaryRoles: user.secondaryRoles ?? [],
       teacherId: user.teacherId,
     };
 
@@ -80,6 +82,7 @@ export class AuthService {
       sub: user.id,
       username: user.username,
       role: user.role,
+      secondaryRoles: user.secondaryRoles ?? [],
       teacherId: user.teacherId,
     };
 

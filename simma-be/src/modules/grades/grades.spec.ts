@@ -21,6 +21,7 @@ import {
 } from "@simma/shared";
 import { buildApp } from "../../app.js";
 import { signAccessToken } from "../../core/auth/jwt.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import type {
   Assessment,
   StudentGrade,
@@ -511,6 +512,19 @@ describe("Grades Module", () => {
         teacherId: sampleAssessment.teacherId,
       });
 
+      vi.spyOn(teacherScopeService, "getScopeForUser").mockResolvedValue({
+        teacherId: sampleAssessment.teacherId ?? null,
+        homeroomClassroomIds: [],
+        subjectAssignments: [
+          { classroomId: sampleAssessment.classroomId, subjectId: sampleAssessment.subjectId },
+        ],
+        assignedClassroomIds: [sampleAssessment.classroomId],
+        extracurricularIds: [],
+        tahfidzClassroomIds: [],
+        mutabaahClassroomIds: [],
+        p5raClassroomIds: [],
+        p5raProjectIds: [],
+      });
       vi.spyOn(gradesRepository, "createAssessment").mockResolvedValue(
         sampleAssessment,
       );

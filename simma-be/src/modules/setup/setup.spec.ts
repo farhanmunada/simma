@@ -236,6 +236,7 @@ describe("SetupService", () => {
       id: "66666666-6666-6666-6666-666666666666",
       userId: null,
       positionId: null,
+      employeeCode: null,
       nik: "3515000000000001",
       nuptk: "1234567890123456",
       fullName: "Ahmad Dahlan, S.Pd.",

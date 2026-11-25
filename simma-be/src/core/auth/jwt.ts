@@ -7,6 +7,7 @@ export interface JwtAuthPayload {
   sub: string;
   username: string;
   role: Role;
+  secondaryRoles?: Role[];
   teacherId?: string | null;
 }
 
@@ -35,6 +36,7 @@ export async function signAccessToken(payload: JwtAuthPayload): Promise<string> 
   return new SignJWT({
     username: payload.username,
     role: payload.role,
+    secondaryRoles: payload.secondaryRoles ?? [],
     teacherId: payload.teacherId ?? null,
   })
     .setProtectedHeader({ alg: "HS256" })
@@ -51,6 +53,7 @@ export async function signRefreshToken(payload: JwtAuthPayload): Promise<string>
   return new SignJWT({
     username: payload.username,
     role: payload.role,
+    secondaryRoles: payload.secondaryRoles ?? [],
     teacherId: payload.teacherId ?? null,
   })
     .setProtectedHeader({ alg: "HS256" })
@@ -78,6 +81,9 @@ export async function verifyAccessToken(token: string): Promise<JwtAuthPayload> 
       sub: payload.sub,
       username: (payload.username as string) || "",
       role: payload.role as Role,
+      secondaryRoles: Array.isArray(payload.secondaryRoles)
+        ? (payload.secondaryRoles as Role[])
+        : [],
       teacherId: (payload.teacherId as string | null | undefined) ?? null,
     };
   } catch (error) {
@@ -106,6 +112,9 @@ export async function verifyRefreshToken(token: string): Promise<JwtAuthPayload>
       sub: payload.sub,
       username: (payload.username as string) || "",
       role: payload.role as Role,
+      secondaryRoles: Array.isArray(payload.secondaryRoles)
+        ? (payload.secondaryRoles as Role[])
+        : [],
       teacherId: (payload.teacherId as string | null | undefined) ?? null,
     };
   } catch (error) {

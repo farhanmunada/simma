@@ -5,21 +5,25 @@ import { mutabaahController } from "./mutabaah.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kurikulum",
   "waka_kesiswaan",
   "wali_kelas",
   "guru",
   "guru_tahfidz",
+  "musyrif",
   "admin_tu",
 ];
 
 const writeRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "wali_kelas",
   "guru",
+  "musyrif",
 ];
 
 const configRoles: Role[] = [

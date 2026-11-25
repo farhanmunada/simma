@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { z } from "zod";
 import { ValidationError } from "../../core/errors/index.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import { GradesService, gradesService } from "./grades.service.js";
 import {
   CreateAssessmentSchema,
@@ -35,17 +36,39 @@ export class GradesController {
   getAssessments = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(AssessmentQuerySchema, req.query);
     const result = await this.service.getAssessments(query);
+    if (
+      !teacherScopeService.isPrivileged(req.user, [
+        "kepala_madrasah",
+        "waka_kurikulum",
+        "waka_kesiswaan",
+        "admin_tu",
+      ])
+    ) {
+      const scope = await teacherScopeService.getScopeForUser(req.user);
+      const filtered = result.data.filter((a) =>
+        scope.subjectAssignments.some(
+          (p) => p.classroomId === a.classroomId && p.subjectId === a.subjectId,
+        ),
+      );
+      return reply.status(200).send({
+        ...result,
+        data: filtered,
+        meta: { ...result.meta, total: filtered.length },
+      });
+    }
     return reply.status(200).send(result);
   };
 
   getAssessmentById = async (req: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(IdParamSchema, req.params);
     const data = await this.service.getAssessmentById(id);
+    await teacherScopeService.assertSubjectClassroom(req.user, data.classroomId, data.subjectId);
     return reply.status(200).send({ data });
   };
 
   createAssessment = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(CreateAssessmentSchema, req.body);
+    await teacherScopeService.assertSubjectClassroom(req.user, input.classroomId, input.subjectId);
     const teacherId = req.user?.teacherId;
     const data = await this.service.createAssessment(input, teacherId);
     return reply.status(201).send({ data });
@@ -53,6 +76,8 @@ export class GradesController {
 
   updateAssessment = async (req: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(IdParamSchema, req.params);
+    const existing = await this.service.getAssessmentById(id);
+    await teacherScopeService.assertSubjectClassroom(req.user, existing.classroomId, existing.subjectId);
     const input = parseData(UpdateAssessmentSchema, req.body);
     const data = await this.service.updateAssessment(id, input);
     return reply.status(200).send({ data });
@@ -60,6 +85,8 @@ export class GradesController {
 
   deleteAssessment = async (req: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(IdParamSchema, req.params);
+    const existing = await this.service.getAssessmentById(id);
+    await teacherScopeService.assertSubjectClassroom(req.user, existing.classroomId, existing.subjectId);
     await this.service.deleteAssessment(id);
     return reply.status(204).send();
   };

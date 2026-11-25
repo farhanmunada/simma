@@ -48,6 +48,8 @@ describe("Teachers & Staff (GTK) Feature Module (Frontend)", () => {
     expect(typeof api.useDeleteDocument).toBe("function");
     expect(typeof api.useUpsertTeacherWorkload).toBe("function");
     expect(typeof api.fetchEmisGtkData).toBe("function");
+    expect(typeof api.fetchNextTeacherCode).toBe("function");
+    expect(typeof api.useResetTeacherPassword).toBe("function");
   });
 
   it("should define structured query keys for cache management", async () => {

@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useStudentAttendances, useTeacherAttendances } from "../api/attendance.api";
 import { useClassrooms } from "../../settings";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useMyScope } from "../../auth/api/auth.api";
 import { AttendanceFilterBar } from "./AttendanceFilterBar";
 import { AttendanceRecapSummaryCards } from "./AttendanceRecapSummaryCards";
 import { AttendanceRecapTable } from "./AttendanceRecapTable";
@@ -26,7 +28,21 @@ export const AttendanceRecapPage: React.FC = () => {
   const [selectedStudentSummary, setSelectedStudentSummary] = useState<{ id: string; name?: string } | null>(null);
   const [selectedTeacherSummary, setSelectedTeacherSummary] = useState<{ id: string; name?: string } | null>(null);
 
-  const { data: classrooms = [] } = useClassrooms();
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const isPrivileged = hasRole([
+    "super_admin",
+    "operator",
+    "kepala_madrasah",
+    "waka_kesiswaan",
+    "admin_tu",
+  ]);
+  const { data: scope } = useMyScope();
+  const { data: rawClassrooms = [] } = useClassrooms();
+  const classrooms = useMemo(() => {
+    if (isPrivileged || !scope) return rawClassrooms;
+    const allowed = new Set(scope.assignedClassroomIds);
+    return rawClassrooms.filter((c) => allowed.has(c.id));
+  }, [rawClassrooms, isPrivileged, scope]);
 
   const { data: studentData, isLoading: isLoadingStudent } = useStudentAttendances({
     startDate: startDate || undefined,

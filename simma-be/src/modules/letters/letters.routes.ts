@@ -14,6 +14,7 @@ export const lettersRoutes: FastifyPluginAsync = async (app) => {
       authenticate,
       requireRoles(
         "super_admin",
+        "operator",
         "admin_tu",
         "kepala_madrasah",
         "waka_kesiswaan",
@@ -26,7 +27,7 @@ export const lettersRoutes: FastifyPluginAsync = async (app) => {
   const tuOrKamadGuard = {
     preHandler: [
       authenticate,
-      requireRoles("super_admin", "admin_tu", "kepala_madrasah"),
+      requireRoles("super_admin", "operator", "admin_tu", "kepala_madrasah"),
     ],
   };
 

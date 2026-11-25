@@ -4,15 +4,25 @@ import { Users, UserCheck, CalendarCheck, BarChart3 } from "lucide-react";
 import { AttendanceStudentPage } from "./components/AttendanceStudentPage";
 import { AttendanceTeacherPage } from "./components/AttendanceTeacherPage";
 import { AttendanceRecapPage } from "./components/AttendanceRecapPage";
+import { RouteRoleGuard } from "../auth";
+import { MODULE_ROLES } from "../../config/roles";
+import { useAuthStore } from "../../stores/auth.store";
 
 const tabs = [
   { name: "Presensi Siswa", href: "/attendance", icon: Users },
-  { name: "Presensi Guru & GTK", href: "/attendance/teachers", icon: UserCheck },
+  {
+    name: "Presensi Guru & GTK",
+    href: "/attendance/teachers",
+    icon: UserCheck,
+    roles: MODULE_ROLES.ATTENDANCE_TEACHERS,
+  },
   { name: "Rekapitulasi", href: "/attendance/recap", icon: BarChart3 },
 ];
 
 export const AttendanceRoutes: React.FC = () => {
   const location = useLocation();
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const visibleTabs = tabs.filter((tab) => !tab.roles || hasRole(tab.roles));
 
   const todayStr = new Intl.DateTimeFormat("id-ID", {
     weekday: "long",
@@ -53,7 +63,7 @@ export const AttendanceRoutes: React.FC = () => {
       {/* Sub navigation bar */}
       <div className="border-b border-slate-200">
         <nav className="flex space-x-6 -mb-px overflow-x-auto" aria-label="Attendance Tabs">
-          {tabs.map((tab) => {
+          {visibleTabs.map((tab) => {
             const active = isTabActive(tab.href);
             const Icon = tab.icon;
             return (
@@ -78,7 +88,14 @@ export const AttendanceRoutes: React.FC = () => {
       <Routes>
         <Route index element={<AttendanceStudentPage />} />
         <Route path="students" element={<AttendanceStudentPage />} />
-        <Route path="teachers" element={<AttendanceTeacherPage />} />
+        <Route
+          path="teachers"
+          element={
+            <RouteRoleGuard roles={MODULE_ROLES.ATTENDANCE_TEACHERS}>
+              <AttendanceTeacherPage />
+            </RouteRoleGuard>
+          }
+        />
         <Route path="recap" element={<AttendanceRecapPage />} />
         <Route path="*" element={<Navigate to="" replace />} />
       </Routes>

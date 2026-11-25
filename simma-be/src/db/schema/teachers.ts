@@ -6,8 +6,9 @@ import {
   boolean,
   date,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { teachers, academicYears, semesters } from "./setup";
+import { teachers, academicYears, semesters, classrooms, subjects } from "./setup";
 
 export const teacherProfiles = pgTable("teacher_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -110,6 +111,65 @@ export const teacherWorkloads = pgTable("teacher_workloads", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const teacherSubjectAssignments = pgTable(
+  "teacher_subject_assignments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    teacherId: uuid("teacher_id")
+      .notNull()
+      .references(() => teachers.id, { onDelete: "cascade" }),
+    academicYearId: uuid("academic_year_id")
+      .notNull()
+      .references(() => academicYears.id, { onDelete: "cascade" }),
+    semesterId: uuid("semester_id")
+      .notNull()
+      .references(() => semesters.id, { onDelete: "cascade" }),
+    classroomId: uuid("classroom_id")
+      .notNull()
+      .references(() => classrooms.id, { onDelete: "cascade" }),
+    subjectId: uuid("subject_id")
+      .notNull()
+      .references(() => subjects.id, { onDelete: "cascade" }),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("teacher_subject_assignments_unique_idx").on(
+      table.teacherId,
+      table.semesterId,
+      table.classroomId,
+      table.subjectId,
+    ),
+  ],
+);
+
+export const teacherClassroomScopes = pgTable(
+  "teacher_classroom_scopes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    teacherId: uuid("teacher_id")
+      .notNull()
+      .references(() => teachers.id, { onDelete: "cascade" }),
+    semesterId: uuid("semester_id")
+      .notNull()
+      .references(() => semesters.id, { onDelete: "cascade" }),
+    classroomId: uuid("classroom_id")
+      .notNull()
+      .references(() => classrooms.id, { onDelete: "cascade" }),
+    scopeType: text("scope_type").$type<"tahfidz" | "mutabaah" | "p5ra">().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("teacher_classroom_scopes_unique_idx").on(
+      table.teacherId,
+      table.semesterId,
+      table.classroomId,
+      table.scopeType,
+    ),
+  ],
+);
+
 export type TeacherProfile = typeof teacherProfiles.$inferSelect;
 export type NewTeacherProfile = typeof teacherProfiles.$inferInsert;
 export type TeacherEducation = typeof teacherEducation.$inferSelect;
@@ -120,3 +180,7 @@ export type TeacherDocument = typeof teacherDocuments.$inferSelect;
 export type NewTeacherDocument = typeof teacherDocuments.$inferInsert;
 export type TeacherWorkload = typeof teacherWorkloads.$inferSelect;
 export type NewTeacherWorkload = typeof teacherWorkloads.$inferInsert;
+export type TeacherSubjectAssignment = typeof teacherSubjectAssignments.$inferSelect;
+export type NewTeacherSubjectAssignment = typeof teacherSubjectAssignments.$inferInsert;
+export type TeacherClassroomScope = typeof teacherClassroomScopes.$inferSelect;
+export type NewTeacherClassroomScope = typeof teacherClassroomScopes.$inferInsert;

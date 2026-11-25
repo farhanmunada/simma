@@ -149,4 +149,45 @@ describe("Auth Store & API Integration", () => {
     expect(user.fullName).toBe("Drs. H. Ahmad Fauzi, M.Pd");
     expect(user.role).toBe("kepala_madrasah");
   });
+
+  it("should support all madrasah RBAC roles in hasRole and MODULE_ROLES", async () => {
+    const { MODULE_ROLES } = await import("../../config/roles");
+    const store = useAuthStore.getState();
+
+    for (const role of ["bendahara", "guru_tahfidz", "pembina_ekskul", "waka_sarpras", "guru_bk"] as const) {
+      store.setAuth(
+        { id: `u-${role}`, email: `${role}@madrasah.sch.id`, fullName: role, role },
+        "token"
+      );
+      expect(useAuthStore.getState().hasRole(role)).toBe(true);
+    }
+
+    expect(MODULE_ROLES.TAHFIDZ).toContain("guru_tahfidz");
+    expect(MODULE_ROLES.EXTRACURRICULAR).toContain("pembina_ekskul");
+    expect(MODULE_ROLES.FINANCE_MENU).toContain("bendahara");
+    expect(MODULE_ROLES.SETTINGS).toContain("kepala_madrasah");
+    expect(MODULE_ROLES.TEACHERS).toEqual(["super_admin", "operator"]);
+  });
+
+  it("should evaluate secondaryRoles in hasRole for multi-role GTK accounts", () => {
+    const store = useAuthStore.getState();
+    store.setAuth(
+      {
+        id: "u-multi",
+        email: "2101",
+        fullName: "Ustadzah Siti Rahmawati",
+        role: "wali_kelas",
+        secondaryRoles: ["guru_mapel", "pembina_ekskul"],
+        teacherId: "t-1",
+      },
+      "jwt-token"
+    );
+
+    const state = useAuthStore.getState();
+    expect(state.hasRole("wali_kelas")).toBe(true);
+    expect(state.hasRole("guru_mapel")).toBe(true);
+    expect(state.hasRole("pembina_ekskul")).toBe(true);
+    expect(state.hasRole("operator")).toBe(false);
+    expect(state.hasRole(["operator", "bendahara"])).toBe(false);
+  });
 });

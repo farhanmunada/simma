@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { z } from "zod";
 import { ValidationError } from "../../core/errors/index.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import {
   ExtracurricularService,
   extracurricularService,
@@ -38,11 +39,24 @@ export class ExtracurricularController {
   list = async (request: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(ExtracurricularQuerySchema, request.query);
     const data = await this.service.listExtracurriculars(query);
+    if (
+      !teacherScopeService.isPrivileged(request.user, [
+        "kepala_madrasah",
+        "waka_kesiswaan",
+        "waka_kurikulum",
+        "admin_tu",
+      ])
+    ) {
+      const scope = await teacherScopeService.getScopeForUser(request.user);
+      const filtered = data.filter((e) => scope.extracurricularIds.includes(e.id));
+      return reply.status(200).send({ data: filtered });
+    }
     return reply.status(200).send({ data });
   };
 
   getById = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(ExtracurricularIdParamSchema, request.params);
+    await teacherScopeService.assertExtracurricular(request.user, id);
     const data = await this.service.getExtracurricularById(id);
     return reply.status(200).send({ data });
   };
@@ -55,6 +69,7 @@ export class ExtracurricularController {
 
   update = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(ExtracurricularIdParamSchema, request.params);
+    await teacherScopeService.assertExtracurricular(request.user, id);
     const body = parseData(UpdateExtracurricularSchema, request.body);
     const data = await this.service.updateExtracurricular(id, body);
     return reply.status(200).send({ data, message: "Ekstrakurikuler berhasil diperbarui" });
@@ -62,6 +77,7 @@ export class ExtracurricularController {
 
   delete = async (request: FastifyRequest, reply: FastifyReply) => {
     const { id } = parseData(ExtracurricularIdParamSchema, request.params);
+    await teacherScopeService.assertExtracurricular(request.user, id);
     await this.service.deleteExtracurricular(id);
     return reply.status(200).send({ message: "Ekstrakurikuler berhasil dihapus" });
   };
@@ -70,12 +86,29 @@ export class ExtracurricularController {
 
   listMembers = async (request: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(ExtracurricularMemberQuerySchema, request.query);
+    if (query.extracurricularId) {
+      await teacherScopeService.assertExtracurricular(request.user, query.extracurricularId);
+    }
     const data = await this.service.listMembers(query);
+    if (
+      !teacherScopeService.isPrivileged(request.user, [
+        "kepala_madrasah",
+        "waka_kesiswaan",
+        "waka_kurikulum",
+        "admin_tu",
+      ])
+    ) {
+      const scope = await teacherScopeService.getScopeForUser(request.user);
+      return reply.status(200).send({
+        data: data.filter((m: any) => scope.extracurricularIds.includes(m.extracurricularId)),
+      });
+    }
     return reply.status(200).send({ data });
   };
 
   registerMember = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = parseData(CreateExtracurricularMemberSchema, request.body);
+    await teacherScopeService.assertExtracurricular(request.user, body.extracurricularId);
     const data = await this.service.registerMember(body);
     return reply.status(201).send({ data, message: "Pendaftaran anggota berhasil" });
   };

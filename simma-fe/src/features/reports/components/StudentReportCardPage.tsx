@@ -15,6 +15,8 @@ import {
 } from "../api/reports.api";
 import { useSemesters, useClassrooms, useAcademicYears } from "../../settings/api/settings.api";
 import { useStudents } from "../../students/api/students.api";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useMyScope } from "../../auth/api/auth.api";
 import { formatSemesterType } from "../utils";
 import { ReportCardHeader } from "./ReportCardHeader";
 import { AcademicGradesSection } from "./AcademicGradesSection";
@@ -35,9 +37,23 @@ export const StudentReportCardPage: React.FC = () => {
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
 
   // Reference queries
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const isPrivileged = hasRole([
+    "super_admin",
+    "operator",
+    "kepala_madrasah",
+    "waka_kurikulum",
+    "admin_tu",
+  ]);
+  const { data: scope } = useMyScope();
   const { data: academicYears = [] } = useAcademicYears();
   const { data: semesters = [], isLoading: isLoadingSemesters } = useSemesters();
-  const { data: classrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
+  const { data: rawClassrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
+  const classrooms = React.useMemo(() => {
+    if (isPrivileged || !scope) return rawClassrooms;
+    const allowed = new Set(scope.assignedClassroomIds);
+    return rawClassrooms.filter((c) => allowed.has(c.id));
+  }, [rawClassrooms, isPrivileged, scope]);
   const { data: studentsData, isLoading: isLoadingStudents } = useStudents(
     selectedClassroomId ? { classroomId: selectedClassroomId } : undefined
   );

@@ -9,6 +9,7 @@ import { EXTRACURRICULAR_CATEGORIES } from "@simma/shared";
 interface Props {
   items: ExtracurricularItem[];
   isLoading: boolean;
+  canManage?: boolean;
   onAdd: () => void;
   onEdit: (item: ExtracurricularItem) => void;
   onDelete: (id: string) => void;
@@ -17,6 +18,7 @@ interface Props {
 export const ExtracurricularTable: React.FC<Props> = ({
   items,
   isLoading,
+  canManage = true,
   onAdd,
   onEdit,
   onDelete,
@@ -79,10 +81,12 @@ export const ExtracurricularTable: React.FC<Props> = ({
             ))}
           </select>
         </div>
-        <Button onClick={onAdd} className="w-full sm:w-auto">
-          <Plus className="w-4 h-4 mr-1.5" />
-          Tambah Ekskul
-        </Button>
+        {canManage && (
+          <Button onClick={onAdd} className="w-full sm:w-auto">
+            <Plus className="w-4 h-4 mr-1.5" />
+            Tambah Ekskul
+          </Button>
+        )}
       </div>
 
       {/* Table Card */}
@@ -96,7 +100,7 @@ export const ExtracurricularTable: React.FC<Props> = ({
                 <th className="px-4 py-3">Jadwal & Lokasi</th>
                 <th className="px-4 py-3 text-center">Kapasitas</th>
                 <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
+                {canManage && <th className="px-4 py-3 text-right">Aksi</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -145,26 +149,28 @@ export const ExtracurricularTable: React.FC<Props> = ({
                         {item.isActive ? "Aktif" : "Non-Aktif"}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3.5 text-right space-x-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onEdit(item)}
-                        className="text-slate-600 hover:text-emerald-600"
-                        title="Edit Ekskul"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onDelete(item.id)}
-                        className="text-slate-600 hover:text-red-600"
-                        title="Hapus Ekskul"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </td>
+                    {canManage && (
+                      <td className="px-4 py-3.5 text-right space-x-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onEdit(item)}
+                          className="text-slate-600 hover:text-emerald-600"
+                          title="Edit Ekskul"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onDelete(item.id)}
+                          className="text-slate-600 hover:text-red-600"
+                          title="Hapus Ekskul"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

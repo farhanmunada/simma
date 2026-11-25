@@ -5,6 +5,7 @@ import { extracurricularController } from "./extracurricular.controller.js";
 
 const allStaffRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "waka_kurikulum",
@@ -17,6 +18,7 @@ const allStaffRoles: Role[] = [
 
 const manageRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "pembina_ekskul",
@@ -25,6 +27,7 @@ const manageRoles: Role[] = [
 
 const gradingRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_kesiswaan",
   "pembina_ekskul",

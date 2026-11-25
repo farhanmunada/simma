@@ -6,10 +6,14 @@ import {
 import {
   ADDITIONAL_DUTY_JTM_MAP,
   MIN_JTM_TPG,
+  ROLES,
   type AdditionalDutyType,
+  type Role,
   type SimpatikaStatus,
 } from "@simma/shared";
 import { teachersRepository, TeachersRepository } from "./teachers.repository.js";
+import { teachersAccountRepository } from "./teachers-account.repository.js";
+import { getDb } from "../../core/database/client.js";
 import type {
   CreateTeacherFullInput,
   UpdateTeacherFullInput,
@@ -58,6 +62,7 @@ export class TeachersService {
     const teacherData = {
       userId: input.userId ?? null,
       positionId: input.positionId ?? null,
+      employeeCode: input.account?.employeeCode ?? input.employeeCode ?? null,
       nik: input.nik,
       nuptk: input.nuptk ?? null,
       fullName: input.fullName,
@@ -66,7 +71,16 @@ export class TeachersService {
       emisData: input.emisData ?? {},
     };
 
-    return this.repo.createTeacherWithProfile(teacherData, input.profile);
+    const accountConfig = input.account
+      ? input.account
+      : { primaryRole: "guru_mapel" as Role, employeeCode: input.employeeCode ?? undefined };
+
+    return this.repo.createTeacherWithProfile(
+      teacherData,
+      input.profile,
+      accountConfig,
+      input.assignments,
+    );
   }
 
   async updateTeacher(id: string, input: UpdateTeacherFullInput): Promise<TeacherFullDetail> {
@@ -92,6 +106,7 @@ export class TeachersService {
     const teacherData = {
       userId: input.userId !== undefined ? input.userId : undefined,
       positionId: input.positionId !== undefined ? input.positionId : undefined,
+      employeeCode: input.employeeCode !== undefined ? input.employeeCode : undefined,
       nik: input.nik,
       nuptk: input.nuptk,
       fullName: input.fullName,
@@ -100,7 +115,13 @@ export class TeachersService {
       emisData: input.emisData,
     };
 
-    return this.repo.updateTeacherWithProfile(id, teacherData, input.profile);
+    return this.repo.updateTeacherWithProfile(
+      id,
+      teacherData,
+      input.profile,
+      input.account,
+      input.assignments,
+    );
   }
 
   async deleteTeacher(id: string): Promise<void> {
@@ -286,6 +307,30 @@ export class TeachersService {
   }
   async getPositions() {
     return await this.repo.getAllPositions();
+  }
+
+  async getNextCodeForRole(roleInput?: string): Promise<{ code: string; role: Role }> {
+    const role = (ROLES.includes(roleInput as Role) ? roleInput : "guru_mapel") as Role;
+    const code = await teachersAccountRepository.generateNextEmployeeCode(role);
+    return { code, role };
+  }
+
+  async resetAccountPasswordToCode(teacherId: string): Promise<{ employeeCode: string }> {
+    const teacher = await this.getTeacherById(teacherId);
+    const role = teacher.account?.role ?? "guru_mapel";
+    const db = getDb();
+    const res = await db.transaction(async (tx) => {
+      return teachersAccountRepository.provisionAccountInTx(tx, {
+        teacherId: teacher.id,
+        existingUserId: teacher.userId ?? null,
+        existingCode: teacher.employeeCode ?? null,
+        primaryRole: role,
+        secondaryRoles: teacher.account?.secondaryRoles ?? [],
+        isActive: teacher.account?.isActive ?? true,
+        resetPasswordToCode: true,
+      });
+    });
+    return { employeeCode: res.employeeCode };
   }
 }
 

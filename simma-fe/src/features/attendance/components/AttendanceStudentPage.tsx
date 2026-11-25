@@ -5,6 +5,8 @@ import { Button } from "../../../components/ui/Button";
 import { Select } from "../../../components/ui/Select";
 import { useClassrooms } from "../../settings";
 import { useStudents } from "../../students/api/students.api";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useMyScope } from "../../auth/api/auth.api";
 import {
   useClassroomAttendance,
   useBulkRecordStudents,
@@ -18,7 +20,21 @@ export const AttendanceStudentPage: React.FC = () => {
   const [attendanceRows, setAttendanceRows] = useState<StudentAttendanceRow[]>([]);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const { data: classrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const isPrivileged = hasRole([
+    "super_admin",
+    "operator",
+    "kepala_madrasah",
+    "waka_kesiswaan",
+    "admin_tu",
+  ]);
+  const { data: scope } = useMyScope();
+  const { data: rawClassrooms = [], isLoading: isLoadingClassrooms } = useClassrooms();
+  const classrooms = useMemo(() => {
+    if (isPrivileged || !scope) return rawClassrooms;
+    const allowed = new Set(scope.assignedClassroomIds);
+    return rawClassrooms.filter((c) => allowed.has(c.id));
+  }, [rawClassrooms, isPrivileged, scope]);
 
   useEffect(() => {
     if (classrooms.length > 0 && !selectedClassroomId) {

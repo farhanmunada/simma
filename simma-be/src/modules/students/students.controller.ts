@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { z } from "zod";
-import { ValidationError } from "../../core/errors/index.js";
+import { ForbiddenError, ValidationError } from "../../core/errors/index.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import { StudentsService, studentsService } from "./students.service.js";
 import {
   CreateStudentSchema,
@@ -31,6 +32,30 @@ export class StudentsController {
 
   getStudents = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(StudentQuerySchema, req.query);
+    if (
+      !teacherScopeService.isPrivileged(req.user, [
+        "admin_tu",
+        "kepala_madrasah",
+        "waka_kesiswaan",
+        "waka_kurikulum",
+      ])
+    ) {
+      const scope = await teacherScopeService.getScopeForUser(req.user);
+      if (query.classroomId && !scope.assignedClassroomIds.includes(query.classroomId)) {
+        throw new ForbiddenError(
+          "Akses ditolak: Anda hanya dapat melihat data siswa di kelas tugas Anda.",
+        );
+      }
+      if (!query.classroomId) {
+        if (scope.assignedClassroomIds.length === 0) {
+          return reply.status(200).send({
+            data: [],
+            meta: { page: query.page, limit: query.limit, total: 0, totalPages: 1 },
+          });
+        }
+        query.classroomId = scope.homeroomClassroomIds[0] ?? scope.assignedClassroomIds[0];
+      }
+    }
     const result = await this.service.getStudents(query);
     return reply.status(200).send(result);
   };

@@ -5,10 +5,21 @@ import { attendanceController } from "./attendance.controller.js";
 
 const allowedRoles: Role[] = [
   "super_admin",
+  "operator",
   "admin_tu",
+  "kepala_madrasah",
+  "waka_kesiswaan",
   "wali_kelas",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
+];
+
+const teacherAttendanceManageRoles: Role[] = [
+  "super_admin",
+  "operator",
+  "admin_tu",
+  "kepala_madrasah",
 ];
 
 export const attendanceRoutes: FastifyPluginAsync = async (app) => {
@@ -20,7 +31,11 @@ export const attendanceRoutes: FastifyPluginAsync = async (app) => {
   app.post("/bulk", attendanceController.bulkRecordStudents);
   app.patch("/bulk", attendanceController.bulkRecordStudents);
   app.post("/students/bulk", attendanceController.bulkRecordStudents);
-  app.post("/teachers/bulk", attendanceController.bulkRecordTeachers);
+  app.post(
+    "/teachers/bulk",
+    { preHandler: [requireRoles(...teacherAttendanceManageRoles)] },
+    attendanceController.bulkRecordTeachers,
+  );
 
   // --- Classroom & Summary Endpoints ---
   app.get(
@@ -44,11 +59,31 @@ export const attendanceRoutes: FastifyPluginAsync = async (app) => {
   app.delete("/students/:id", attendanceController.deleteStudentAttendance);
 
   // --- Teacher Attendance CRUD ---
-  app.get("/teachers", attendanceController.getTeacherAttendances);
-  app.post("/teachers", attendanceController.recordTeacher);
-  app.get("/teachers/:id", attendanceController.getTeacherAttendanceById);
-  app.patch("/teachers/:id", attendanceController.updateTeacherAttendance);
-  app.delete("/teachers/:id", attendanceController.deleteTeacherAttendance);
+  app.get(
+    "/teachers",
+    { preHandler: [requireRoles(...teacherAttendanceManageRoles)] },
+    attendanceController.getTeacherAttendances,
+  );
+  app.post(
+    "/teachers",
+    { preHandler: [requireRoles(...teacherAttendanceManageRoles)] },
+    attendanceController.recordTeacher,
+  );
+  app.get(
+    "/teachers/:id",
+    { preHandler: [requireRoles(...teacherAttendanceManageRoles)] },
+    attendanceController.getTeacherAttendanceById,
+  );
+  app.patch(
+    "/teachers/:id",
+    { preHandler: [requireRoles(...teacherAttendanceManageRoles)] },
+    attendanceController.updateTeacherAttendance,
+  );
+  app.delete(
+    "/teachers/:id",
+    { preHandler: [requireRoles(...teacherAttendanceManageRoles)] },
+    attendanceController.deleteTeacherAttendance,
+  );
 
   // --- Root student attendance shortcuts ---
   app.get("/", attendanceController.getStudentAttendances);

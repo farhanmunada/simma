@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { z } from "zod";
-import { ValidationError } from "../../core/errors/index.js";
+import { ForbiddenError, ValidationError } from "../../core/errors/index.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import {
   AttendanceService,
   attendanceService,
@@ -39,8 +40,28 @@ export class AttendanceController {
 
   // --- Student Attendance ---
 
+  private async assertClassroomScope(req: FastifyRequest, classroomId?: string) {
+    if (
+      !classroomId ||
+      teacherScopeService.isPrivileged(req.user, [
+        "admin_tu",
+        "kepala_madrasah",
+        "waka_kesiswaan",
+      ])
+    ) {
+      return;
+    }
+    const scope = await teacherScopeService.getScopeForUser(req.user);
+    if (!scope.assignedClassroomIds.includes(classroomId)) {
+      throw new ForbiddenError(
+        "Akses ditolak: Anda hanya dapat mengelola presensi pada kelas yang ditugaskan kepada Anda.",
+      );
+    }
+  }
+
   recordStudent = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(RecordStudentAttendanceSchema, req.body);
+    await this.assertClassroomScope(req, input.classroomId);
     const fallbackTeacherId = req.user?.teacherId;
     const data = await this.service.recordStudentAttendance(
       input,
@@ -51,6 +72,7 @@ export class AttendanceController {
 
   bulkRecordStudents = async (req: FastifyRequest, reply: FastifyReply) => {
     const input = parseData(BulkStudentAttendanceSchema, req.body);
+    await this.assertClassroomScope(req, input.classroomId);
     const fallbackTeacherId = req.user?.teacherId;
     const data = await this.service.bulkRecordStudentAttendance(
       input,
@@ -61,6 +83,9 @@ export class AttendanceController {
 
   getStudentAttendances = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(StudentAttendanceQuerySchema, req.query);
+    if (query.classroomId) {
+      await this.assertClassroomScope(req, query.classroomId);
+    }
     const result = await this.service.getStudentAttendances(query);
     return reply.status(200).send(result);
   };
@@ -101,6 +126,7 @@ export class AttendanceController {
       ClassroomDateParamSchema,
       req.params,
     );
+    await this.assertClassroomScope(req, classId);
     const data = await this.service.getClassroomAttendance(classId, date);
     return reply.status(200).send({ data });
   };

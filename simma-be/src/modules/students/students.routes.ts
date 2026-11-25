@@ -8,6 +8,7 @@ export const studentRoutes: FastifyPluginAsync = async (app) => {
       authenticate,
       requireRoles(
         "super_admin",
+        "operator",
         "admin_tu",
         "kepala_madrasah",
         "waka_kurikulum",
@@ -19,7 +20,7 @@ export const studentRoutes: FastifyPluginAsync = async (app) => {
   };
 
   const writeAuthGuard = {
-    preHandler: [authenticate, requireRoles("super_admin", "admin_tu")],
+    preHandler: [authenticate, requireRoles("super_admin", "operator", "admin_tu")],
   };
 
   // Student CRUD

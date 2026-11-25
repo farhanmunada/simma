@@ -5,6 +5,7 @@ import { facilitiesController } from "./facilities.controller.js";
 
 const allStaffRoles: Role[] = [
   "super_admin",
+  "operator",
   "kepala_madrasah",
   "waka_sarpras",
   "admin_tu",
@@ -14,12 +15,15 @@ const allStaffRoles: Role[] = [
   "wali_kelas",
   "guru",
   "guru_mapel",
+  "guru_diniyah",
   "bendahara",
   "guru_tahfidz",
   "pembina_ekskul",
+  "musyrif",
+  "pustakawan",
 ];
 
-const manageRoles: Role[] = ["super_admin", "waka_sarpras", "admin_tu"];
+const manageRoles: Role[] = ["super_admin", "operator", "waka_sarpras", "admin_tu"];
 
 export const facilitiesRoutes: FastifyPluginAsync = async (app) => {
   // Public QR scan endpoint (PRD F-SAR-03: audit cepat via kamera tanpa login admin)

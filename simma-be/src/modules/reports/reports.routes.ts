@@ -5,6 +5,7 @@ import { reportsController } from "./reports.controller.js";
 
 const readRoles: Role[] = [
   "super_admin",
+  "operator",
   "admin_tu",
   "kepala_madrasah",
   "waka_kurikulum",
@@ -15,6 +16,7 @@ const readRoles: Role[] = [
 
 const writeNotesRoles: Role[] = [
   "super_admin",
+  "operator",
   "wali_kelas",
 ];
 

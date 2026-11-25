@@ -13,6 +13,8 @@ import {
   teacherEducation,
   teacherRanks,
   teacherWorkloads,
+  teacherSubjectAssignments,
+  extracurriculars,
   classrooms,
   subjects,
   students,
@@ -37,75 +39,123 @@ async function seed() {
   console.log("==> Memulai Seeding Data Riil ke Database PostgreSQL...");
 
   const db = getDb();
-  const defaultPassword = "admin123";
-  const passwordHash = await bcrypt.hash(defaultPassword, 10);
 
-  // 1. SEED USERS & ROLES
-  console.log("1. Seeding Users...");
-  const devAccounts: { username: string; role: Role }[] = [
-    { username: "superadmin", role: "super_admin" },
-    { username: "admin", role: "super_admin" },
-    { username: "admin@madrasah.sch.id", role: "super_admin" },
-    { username: "kamad", role: "kepala_madrasah" },
-    { username: "tu", role: "admin_tu" },
-    { username: "guru", role: "guru" },
-    { username: "walikelas", role: "wali_kelas" },
-    { username: "tahfidz", role: "guru_tahfidz" },
+  // 1. CLEAR OLD AUTH & SEED USERS (KODE 4 DIGIT ANGKA INTERNAL)
+  console.log("1. Menghapus autentikasi lama & seeding akun GTK kode 4 digit...");
+  await db.transaction(async (tx) => {
+    await tx.update(teachers).set({ userId: null, employeeCode: null });
+    await tx.delete(users);
+  });
+
+  const devAccounts: {
+    code: string;
+    role: Role;
+    secondaryRoles?: Role[];
+  }[] = [
+    { code: "1001", role: "super_admin" },
+    { code: "1101", role: "operator" },
+    { code: "1201", role: "kepala_madrasah" },
+    { code: "1301", role: "admin_tu" },
+    { code: "2101", role: "wali_kelas", secondaryRoles: ["guru_mapel"] },
+    { code: "2201", role: "guru_mapel" },
+    { code: "2301", role: "guru_diniyah" },
+    { code: "2401", role: "guru_tahfidz", secondaryRoles: ["wali_kelas"] },
+    { code: "2501", role: "guru_bk" },
+    { code: "2601", role: "waka_kurikulum", secondaryRoles: ["wali_kelas", "guru_mapel"] },
+    { code: "2701", role: "waka_kesiswaan" },
+    { code: "2801", role: "waka_sarpras" },
+    { code: "3101", role: "pembina_ekskul" },
+    { code: "3201", role: "musyrif" },
+    { code: "3301", role: "bendahara" },
   ];
 
   const userMap: Record<string, string> = {};
 
   for (const acc of devAccounts) {
-    const existing = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.username, acc.username))
-      .limit(1);
-
-    if (existing.length > 0) {
-      await db
-        .update(users)
-        .set({
-          passwordHash,
-          role: acc.role,
-          isActive: true,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.username, acc.username));
-      userMap[acc.username] = existing[0].id;
-    } else {
-      const [inserted] = await db
-        .insert(users)
-        .values({
-          username: acc.username,
-          passwordHash,
-          role: acc.role,
-          isActive: true,
-        })
-        .returning({ id: users.id });
-      userMap[acc.username] = inserted.id;
-    }
+    const codeHash = await bcrypt.hash(acc.code, 10);
+    const [inserted] = await db
+      .insert(users)
+      .values({
+        username: acc.code,
+        passwordHash: codeHash,
+        role: acc.role,
+        secondaryRoles: acc.secondaryRoles ?? [],
+        isActive: true,
+      })
+      .returning({ id: users.id });
+    userMap[acc.code] = inserted.id;
   }
 
   // 2. SEED INSTITUTION
-  console.log("2. Seeding Institution (Madrasah)...");
+  console.log("2. Seeding Institution (PIPP Manba'ul Hikmah)...");
   const existingInst = await db.select().from(institutions).limit(1);
+  const manbaulEmisData = {
+    akreditasi: "A",
+    kurikulum: "Kurikulum Merdeka Kemenag & Kurikulum PonPes Salafiyah",
+    foundedYear: "1998",
+    pengasuh: "K. Nur Yasin",
+    village: "Kebonsari",
+    district: "Wonoboyo",
+    city: "Kabupaten Temanggung",
+    province: "Jawa Tengah",
+    postalCode: "56266",
+    phone: "+6285602015153",
+    email: "ppsmanbaulhikmah@gmail.com",
+    website: "https://pippmanbaulhikmah.com",
+    whatsappKonsultasi: "6285602015153",
+    whatsappPutra: "6285799218349",
+    whatsappPutri: "6282329477596",
+    whatsappBendahara: "6281578964250",
+    facebook: "pipp.hikmah",
+    instagram: "pipp.manbaulhikmah",
+    youtube: "Pipp Manba'ul Hikmah",
+    vision:
+      "Menjadi lembaga pendidikan Islam yang unggul dan mencetak generasi muslim yang cerdas dan sholih, unggul dalam IMTAK berprestasi dalam IPTEK, serta mencetak mujtahid, mujadid, dan mujahid.",
+    missions: [
+      "Menyelenggarakan proses belajar mengajar yang menyenangkan, kreatif, dan inovatif dalam segala bidang.",
+      "Menumbuhkembangkan akhlak dan sikap amaliah Islam.",
+      "Mengembangkan multi kecerdasan secara berimbang.",
+      "Membina peningkatan keterampilan selaras dengan perkembangan zaman.",
+      "Menanamkan sikap bersungguh-sungguh dalam mencapai tujuan mulia.",
+      "Memberikan wawasan baru untuk mengembangkan ilmu pengetahuan dalam segala bidang.",
+      "Memperjuangkan kebenaran yang hak sesuai dengan Al-Qur'an dan Al-Hadis.",
+    ],
+  };
+
   let institutionId: string;
   if (existingInst.length === 0) {
     const [inst] = await db
       .insert(institutions)
       .values({
-        nsm: "131132040001",
-        npsn: "20277001",
-        name: "MAN 1 Model Nusantara",
-        status: "negeri",
-        address: "Jl. Pendidikan Islam No. 45, Jakarta",
-        emisData: { akreditasi: "A", kurikulum: "Kurikulum Merdeka Kemenag" },
+        nsm: "131233230001", // Placeholder: lengkapi NSM 12 digit resmi via Profil Madrasah
+        npsn: "20364001", // Placeholder: lengkapi NPSN 8 digit resmi via Profil Madrasah
+        name: "PIPP Manba'ul Hikmah",
+        status: "swasta",
+        address:
+          "Jl. Kebonsari, Bantengan, Kebonsari, Wonoboyo, Kabupaten Temanggung, Jawa Tengah 56266",
+        logoPath: "/images/logo-manbaul-hikmah.png",
+        emisData: manbaulEmisData,
       })
       .returning({ id: institutions.id });
     institutionId = inst.id;
   } else {
     institutionId = existingInst[0].id;
+    if (existingInst[0].name === "MAN 1 Model Nusantara") {
+      await db
+        .update(institutions)
+        .set({
+          nsm: "131233230001",
+          npsn: "20364001",
+          name: "PIPP Manba'ul Hikmah",
+          status: "swasta",
+          address:
+            "Jl. Kebonsari, Bantengan, Kebonsari, Wonoboyo, Kabupaten Temanggung, Jawa Tengah 56266",
+          logoPath: "/images/logo-manbaul-hikmah.png",
+          emisData: manbaulEmisData,
+          updatedAt: new Date(),
+        })
+        .where(eq(institutions.id, institutionId));
+    }
   }
 
   // 3. SEED ACADEMIC YEAR & SEMESTER
@@ -187,18 +237,19 @@ async function seed() {
     {
       nik: "3201011508800001",
       nuptk: "198008152005011001",
+      employeeCode: "1201",
       fullName: "Drs. H. Ahmad Fauzi, M.Pd.I",
       employmentType: "PNS",
       certification: "Sertifikasi Guru Qur'an Hadis",
-      userId: userMap["guru"],
+      userId: userMap["1201"],
       positionId: posMap["KAMAD"],
       gtkType: "pendidik",
       gender: "L",
-      birthPlace: "Jakarta",
+      birthPlace: "Temanggung",
       birthDate: "1980-08-15",
-      address: "Jl. Lapangan Banteng Barat No. 34, Jakarta",
+      address: "Wonoboyo, Kabupaten Temanggung",
       phone: "081234567801",
-      email: "ahmad.fauzi@madrasah.sch.id",
+      email: "ahmad.fauzi@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Pembina Tk. I",
       gradeGroup: "IV/b",
@@ -207,17 +258,19 @@ async function seed() {
     {
       nik: "3201012503850002",
       nuptk: "198503252008012002",
+      employeeCode: "2101",
       fullName: "Ustadzah Siti Rahmawati, S.Ag., M.Pd.",
       employmentType: "PPPK",
       certification: "Sertifikasi Guru Fiqih",
-      userId: userMap["walikelas"],
+      userId: userMap["2101"],
+      positionId: posMap["GURU_MAPEL"],
       gtkType: "pendidik",
       gender: "P",
-      birthPlace: "Bandung",
+      birthPlace: "Temanggung",
       birthDate: "1985-03-25",
-      address: "Jl. Cihampelas No. 12, Bandung",
+      address: "Parakan, Kabupaten Temanggung",
       phone: "081234567802",
-      email: "siti.rahmawati@madrasah.sch.id",
+      email: "siti.rahmawati@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Penata Tk. I",
       gradeGroup: "III/d",
@@ -226,17 +279,19 @@ async function seed() {
     {
       nik: "3201011111900003",
       nuptk: "199011112015011003",
+      employeeCode: "2401",
       fullName: "Ustadz Muhammad Ridwan, S.Th.I., Al-Hafidz",
       employmentType: "GTY",
       certification: "Sanad Tahfidz 30 Juz & Asesmen Al-Qur'an",
-      userId: userMap["tahfidz"],
+      userId: userMap["2401"],
+      positionId: posMap["GURU_MAPEL"],
       gtkType: "pendidik",
       gender: "L",
-      birthPlace: "Surabaya",
+      birthPlace: "Wonosobo",
       birthDate: "1990-11-11",
-      address: "Kompleks Pesantren Nusantara No. 5, Jakarta",
+      address: "Kompleks PonPes Manba'ul Hikmah, Wonoboyo",
       phone: "081234567803",
-      email: "ridwan.tahfidz@madrasah.sch.id",
+      email: "ridwan.tahfidz@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Penata Muda Tk. I",
       gradeGroup: "III/b",
@@ -245,17 +300,19 @@ async function seed() {
     {
       nik: "3201011204820004",
       nuptk: "198204122006041004",
+      employeeCode: "2301",
       fullName: "Dr. K.H. Syamsul Arifin, M.A.",
       employmentType: "PNS",
       certification: "Sertifikasi Pendidik Bahasa Arab",
-      userId: null,
+      userId: userMap["2301"],
+      positionId: posMap["GURU_MAPEL"],
       gtkType: "pendidik",
       gender: "L",
       birthPlace: "Yogyakarta",
       birthDate: "1982-04-12",
-      address: "Jl. Kaliurang Km 7, Yogyakarta",
+      address: "Ngadirejo, Temanggung",
       phone: "081234567804",
-      email: "syamsul.arifin@madrasah.sch.id",
+      email: "syamsul.arifin@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Pembina Utama Muda",
       gradeGroup: "IV/c",
@@ -264,17 +321,19 @@ async function seed() {
     {
       nik: "3201011807880005",
       nuptk: "198807182011012005",
+      employeeCode: "2201",
       fullName: "Hj. Nurul Hidayati, S.Pd., M.Si.",
       employmentType: "PNS",
       certification: "Sertifikasi Guru Matematika",
-      userId: null,
+      userId: userMap["2201"],
+      positionId: posMap["GURU_MAPEL"],
       gtkType: "pendidik",
       gender: "P",
       birthPlace: "Semarang",
       birthDate: "1988-07-18",
-      address: "Jl. Pahlawan No. 20, Semarang",
+      address: "Kedu, Kabupaten Temanggung",
       phone: "081234567805",
-      email: "nurul.hidayati@madrasah.sch.id",
+      email: "nurul.hidayati@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Penata",
       gradeGroup: "III/c",
@@ -283,17 +342,19 @@ async function seed() {
     {
       nik: "3201012209910006",
       nuptk: "199109222019031006",
+      employeeCode: "2601",
       fullName: "Ahmad Zaki Mubarak, S.Kom.",
       employmentType: "GTY",
       certification: "Sertifikasi Guru Informatika & Komputer",
-      userId: null,
+      userId: userMap["2601"],
+      positionId: posMap["WAKA_KUR"],
       gtkType: "pendidik",
       gender: "L",
       birthPlace: "Malang",
       birthDate: "1991-09-22",
-      address: "Jl. Soekarno Hatta No. 88, Malang",
+      address: "Temanggung Kota",
       phone: "081234567806",
-      email: "zaki.mubarak@madrasah.sch.id",
+      email: "zaki.mubarak@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Penata Muda",
       gradeGroup: "III/a",
@@ -302,17 +363,19 @@ async function seed() {
     {
       nik: "3201013005840007",
       nuptk: "198405302009022007",
+      employeeCode: "3101",
       fullName: "Dra. Fatimah Zahro, M.Pd.",
       employmentType: "PNS",
-      certification: "Sertifikasi Guru Sejarah Kebudayaan Islam",
-      userId: null,
+      certification: "Sertifikasi Pembina Ekstrakurikuler & SKI",
+      userId: userMap["3101"],
+      positionId: posMap["GURU_MAPEL"],
       gtkType: "pendidik",
       gender: "P",
       birthPlace: "Solo",
       birthDate: "1984-05-30",
-      address: "Jl. Slamet Riyadi No. 40, Surakarta",
+      address: "Bulu, Temanggung",
       phone: "081234567807",
-      email: "fatimah.zahro@madrasah.sch.id",
+      email: "fatimah.zahro@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Penata Tk. I",
       gradeGroup: "III/d",
@@ -321,17 +384,19 @@ async function seed() {
     {
       nik: "3201011402890008",
       nuptk: "198902142014021008",
+      employeeCode: "1301",
       fullName: "Bambang Triyono, S.Sos.",
       employmentType: "PPPK",
       certification: null,
-      userId: userMap["tu"],
+      userId: userMap["1301"],
+      positionId: posMap["KEPALA_TU"],
       gtkType: "tenaga_kependidikan",
       gender: "L",
       birthPlace: "Bogor",
       birthDate: "1989-02-14",
-      address: "Jl. Pajajaran No. 15, Bogor",
+      address: "Wonoboyo, Temanggung",
       phone: "081234567808",
-      email: "bambang.tu@madrasah.sch.id",
+      email: "bambang.tu@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Pengatur Tk. I",
       gradeGroup: "II/d",
@@ -340,17 +405,19 @@ async function seed() {
     {
       nik: "3201010808930009",
       nuptk: null,
+      employeeCode: "2801",
       fullName: "Rudi Hartono, S.AP.",
       employmentType: "GTT",
       certification: null,
-      userId: null,
+      userId: userMap["2801"],
+      positionId: posMap["WAKA_SAR"],
       gtkType: "tenaga_kependidikan",
       gender: "L",
       birthPlace: "Depok",
       birthDate: "1993-08-08",
-      address: "Jl. Margonda Raya No. 101, Depok",
+      address: "Kandangan, Temanggung",
       phone: "081234567809",
-      email: "rudi.ekspedisi@madrasah.sch.id",
+      email: "rudi.sarpras@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Pengatur",
       gradeGroup: "II/c",
@@ -359,21 +426,65 @@ async function seed() {
     {
       nik: "3201011910920010",
       nuptk: "199210192020122010",
-      fullName: "Dewi Lestari, S.Pd. (Guru BK)",
+      employeeCode: "2501",
+      fullName: "Dewi Lestari, S.Pd.",
       employmentType: "PPPK",
       certification: "Sertifikasi Guru Bimbingan dan Konseling",
-      userId: null,
+      userId: userMap["2501"],
+      positionId: posMap["GURU_BK"],
       gtkType: "pendidik",
       gender: "P",
       birthPlace: "Cirebon",
       birthDate: "1992-10-19",
-      address: "Jl. Siliwangi No. 12, Cirebon",
+      address: "Tretep, Temanggung",
       phone: "081234567810",
-      email: "dewi.bk@madrasah.sch.id",
+      email: "dewi.bk@manbaulhikmah.sch.id",
       dutyStatus: "aktif",
       rank: "Penata Muda Tk. I",
       gradeGroup: "III/b",
       jtm: 24,
+    },
+    {
+      nik: "3201011001950011",
+      nuptk: null,
+      employeeCode: "1101",
+      fullName: "Hendra Kusuma, S.Kom.",
+      employmentType: "GTY",
+      certification: null,
+      userId: userMap["1101"],
+      positionId: posMap["STAF_TU"],
+      gtkType: "tenaga_kependidikan",
+      gender: "L",
+      birthPlace: "Magelang",
+      birthDate: "1995-01-10",
+      address: "Kebonsari, Wonoboyo",
+      phone: "081234567811",
+      email: "operator@manbaulhikmah.sch.id",
+      dutyStatus: "aktif",
+      rank: "Pengatur",
+      gradeGroup: "II/c",
+      jtm: 0,
+    },
+    {
+      nik: "3201012002900012",
+      nuptk: null,
+      employeeCode: "3301",
+      fullName: "Siti Aminah, S.E.",
+      employmentType: "GTY",
+      certification: null,
+      userId: userMap["3301"],
+      positionId: posMap["BENDAHARA"],
+      gtkType: "tenaga_kependidikan",
+      gender: "P",
+      birthPlace: "Temanggung",
+      birthDate: "1990-02-20",
+      address: "Parakan, Temanggung",
+      phone: "081234567812",
+      email: "bendahara@manbaulhikmah.sch.id",
+      dutyStatus: "aktif",
+      rank: "Penata Muda",
+      gradeGroup: "III/a",
+      jtm: 0,
     },
   ];
 
@@ -392,6 +503,7 @@ async function seed() {
         .update(teachers)
         .set({
           nuptk: t.nuptk,
+          employeeCode: t.employeeCode,
           fullName: t.fullName,
           employmentType: t.employmentType,
           certification: t.certification,
@@ -405,6 +517,7 @@ async function seed() {
         .values({
           nik: t.nik,
           nuptk: t.nuptk,
+          employeeCode: t.employeeCode,
           fullName: t.fullName,
           employmentType: t.employmentType,
           certification: t.certification,
@@ -471,9 +584,9 @@ async function seed() {
   // 5. SEED CLASSROOMS
   console.log("5. Seeding Kelas / Rombel...");
   const classData = [
-    { name: "Kelas X", gradeLevel: 10, homeroomTeacherId: teacherIds[0] },
-    { name: "Kelas XI", gradeLevel: 11, homeroomTeacherId: teacherIds[1] },
-    { name: "Kelas XII", gradeLevel: 12, homeroomTeacherId: teacherIds[2] },
+    { name: "Kelas X", gradeLevel: 10, homeroomTeacherId: teacherIds[5] }, // 2601 (Waka Kurikulum / Wali Kelas X)
+    { name: "Kelas XI", gradeLevel: 11, homeroomTeacherId: teacherIds[1] }, // 2101 (Ustadzah Siti Rahmawati)
+    { name: "Kelas XII", gradeLevel: 12, homeroomTeacherId: teacherIds[2] }, // 2401 (Ustadz Muhammad Ridwan)
   ];
 
   const classroomIds: string[] = [];
@@ -485,6 +598,10 @@ async function seed() {
       .limit(1);
 
     if (existing.length > 0) {
+      await db
+        .update(classrooms)
+        .set({ homeroomTeacherId: c.homeroomTeacherId })
+        .where(eq(classrooms.id, existing[0].id));
       classroomIds.push(existing[0].id);
     } else {
       const [inserted] = await db
@@ -569,6 +686,7 @@ async function seed() {
     { code: "KIR-MULOK", name: "Karya Ilmiah Remaja / Riset", group: "Mulok", jpPerWeek: 2, phase: "E", isRequired: false },
   ];
 
+  const subjectIdMap: Record<string, string> = {};
   const subjectIds: string[] = [];
   for (const s of subjectList) {
     const existing = await db
@@ -579,6 +697,7 @@ async function seed() {
 
     if (existing.length > 0) {
       subjectIds.push(existing[0].id);
+      subjectIdMap[s.code] = existing[0].id;
     } else {
       const [inserted] = await db
         .insert(subjects)
@@ -592,6 +711,60 @@ async function seed() {
         })
         .returning({ id: subjects.id });
       subjectIds.push(inserted.id);
+      subjectIdMap[s.code] = inserted.id;
+    }
+  }
+
+  // 6b. SEED DELEGASI MAPEL GTK & EKSTRAKURIKULER
+  console.log("6b. Seeding Delegasi Guru Mapel & Pembina Ekstrakurikuler...");
+  await db.delete(teacherSubjectAssignments);
+  await db.insert(teacherSubjectAssignments).values([
+    // 2201: Guru Mapel Al-Qur'an Hadis & Matematika Kelas X
+    { academicYearId, semesterId, teacherId: teacherIds[4], classroomId: classroomIds[0], subjectId: subjectIdMap["QURDIS-10"] },
+    { academicYearId, semesterId, teacherId: teacherIds[4], classroomId: classroomIds[0], subjectId: subjectIdMap["MTK-10"] },
+    // 2101: Wali Kelas XI + Guru Mapel Fikih Kelas XI
+    { academicYearId, semesterId, teacherId: teacherIds[1], classroomId: classroomIds[1], subjectId: subjectIdMap["FIKIH-F"] },
+    // 2301: Guru Diniyah / Bahasa Arab Kelas X & XI
+    { academicYearId, semesterId, teacherId: teacherIds[3], classroomId: classroomIds[0], subjectId: subjectIdMap["BARAB-10"] },
+    { academicYearId, semesterId, teacherId: teacherIds[3], classroomId: classroomIds[1], subjectId: subjectIdMap["BARAB-F"] },
+    // 2601: Waka Kurikulum / Guru Informatika Kelas X
+    { academicYearId, semesterId, teacherId: teacherIds[5], classroomId: classroomIds[0], subjectId: subjectIdMap["INF-10"] },
+  ]);
+
+  const seedEkskulData = [
+    {
+      code: "EKS-PRAMUKA",
+      name: "Pramuka Penegak MA",
+      category: "kepanduan" as const,
+      scheduleDay: "Sabtu",
+      scheduleTime: "14:00 - 16:00",
+      venue: "Lapangan Utama Madrasah",
+      coachId: teacherIds[6], // 3101
+      coachName: "Dra. Fatimah Zahro, M.Pd.",
+      maxCapacity: 60,
+      isActive: true,
+    },
+    {
+      code: "EKS-PASKIBRA",
+      name: "Paskibra Manba'ul Hikmah",
+      category: "kepanduan" as const,
+      scheduleDay: "Jumat",
+      scheduleTime: "15:00 - 17:00",
+      venue: "Halaman Depan Madrasah",
+      coachId: teacherIds[6], // 3101
+      coachName: "Dra. Fatimah Zahro, M.Pd.",
+      maxCapacity: 40,
+      isActive: true,
+    },
+  ];
+  for (const eks of seedEkskulData) {
+    const existing = await db
+      .select({ id: extracurriculars.id })
+      .from(extracurriculars)
+      .where(eq(extracurriculars.code, eks.code))
+      .limit(1);
+    if (existing.length === 0) {
+      await db.insert(extracurriculars).values(eks);
     }
   }
 
@@ -992,10 +1165,10 @@ async function seed() {
       })
       .returning({ id: incomingLetters.id });
 
-    // Seed Disposisi Kepala Madrasah (user kamad)
-    const kamadUserId = userMap["kamad"] || userMap["admin"];
-    const tuUserId = userMap["tu"] || userMap["admin"];
-    const guruUserId = userMap["guru"] || userMap["admin"];
+    // Seed Disposisi Kepala Madrasah (kode 1201)
+    const kamadUserId = userMap["1201"] || userMap["1001"];
+    const tuUserId = userMap["1301"] || userMap["1001"];
+    const guruUserId = userMap["2201"] || userMap["1001"];
 
     if (kamadUserId) {
       await db.insert(dispositions).values([
@@ -1115,17 +1288,24 @@ async function seed() {
   }
 
   console.log("\n=======================================================");
-  console.log("✅ SEEDING BERHASIL! SEMUA DATA TERSIMPAN DI POSTGRESQL");
+  console.log("✅ SEEDING BERHASIL! AUTENTIKASI LAMA DIBERSIHKAN & DIGANTI");
   console.log("=======================================================");
-  console.log("Akun Pengguna yang Tersedia (Password semua akun: admin123):");
-  console.log("  1. Username: superadmin              (Role: Super Admin)");
-  console.log("  2. Username: admin                   (Role: Super Admin)");
-  console.log("  3. Username: admin@madrasah.sch.id   (Role: Super Admin)");
-  console.log("  4. Username: kamad                   (Role: Kepala Madrasah)");
-  console.log("  5. Username: tu                      (Role: Staf Tata Usaha)");
-  console.log("  6. Username: guru                    (Role: Guru Mata Pelajaran)");
-  console.log("  7. Username: walikelas               (Role: Wali Kelas)");
-  console.log("  8. Username: tahfidz                 (Role: Pembina Tahfidz)");
+  console.log("Akun Pengguna Baru (Username = Password = Kode 4 Digit Angka):");
+  console.log("  - 1001 : Super Admin");
+  console.log("  - 1101 : Operator Madrasah (Kelola Akun GTK & Enrolment)");
+  console.log("  - 1201 : Kepala Madrasah");
+  console.log("  - 1301 : Staf Tata Usaha");
+  console.log("  - 2101 : Wali Kelas XI (+ Guru Mapel Fikih XI)");
+  console.log("  - 2201 : Guru Mapel (Qur'an Hadis & Matematika Kelas X)");
+  console.log("  - 2301 : Guru Diniyah (Bahasa Arab Kelas X & XI)");
+  console.log("  - 2401 : Pembina Tahfidz (+ Wali Kelas XII)");
+  console.log("  - 2501 : Guru BK");
+  console.log("  - 2601 : Waka Kurikulum (+ Wali Kelas X & Mapel Informatika)");
+  console.log("  - 2701 : Waka Kesiswaan");
+  console.log("  - 2801 : Waka Sarpras");
+  console.log("  - 3101 : Pembina Ekstrakurikuler (Pramuka & Paskibra)");
+  console.log("  - 3201 : Musyrif Asrama");
+  console.log("  - 3301 : Bendahara (Kasir POS SPP)");
   console.log("=======================================================\n");
 
   await closeDb();

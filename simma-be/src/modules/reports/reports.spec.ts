@@ -21,6 +21,7 @@ import {
 } from "./reports.schema.js";
 import { buildApp } from "../../app.js";
 import { signAccessToken } from "../../core/auth/jwt.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import type {
   Student,
   Semester,
@@ -98,6 +99,7 @@ const mockTeacher: Teacher = {
   id: teacherId,
   userId: "66666666-6666-6666-6666-666666666666",
   positionId: null,
+  employeeCode: null,
   nik: "3201010202020002",
   nuptk: "1234567890123456",
   fullName: "Ust. Abdullah, M.Pd",
@@ -787,8 +789,20 @@ describe("Reports HTTP Endpoints & Auth Guards", () => {
         sub: "user-wali",
         username: "wali1",
         role: "wali_kelas",
+        teacherId,
       });
 
+      vi.spyOn(teacherScopeService, "getScopeForUser").mockResolvedValue({
+        teacherId,
+        homeroomClassroomIds: [classroomId],
+        subjectAssignments: [],
+        assignedClassroomIds: [classroomId],
+        extracurricularIds: [],
+        tahfidzClassroomIds: [classroomId],
+        mutabaahClassroomIds: [classroomId],
+        p5raClassroomIds: [classroomId],
+        p5raProjectIds: [],
+      });
       vi.spyOn(reportsRepository, "findClassroomById").mockResolvedValue({
         classroom: mockClassroom,
         homeroomTeacher: mockTeacher,
@@ -826,8 +840,20 @@ describe("Reports HTTP Endpoints & Auth Guards", () => {
         sub: "user-guru",
         username: "guru_mapel1",
         role: "guru_mapel",
+        teacherId,
       });
 
+      vi.spyOn(teacherScopeService, "getScopeForUser").mockResolvedValue({
+        teacherId,
+        homeroomClassroomIds: [],
+        subjectAssignments: [{ classroomId, subjectId: subjectId1 }],
+        assignedClassroomIds: [classroomId],
+        extracurricularIds: [],
+        tahfidzClassroomIds: [],
+        mutabaahClassroomIds: [],
+        p5raClassroomIds: [],
+        p5raProjectIds: [],
+      });
       vi.spyOn(reportsRepository, "findStudentById").mockResolvedValue(mockStudent);
       vi.spyOn(reportsRepository, "findSemesterWithAcademicYear").mockResolvedValue({
         semester: mockSemester,
@@ -873,8 +899,24 @@ describe("Reports HTTP Endpoints & Auth Guards", () => {
         sub: "user-wali",
         username: "wali1",
         role: "wali_kelas",
+        teacherId,
       });
 
+      vi.spyOn(teacherScopeService, "getScopeForUser").mockResolvedValue({
+        teacherId,
+        homeroomClassroomIds: [classroomId],
+        subjectAssignments: [],
+        assignedClassroomIds: [classroomId],
+        extracurricularIds: [],
+        tahfidzClassroomIds: [classroomId],
+        mutabaahClassroomIds: [classroomId],
+        p5raClassroomIds: [classroomId],
+        p5raProjectIds: [],
+      });
+      vi.spyOn(reportsRepository, "findStudentClassroom").mockResolvedValue({
+        classroom: mockClassroom,
+        homeroomTeacher: mockTeacher,
+      });
       vi.spyOn(reportsRepository, "findStudentById").mockResolvedValue(mockStudent);
       vi.spyOn(reportsRepository, "findSemesterWithAcademicYear").mockResolvedValue({
         semester: mockSemester,

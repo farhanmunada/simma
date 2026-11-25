@@ -7,4 +7,5 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post("/refresh", authController.refresh);
   fastify.post("/logout", authController.logout);
   fastify.get("/me", { preHandler: [authenticate] }, authController.getMe);
+  fastify.get("/my-scope", { preHandler: [authenticate] }, authController.getMyScope);
 };

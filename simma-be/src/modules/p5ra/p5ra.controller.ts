@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { z } from "zod";
 import { ValidationError } from "../../core/errors/index.js";
+import { teacherScopeService } from "../../core/auth/index.js";
 import { P5raService, p5raService } from "./p5ra.service.js";
 import { generateP5raReportPdf } from "./p5ra.pdf.js";
 import {
@@ -32,6 +33,17 @@ export class P5raController {
   listProjects = async (req: FastifyRequest, reply: FastifyReply) => {
     const query = parseData(P5raProjectQuerySchema, req.query);
     const data = await this.service.listProjects(query);
+    if (
+      !teacherScopeService.isPrivileged(req.user, [
+        "admin_tu",
+        "kepala_madrasah",
+        "waka_kurikulum",
+      ])
+    ) {
+      const scope = await teacherScopeService.getScopeForUser(req.user);
+      const filtered = data.filter((p: any) => scope.p5raProjectIds.includes(p.id));
+      return reply.status(200).send({ data: filtered, success: true });
+    }
     return reply.status(200).send({ data, success: true });
   };
 

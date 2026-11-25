@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
     REFRESH: "/auth/refresh",
     LOGOUT: "/auth/logout",
     ME: "/auth/me",
+    MY_SCOPE: "/auth/my-scope",
   },
   SETUP: {
     INSTITUTION: "/setup/institution",
@@ -163,8 +164,10 @@ export const API_ENDPOINTS = {
     WORKLOADS: "/teachers/workloads",
     WORKLOAD_UPSERT: "/teachers/workload",
     POSITIONS: "/teachers/positions",
+    NEXT_CODE: "/teachers/next-code",
     DETAIL: (id: string) => `/teachers/${id}`,
     UPDATE: (id: string) => `/teachers/${id}`,
+    RESET_PASSWORD: (id: string) => `/teachers/${id}/reset-password`,
     DELETE: (id: string) => `/teachers/${id}`,
     EDUCATIONS: (id: string) => `/teachers/${id}/educations`,
     EDUCATION_DELETE: (id: string, eduId: string) => `/teachers/${id}/educations/${eduId}`,

@@ -4,15 +4,25 @@ import { ClipboardCheck, Award, BookCheck } from "lucide-react";
 import { MutabaahDailyChecklistPage } from "./pages/MutabaahDailyChecklistPage";
 import { MutabaahCompliancePage } from "./pages/MutabaahCompliancePage";
 import { MutabaahActivitiesPage } from "./pages/MutabaahActivitiesPage";
+import { RouteRoleGuard } from "../auth";
+import { MODULE_ROLES } from "../../config/roles";
+import { useAuthStore } from "../../stores/auth.store";
 
 const tabs = [
   { name: "Checklist Harian", href: "/mutabaah/checklist", icon: ClipboardCheck },
   { name: "Monitoring & Rapor", href: "/mutabaah/compliance", icon: Award },
-  { name: "Katalog Amalan", href: "/mutabaah/activities", icon: BookCheck },
+  {
+    name: "Katalog Amalan",
+    href: "/mutabaah/activities",
+    icon: BookCheck,
+    roles: MODULE_ROLES.MUTABAAH_ACTIVITIES,
+  },
 ];
 
 export const MutabaahRoutes: React.FC = () => {
   const location = useLocation();
+  const hasRole = useAuthStore((s) => s.hasRole);
+  const visibleTabs = tabs.filter((tab) => !tab.roles || hasRole(tab.roles));
 
   const isTabActive = (tabHref: string) => {
     return location.pathname.startsWith(tabHref);
@@ -22,7 +32,7 @@ export const MutabaahRoutes: React.FC = () => {
     <div className="space-y-4">
       <div className="border-b border-slate-200">
         <nav className="-mb-px flex space-x-2 overflow-x-auto">
-          {tabs.map((tab) => {
+          {visibleTabs.map((tab) => {
             const Icon = tab.icon;
             const active = isTabActive(tab.href);
             return (
@@ -47,7 +57,14 @@ export const MutabaahRoutes: React.FC = () => {
         <Route index element={<Navigate to="checklist" replace />} />
         <Route path="checklist" element={<MutabaahDailyChecklistPage />} />
         <Route path="compliance" element={<MutabaahCompliancePage />} />
-        <Route path="activities" element={<MutabaahActivitiesPage />} />
+        <Route
+          path="activities"
+          element={
+            <RouteRoleGuard roles={MODULE_ROLES.MUTABAAH_ACTIVITIES}>
+              <MutabaahActivitiesPage />
+            </RouteRoleGuard>
+          }
+        />
         <Route path="*" element={<Navigate to="checklist" replace />} />
       </Routes>
     </div>

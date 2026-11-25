@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppLayout } from "./components/layout/AppLayout";
-import { LoginPage } from "./features/auth";
+import { LoginPage, RouteRoleGuard } from "./features/auth";
 import { useAuthStore } from "./stores/auth.store";
+import { MODULE_ROLES } from "./config/roles";
 import { SettingsRoutes } from "./features/settings";
 import { StudentsRoutes } from "./features/students";
 import { TahfidzRoutes } from "./features/tahfidz";
@@ -34,8 +35,13 @@ const queryClient = new QueryClient({
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const role = useAuthStore((s) => s.user?.role);
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  if (role === "calon_siswa") {
+    return <Navigate to="/ppdb" replace />;
   }
   return <>{children}</>;
 }
@@ -57,24 +63,78 @@ export function App() {
             }
           >
             <Route index element={<DashboardOverview />} />
-            <Route path="ppdb-admin/*" element={<PpdbRoutes />} />
-            <Route path="settings/*" element={<SettingsRoutes />} />
-            <Route path="students/*" element={<StudentsRoutes />} />
-            <Route path="tahfidz/*" element={<TahfidzRoutes />} />
-            <Route path="attendance/*" element={<AttendanceRoutes />} />
-            <Route path="mutabaah/*" element={<MutabaahRoutes />} />
-            <Route path="grades/*" element={<GradesRoutes />} />
-            <Route path="reports/*" element={<ReportsRoutes />} />
-            <Route path="letters/*" element={<LettersRoutes />} />
-            <Route path="p5ra/*" element={<P5raRoutes />} />
-            <Route path="teachers/*" element={<TeachersRoutes />} />
-            <Route path="finance/*" element={<FinanceRoutes />} />
-            <Route path="schedules/*" element={<SchedulesRoutes />} />
-            <Route path="discipline/*" element={<DisciplineRoutes />} />
-            <Route path="transfers" element={<TransfersPage />} />
-            <Route path="extracurricular" element={<ExtracurricularPage />} />
-            <Route path="emis" element={<EmisDashboardPage />} />
-            <Route path="facilities" element={<FacilitiesPage />} />
+            <Route
+              path="ppdb-admin/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.PPDB_ADMIN}><PpdbRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="settings/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.SETTINGS}><SettingsRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="students/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.STUDENTS}><StudentsRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="tahfidz/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.TAHFIDZ}><TahfidzRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="attendance/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.ATTENDANCE}><AttendanceRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="mutabaah/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.MUTABAAH}><MutabaahRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="grades/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.GRADES}><GradesRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="reports/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.REPORTS}><ReportsRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="letters/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.LETTERS}><LettersRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="p5ra/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.P5RA}><P5raRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="teachers/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.TEACHERS}><TeachersRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="finance/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.FINANCE}><FinanceRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="schedules/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.SCHEDULES}><SchedulesRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="discipline/*"
+              element={<RouteRoleGuard roles={MODULE_ROLES.DISCIPLINE}><DisciplineRoutes /></RouteRoleGuard>}
+            />
+            <Route
+              path="transfers"
+              element={<RouteRoleGuard roles={MODULE_ROLES.TRANSFERS}><TransfersPage /></RouteRoleGuard>}
+            />
+            <Route
+              path="extracurricular"
+              element={<RouteRoleGuard roles={MODULE_ROLES.EXTRACURRICULAR}><ExtracurricularPage /></RouteRoleGuard>}
+            />
+            <Route
+              path="emis"
+              element={<RouteRoleGuard roles={MODULE_ROLES.EMIS}><EmisDashboardPage /></RouteRoleGuard>}
+            />
+            <Route
+              path="facilities"
+              element={<RouteRoleGuard roles={MODULE_ROLES.FACILITIES}><FacilitiesPage /></RouteRoleGuard>}
+            />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
