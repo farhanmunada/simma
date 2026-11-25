@@ -98,14 +98,41 @@ docker-compose up -d
 # 3. Install deps (when pnpm resolves)
 pnpm install
 
-# 4. Migrate DB
+# 4. Migrate & Seed DB
 pnpm --filter simma-be run db:generate
 pnpm --filter simma-be run db:migrate
+pnpm --filter simma-be run db:seed
 
 # 5. Dev
 pnpm dev:be &   # Terminal 1
 pnpm dev:fe     # Terminal 2
 ```
+
+### Kredensial Login Internal GTK (Development / Seed)
+
+Setelah menjalankan `pnpm --filter simma-be run db:seed` (sumber: `simma-be/src/db/seed.ts`), sistem autentikasi baru menggunakan **Kode Unik 4 Digit Angka** (`2 digit gugus tugas + 2 digit nomor urut`) sebagai **Username dan Password awal**.
+
+> Guru dan Tenaga Kependidikan **tidak dapat mengubah password sendiri**; pembuatan akun, penerbitan kode, reset password, dan delegasi tugas (Wali Kelas / Guru Mapel / Pembina Ekskul) dikelola sepenuhnya oleh **Operator** melalui modul Kepegawaian GTK (`/teachers`).
+
+| Kode (Username & Password) | Role Utama (`users.role`) | Role Tambahan / Delegasi Tugas | Keterangan |
+|---|---|---|---|
+| `1001` | `super_admin` | — | Super Admin Sistem |
+| `1101` | `operator` | — | Operator Madrasah (Pengelola Akun & Kepegawaian GTK) |
+| `1201` | `kepala_madrasah` | — | Kepala Madrasah (Drs. H. Ahmad Fauzi, M.Pd.I) |
+| `1301` | `admin_tu` | — | Staf Tata Usaha (Bambang Triyono, S.Sos.) |
+| `2101` | `wali_kelas` | `guru_mapel` | Wali Kelas **Kelas XI** & Guru Mapel Fikih Kelas XI |
+| `2201` | `guru_mapel` | — | Guru Mapel Al-Qur'an Hadis **Kelas X** |
+| `2301` | `guru_diniyah` | — | Guru Diniyah / Bahasa Arab |
+| `2401` | `guru_tahfidz` | `wali_kelas` | Pembina Tahfidz & Wali Kelas **Kelas XII** |
+| `2501` | `guru_bk` | — | Guru Bimbingan Konseling (Layanan Konseling Privat) |
+| `2601` | `waka_kurikulum` | `wali_kelas`, `guru_mapel` | Waka Kurikulum, Wali Kelas **Kelas X**, & Guru Mapel Matematika |
+| `2701` | `waka_kesiswaan` | — | Waka Kesiswaan |
+| `2801` | `waka_sarpras` | — | Waka Sarana & Prasarana |
+| `3101` | `pembina_ekskul` | — | Pembina Ekskul **Pramuka** & **Paskibra** |
+| `3201` | `musyrif` | — | Musyrif / Pendamping Asrama |
+| `3301` | `bendahara` | — | Bendahara Madrasah (Kasir POS SPP) |
+
+> **Catatan:** Kredensial di atas hanya untuk environment development/testing lokal. Segera reset kode / nonaktifkan akun dummy sebelum deployment produksi.
 
 ---
 
