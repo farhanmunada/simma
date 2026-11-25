@@ -64,4 +64,16 @@ describe("PPDB Feature Module (Frontend)", () => {
     expect(typeof api.useEnrollApplicant).toBe("function");
     expect(typeof api.useDeleteApplicant).toBe("function");
   });
+
+  it("should expose PIPP Manbaul Hikmah defaults and modular landing components", async () => {
+    const shared = await import("@simma/shared");
+    const { PpdbPublicPortalPage } = await import("./components/PpdbPublicPortalPage");
+    const { PpdbPublicLandingSection } = await import("./components/PpdbPublicLandingSection");
+
+    expect(shared.DEFAULT_INSTITUTION_PUBLIC_PROFILE.name).toBe("PIPP Manba'ul Hikmah");
+    expect(shared.DEFAULT_INSTITUTION_PUBLIC_PROFILE.foundedYear).toBe("1998");
+    expect(shared.DEFAULT_INSTITUTION_PUBLIC_PROFILE.educationLevels.length).toBe(3);
+    expect(typeof PpdbPublicPortalPage).toBe("function");
+    expect(typeof PpdbPublicLandingSection).toBe("function");
+  });
 });

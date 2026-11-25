@@ -202,6 +202,30 @@ describe("PpdbService", () => {
       expect(result.buffer.toString("utf-8")).toContain("%PDF-1.4");
     });
   });
+
+  describe("getPublicInfo", () => {
+    it("should return public PPDB info with fallback PIPP Manbaul Hikmah profile", async () => {
+      const info = await service.getPublicInfo();
+      expect(info.academicYear).toBe("2024/2025");
+      expect(info.institution.name).toBe("PIPP Manba'ul Hikmah");
+      expect(info.institution.pengasuh).toBe("K. Nur Yasin");
+      expect(info.tracks.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it("should merge custom institution record from repository", async () => {
+      mockRepo.getPublicInstitution = vi.fn().mockResolvedValue({
+        name: "MA Manba'ul Hikmah Temanggung",
+        status: "swasta",
+        address: "Jl. Kebonsari, Wonoboyo, Temanggung",
+        logoPath: "/images/logo-manbaul-hikmah.png",
+        emisData: { pengasuh: "KH. Nur Yasin", foundedYear: "1998" },
+      });
+
+      const info = await service.getPublicInfo();
+      expect(info.institution.name).toBe("MA Manba'ul Hikmah Temanggung");
+      expect(info.institution.pengasuh).toBe("KH. Nur Yasin");
+    });
+  });
 });
 
 describe("PPDB Routes Integration", () => {

@@ -1,4 +1,6 @@
 import type {
+  InstitutionPublicProfile,
+  PpdbPublicInfo,
   PpdbStatus,
   PpdbSchoolType,
   PpdbMajor,
@@ -14,6 +16,8 @@ import type {
 } from "@simma/shared";
 
 export type {
+  InstitutionPublicProfile,
+  PpdbPublicInfo,
   PpdbStatus,
   PpdbSchoolType,
   PpdbMajor,
@@ -100,16 +104,4 @@ export interface PpdbStats {
   accepted: number;
   rejected: number;
   enrolled: number;
-}
-
-export interface PpdbPublicInfo {
-  academicYear: string;
-  academicYearId: string | null;
-  tracks: {
-    id: string;
-    name: string;
-  }[];
-  majors: string[];
-  isOpen: boolean;
-  totalApplicants: number;
 }

@@ -11,15 +11,17 @@ import {
   ConflictError,
   ValidationError,
 } from "../../core/errors/index.js";
-import type {
-  RegisterApplicantInput,
-  UpdateApplicantStatusInput,
-  ApplicantQueryParams,
-  CheckStatusQueryParams,
-  PpdbRegisterAccountInput,
-  PpdbLoginInput,
-  UpdateApplicantFormInput,
-  VerifyDocumentInput,
+import {
+  buildPublicInstitutionProfile,
+  type PpdbPublicInfo,
+  type RegisterApplicantInput,
+  type UpdateApplicantStatusInput,
+  type ApplicantQueryParams,
+  type CheckStatusQueryParams,
+  type PpdbRegisterAccountInput,
+  type PpdbLoginInput,
+  type UpdateApplicantFormInput,
+  type VerifyDocumentInput,
 } from "@simma/shared";
 import type {
   PpdbApplicant,
@@ -237,16 +239,36 @@ export class PpdbService {
     });
   }
 
-  async getPublicInfo(): Promise<{
-    activeAcademicYear: { id: string; name: string } | null;
-    openTracks: string[];
-    allowedMajors: string[];
-  }> {
+  async getPublicInfo(): Promise<PpdbPublicInfo> {
     const activeYear = await this.ppdbRepo.getActiveAcademicYear();
+    const institutionRecord =
+      typeof this.ppdbRepo.getPublicInstitution === "function"
+        ? await this.ppdbRepo.getPublicInstitution()
+        : null;
+    const stats =
+      typeof this.ppdbRepo.getStats === "function"
+        ? await this.ppdbRepo.getStats()
+        : null;
+
+    const tracks = [
+      { id: "reguler", name: "Jalur Reguler" },
+      { id: "prestasi", name: "Jalur Prestasi & Tahfidz" },
+      { id: "afirmasi", name: "Jalur Afirmasi (KIP/PKH)" },
+      { id: "perpindahan_ortu", name: "Jalur Perpindahan Orang Tua / Anak GTK" },
+    ];
+    const majors = ["MIPA", "IPS", "Keagamaan", "Umum"];
+
     return {
+      academicYear: activeYear?.name || "2026/2027",
+      academicYearId: activeYear?.id || null,
       activeAcademicYear: activeYear,
-      openTracks: ["reguler", "prestasi", "afirmasi"],
-      allowedMajors: ["MIPA", "IPS", "Keagamaan", "Bahasa", "Vokasi"],
+      tracks,
+      openTracks: tracks.map((t) => t.id),
+      majors,
+      allowedMajors: majors,
+      isOpen: true,
+      totalApplicants: stats?.total ?? 0,
+      institution: buildPublicInstitutionProfile(institutionRecord),
     };
   }
 

@@ -1,7 +1,8 @@
 import { eq, and, or, ilike, count, desc } from "drizzle-orm";
 import { getDb } from "../../core/database/client.js";
 import { ppdbApplicants, ppdbDocuments } from "../../db/schema/ppdb.js";
-import { academicYears } from "../../db/schema/setup.js";
+import { academicYears, institutions } from "../../db/schema/setup.js";
+import type { Institution } from "../../db/schema/setup.js";
 import { PpdbDocumentRepository } from "./ppdb-document.repository.js";
 import type {
   PpdbApplicant,
@@ -19,6 +20,12 @@ export class PpdbRepository {
       .from(academicYears)
       .where(eq(academicYears.isActive, true))
       .limit(1);
+    return row || null;
+  }
+
+  async getPublicInstitution(): Promise<Institution | null> {
+    const db = getDb();
+    const [row] = await db.select().from(institutions).limit(1);
     return row || null;
   }
 

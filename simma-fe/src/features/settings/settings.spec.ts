@@ -59,4 +59,14 @@ describe("Settings Feature Module", () => {
     expect(typeof AdminUserStep).toBe("function");
     expect(typeof SetupSummaryStep).toBe("function");
   });
+
+  it("should export InstitutionProfilePage and Pesantren profile form", async () => {
+    const { InstitutionProfilePage } = await import("./components/InstitutionProfilePage");
+    const { InstitutionPesantrenProfileForm } = await import(
+      "./components/profile/InstitutionPesantrenProfileForm"
+    );
+
+    expect(typeof InstitutionProfilePage).toBe("function");
+    expect(typeof InstitutionPesantrenProfileForm).toBe("function");
+  });
 });
